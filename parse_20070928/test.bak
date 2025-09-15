@@ -1,0 +1,9 @@
+program test;
+
+var i: integer;
+
+begin
+
+   i := 0
+
+end.

@@ -1,0 +1,21 @@
+program test(output);
+
+uses windows;
+
+var wb: array 1 of wchar;
+    r:  boolean;
+    l:  integer;
+    h:  integer;
+
+begin
+
+   writeln('Uncode output test program');
+
+   writeln('In ascii: ', chr($c9));
+   write('In unicode: ');
+   wb[1] := $c9;
+   h := sc_getstdhandle(sc_std_output_handle);
+   r := sc_writeconsolew(h, wb, l);
+   writeln;
+
+end.

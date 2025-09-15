@@ -1,0 +1,23 @@
+IP PASCAL INTEGER PROMOTIONS
+
+TYPE A     TYPE B      RESULT TYPE
+================================================================
+integer    integer     integer	   +---> The "identity" rules
+cardinal   cardinal    cardinal	   |
+linteger   linteger    linteger	   |
+lcardinal  lcardinal   lcardinal   |
+
+integer    cardinal    integer
+linteger   lcardinal   linteger
+linteger   cardinal    linteger
+integer    lcardinal   linteger
+
+Rules:
+
+1. Any operator with the same type on both sides is the same type.
+2. Any combination of integers and cardinals is an integer result.
+3. Any combination of long type with short type is a long type.
+
+Note that combining integer with lcardinal is the only combination
+that results in a type that is different from either input type.
+

@@ -1,0 +1,11 @@
+1999/01/15 "with" level interferes with "for" variable check.
+
+The fact that "with" nests the level was confusing the check for local
+variable in "parfor". Added "wthlvl" variable, this keeps track of the
+"with" nesting level. Since "with" is the only level change within a
+code block, that is subtracted from the "level" variable before check.
+
+1999/01/16 "with" level interferes with "goto" target check.
+
+As above, gotos that cross out of a "with" statement were erroneously
+tagged as external block references. Used with level to correct.

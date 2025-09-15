@@ -1,0 +1,220 @@
+/** ****************************************************************************
+
+Module debugio
+
+Description
+
+This module provides basic I/O for a VO kernel, directly to an IBM-PC MDA
+screen.
+
+Exports
+
+*******************************************************************************/
+
+/* declare dementions of a standard 25x80 MDA screen */
+
+const int maxx = 80; /* characters on line */
+const int maxy = 25;
+
+/** definition of single MDA character cell */
+
+typedef struct {
+
+    char          chr; /** character at cell */
+	unsigned char atr; /** attributes */
+
+} mdacell;
+
+/** MDA screen memory */
+
+extern mdacell screen[maxy, maxx];
+
+int curx, cury: integer; /* current cursor location */
+
+/** ****************************************************************************
+
+Function clrscn
+
+Description
+
+Clears the MDA screen and homes the cursor .
+
+Returns
+
+None
+
+*******************************************************************************/
+
+void clrscn(void)
+
+{
+
+    /* screen indexes */ int x, y; 
+
+    for (y = 0; y < maxy; y++) {
+
+        for (x = 0; x < maxx; x++) {
+
+            screen[y, x].chr = ' '; /* clear to spaces */
+            screen[y, x].atr = 0;   /* place "black" attribute */
+
+        }
+
+    }
+    curx = 1; /* set cursor to upper left hand corner */
+    cury = 1
+
+}
+
+/** ****************************************************************************
+
+Function scrollup
+
+Description
+
+Scroll the MDA screen up one line.
+
+Returns
+
+None
+
+*******************************************************************************/
+
+void scrollup(void)
+
+
+{
+
+    /* screen indexes */ int x, y; 
+
+    for (y = 0; y < maxy; y++) {
+
+        for (x = 0; x < maxx; x++) {
+
+            screen[y, x].chr = screen[y+1, x].chr; /* copy character */
+            screen[y, x].atr = screen[y+1, x].atr /* copy attribute */
+
+        }
+
+    }
+    /* now clear the last line */
+    for (x = 0; x < maxx; x++) {
+
+        screen[maxy, x].chr = ' '; /* clear to spaces */
+        screen[maxy, x].atr = 0;   /* place "black" attribute */
+
+    }
+
+}
+
+/** ****************************************************************************
+
+Function wrtchr
+
+Description
+
+Write character to cursor. Performs new line and carriage return processing.
+
+Returns
+
+None
+
+*******************************************************************************/
+
+void wrtchr(char c)
+
+{
+
+    screen[cury, curx].chr = c;
+    screen[cury, curx].atr = 7; /* place "white" attribute */
+    curx = curx+1; /* advance cursor */
+    if curx > maxx then { /* next line */
+
+        curx = 1; /* reset to start of line */
+        if cury <= maxy then /* not on last line */
+            cury = cury+1 /* next line */
+        else 
+            scrollup /* create new line by scrolling */
+
+    }
+
+}
+
+/** ****************************************************************************
+
+Function wrtchr
+
+Description
+
+Write string to cursor.
+
+Returns
+
+None
+
+*******************************************************************************/
+
+void wrtstr(char s[])
+
+
+{
+
+    int i;
+
+    while (s[i]) {
+
+       screen[cury, curx].chr = s[i];
+       screen[cury, curx].atr = 7; /* place "white" attribute */
+	   i++; /* next string character */
+       curx++; /* advance cursor */
+
+    }
+
+}
+
+/** ****************************************************************************
+
+Function gotoxy
+
+Description
+
+Go to cursor location.
+
+Returns
+
+None
+
+*******************************************************************************/
+
+void gotoxy(in x, y)
+
+{
+
+   curx = x; /* place new cursor coordinates */
+   cury = y
+
+}
+   
+/** ****************************************************************************
+
+Function init_debugio
+
+Description
+
+Initializes the debug I/O package.
+
+Returns
+
+None
+
+*******************************************************************************/
+
+void init_debugio(void)
+
+{
+
+   /* clear screen and home cursor */
+
+   clrscn
+
+}

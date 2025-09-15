@@ -1,0 +1,30 @@
+program test;
+
+type string = packed array of char;
+     pstring = ^string;
+
+var s: pstring;
+    sp: packed array [1..100] of char;
+
+procedure nums(var s: string; n: integer; r: integer); begin end;
+
+overload function nums(n: integer; f: integer; r: integer): pstring;
+
+var s: pstring;
+
+begin
+
+   nums := s
+   
+end;
+
+function ints(i: integer; f: integer): pstring;
+
+begin
+
+   ints := nums(i, f, 10)
+   
+end;
+
+begin
+end.

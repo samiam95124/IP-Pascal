@@ -1,0 +1,496 @@
+********************************************************************************
+
+                 IBM-PC IP PASCAL STANDALONE/EMBEDDED PLATFORM
+
+                         Copyright (C) 2008 S. A. Moore
+
+********************************************************************************
+
+Implements a standalone platform for the IBM-PC "to the metal". IP Pascal has a
+flexible series of standard modules that define its I/O platform, cumulating 
+with the syslib module, that implements a serial I/O platform.
+
+Most people are familar with the IBM-PC as a desktop platform. However, it also
+makes a excellent embedded programming platform. Because many of todays embedded
+x86 compatible chips for embedded and other uses feature a built in 
+"south bridge" and "super I/O", interface, which implements most of the common
+PC based hardware interfaces, all that such a platform needs is a BIOS to form
+a hardware system that follows IBM-PC standards.
+
+Not only does this create an embedded target system able to emulate most of an
+IBM-PC, but it also allows the embedded program to be developed on a standard
+IBM-PC desktop computer.
+
+Programs prepared for the embedded platform appear similar to an OS based
+program. The are linked with serlib at the start, then a series of modules,
+ended by a cap cell. However, the loading of a program is done by creating a
+disk image, which then is booted on the target platform.
+
+The debugging of programs is carried out almost exclusively under the bochs
+system, which emulates an advanced IBMPC that we can run on.
+
+STRUCTURE OF SERLIB
+
+The primary difference between an OS based serlib and a standalone image is
+that the components under syslib resemble a full operating system. A full
+device multiplexer and series of hardware interface packages exist, then syslib
+brings them together in the familar interface for IP Pascal programs.
+
+Serlib has the following components, in low to high order:
+
+startup.asm - Startup code and direct machine equates (like the MDA screen)
+memman.asm  - Contains the dynamic memory allocation and deallocation
+devcal.asm  - Contains a pointer table interface for device drivers
+devreg.pas  - The device registry, contains an interface to place devices active
+              in the system,  and track them in a list.
+devmda.pas  - The MDA black and white character screen interface, with direct
+              keyboard interface.
+devlog.pas  - Registers several logical I/O devices, such as _input, _output, 
+              etc.
+syslib.pas  - Presents the syslib interface.
+paslib      - The usual Pascal support library. This is the same one we run for
+              all systems.
+
+LAYOUT OF AN EMBEDDED PROGRAM
+
+Embedded programs are full 32 bit, run in unmanaged physical space on the 
+target, and use a special loader that both loads them and places them in memory.
+There is no limit to where a program can be loaded, or how long it is, but the
+existence of the original IBM-PC hardware I/O area at $a0000 effectively divides
+the memory space such that you must choose two TPA areas to run in.
+
+Area     Range                  Stack top
+===============================================================
+TPA 1    $00001000-$0009ffff    $a0000
+TPA 2    $00100000-$ffffffff    $00000000 (wrapped to top)
+
+For TPA 1, the low bound is dictated by the location of bios special variables,
+the CPU vector table, the location of the bootstrap during load, and various
+data areas used by the bootstrap. The high bound of TPA 1 is the bottom of the
+hardware area.
+
+For TPA 2, the low bound is dictated by the top of the hardware area, to the end
+of memory. Although shown as the full 32 bit address space, the actual end is
+dictated by the hardware, since the BIOS can reduce the real memory size by
+relocating hardware windows to the highest addresses. In addition, there may not
+be that much memory actually stuffed in the system. There is a special BIOS
+address that gives the true top of memory, see an IBM-PC reference.
+
+The target program must be located and sized for one of the TPAs. Assuming that
+the program is linear, one of the TPA is going to be used, with the other
+wasted. With that idea, the bootstrap loader is designed to load to TPA 1 only.
+The access to TPA 2 is done by a second stage loader that runs in 32 bit mode.
+
+Because the embedded program runs in 32 bit mode, it must implement direct 
+hardware operation code to access features of the IBM-PC.
+
+The layout of the program in either TPA 1 or TPA 2 is as follows:
+
+Section
+============================================
+Program code (_pstr)
+Fixed (global) variables (_pend and _vstr)
+Heap start (_vend)
+Heap end
+--------
+Stack bottom
+Stack top
+
+This is the standard layout for IP Pascal programs.
+
+STRUCTURE OF THE EMBEDDED SUPPORT SYSTEM
+
+The support system that makes up serlib can be considered as a small, real time
+operating system. It has the following sections:
+
+Section
+============================================
+Initialization
+Fixed device support area
+Device registry
+Devices
+Logical device creation
+Syslib
+
+Each of these will be discussed in turn.
+
+Initialization
+
+Performs general initalization required to start the image. On the IBM-PC, the
+non-devivce specific initialzatin is minimal, and consists of making sure the
+direction flag is clear, and that the FPU control word is set.
+
+The initialzation module also defines a series of hardware locations so that 
+they can be directly used from Pascal code. These are defined in startup.asm,
+and declared in startup.pas.
+
+Fixed device support area
+
+Devices or hardware features that don't participate in the driver multiplexer
+are here. This includes dynamic memory allocation, things like the real time
+clock, PCI interface routines, etc.
+
+Device registry
+
+The device registry system maintains a list of driver entries that allow a 
+device to be selected by name. Each device entry is represented by a series
+of vectors to handle standard functions, such as read, write, length, etc.
+
+When a device enters the registry, it calls devreg.pas to create a device entry,
+then places vectors to its internal versions of the required functions into the
+device control block, using devreg routines to form the pointers.
+
+Devices
+
+In this area, each of the actual I/O devices are represented. For example, the
+console I/O can be defined by the MDA character screen and a keyboard. The disk
+I/O can be performed by the ATA interface, etc.
+
+Each device places itself in the registry, with a unique name, during its 
+startup.
+
+Logical device creation
+
+Besides the actual physical devices, there exist a series of logical I/O names
+that IP Pascal programs use:
+
+_input   
+_output  
+_error   
+_list    
+_command 
+         
+These are assigned to real devices in the logical device creation step. 
+Basically, devlog simply creates a series of device blocks, then copies the 
+vectors to them from an existing, real device block. Then, I/O to the logical
+device is directed to the physical device.
+
+Syslib
+
+The syslib step unites the separate packages into the standard IP Pascal lowest
+level support used with any other operating system. Because syslib contains all
+of the basic IP Pascal support, everything from here up looks just like a 
+standard IP Pascal image. In fact, a 80386 Pascal program that uses standard I/O
+procedures can be simply linked to create an embedded binary, no recompliation.
+
+The embedded version of syslib is different from OS based syslibs in that it, 
+too, is a logical abstraction layer. In fact, all embedded systems will use the
+same syslib. It calls lower level modules to get actual work done, and has no
+implementation dependent code within it.
+
+BOOTSTRAP IMAGES AND FILE SYSTEMS
+
+IBM-PC embedded programs don't load under an operating system, so they are 
+designed to directly boot up from the disc. The standard file format used for
+this is the VO file system, borrowed from the VO project. Basically, it is a
+progressive index system that varies its indexing level dependent on the size
+of a file. It is very efficient in terms of management overhead, and has a
+recursive structure that makes code to run it very simple and logical.
+
+To run an embedded program, an image of the file system for the target hardware
+is created. This is a direct, one for one, block by block image of the bootstrap
+device that is to be used on the target.
+
+The boot device can be one of several devices:
+
+Floppy disc
+Hard disc
+CD-ROM
+USB key
+PCI card
+Flash card
+
+The image that is created to run on the target is not dependent on the boot 
+device format except that the block size matches the block size of the target
+device. The formatting of the image is according to the VO filesystem, which
+can work in any reasonable block size.
+
+The boot image is created by the program creatimg.exe. It takes bootstrap image,
+along with a series of files from the host file system, and creates a ready to
+boot image.
+
+A boot image need not be the size of the entire boot device. By convention,
+if the image is shorter than the boot device, then the data in the image is 
+loaded to the start of the device and written consequtively until the end of the
+image file. There is no requirement to initialize or write to the space after
+the image on the boot device, the VO file format treats this space as 
+uninitialized. Short image files take less space and are faster to create and
+copy to the boot device. However, there is a option to create a full length
+image file if that is required.
+
+The final step is to take the boot device image and copy it to the final boot
+device for the target. Using the bochs emulator, this can be done by simply
+copying the image to the name bochs expects to find its device image in, since
+bochs uses a plain format for its device images just as creatimg does. Bochs can
+also use partial volume files.
+
+For non-simulated target devices there are a series of programs designed to
+transfer image files to the target device:
+
+writeata   - Writes an image to an ATA device
+writefpy   - Writes an image to a floppy
+writecdrom - Writes an image to a CD-ROM
+
+etc.
+
+You may need to create a program specifically to transfer an image to your
+particular boot device.
+
+USING CREATIMG
+
+Creatimag uses the file image.fmt to tell it how to construct a VO filesystem
+image. It takes a description of the boot device, how to layout any special VO
+formatting options, how and if to place system special files, and any number of
+files that you want to place into the target file system as program, data or
+any other type of file.
+
+The commands creatimg will execute are:
+
+! comment                                                                   
+                                                                            
+Creates a comment. Can be placed on any line alone or after a command.      
+Ignores the rest of the line.                                               
+                                                                            
+volsize <size>                                                              
+                                                                            
+Defines the size of the volume to be created.                               
+                                                                            
+bootsize <block>                                                            
+                                                                            
+Gives the offset of the directory prime block. Defaults to 1.               
+                                                                            
+bootfile <file>                                                             
+                                                                            
+Gives the bootstrap file. This must fit within the number of blocks defined 
+by bootsize. This defaults to no boot block, which means that the boot      
+block is filled with zeros. Alternatively, if the volume is not to be       
+bootable, a specific filler block or a stub booter can be created, such     
+that an error is output.                                                    
+                                                                            
+blocksize <length>                                                          
+                                                                            
+Gives the size of blocks on the target volume.                              
+                                                                            
+reverseindex                                                                
+                                                                            
+Reverses the index under file order so that the index appears after the     
+file. Normally the index for the file appears before it. This is optimal    
+access/caching speed, so that the index can be loaded into a cache before   
+the file data that is to be accessed. However, if the file is placed first, 
+the boot file naturally has the characteristic that it is linear and can be 
+found easily by skipping the directory block and using the simple length    
+of the file to load it (assuming a fixed length prime directory). This      
+option can greatly simplify booting for systems that have trouble fitting   
+into a single boot block.                                                   
+                                                                            
+rootfile <file>                                                             
+                                                                            
+Places a file into the root directory, in the order given. Any number of    
+root files can be specified.                                                
+                                                                            
+systemfile <file>                                                           
+                                                                            
+Places a file into the "boot" file in the root directory. This is the       
+second level bootstrap, and usually contains the entire system to be        
+booted. The name of the file will be changed to whatever is given. Note     
+that the default name for the boot file is simply "boot". The bootstrap     
+file is not to be confused with the first level bootstrap above.            
+Note that the default is to create an entry called "boot" that has no       
+length, which effectively disables second level bootstrapping.              
+                                                                            
+fillvolume                                                                  
+                                                                            
+Fills the unallocated space on a volume image with zeros. After all of the  
+files, freespace and other data is placed in the volume, the rest of the    
+indicated space will be filled out with zero. The default is to end the     
+volume after the required data has been placed on the volume. It can be     
+impractical to completely fill out a very large volume, say, gigabytes.     
+But it may make sense, and even be required, for smaller volumes. Note that 
+many systems can take partial volumes, including the Bochs simulator.       
+                                                                            
+outputfile <file>                                                           
+                                                                            
+Sets the output filename. The default is "volume.img".                      
+
+Please see also the file "vofile.doc", which is a word document describing the
+VO file format.
+
+A sample format file, for a floppy disc boot is:
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                                              !
+!                      CREATE BOOTABLE TEST IMAGE FOR FLOPPY                   !
+!                                                                              !
+! Creates a basic boot image for an IBM-PC. An IBM-PC 1.44MB 3 1/4" floppy     !
+! image is created with a bootstrap to 32 bits and the test program is         !
+! restricted to the first 640kb. Doing this simplifies the bootstrap, because  !
+! it does not have to manipulate large addresses during the 16 bit BIOS boot   !
+! phase.                                                                       !
+!                                                                              !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!
+! IBM-PC 3 1/4 floppy is 2880 sectors, double sided, with a sector 0 boot
+! to $7c00 in memory (with an implied program destination of $8000).
+!
+volsize    1474560     ! 1.44MB
+blocksize  512         ! pretty much everything on the PC is 512, like Unix
+bootsize   1           ! the usual single sector boot
+bootfile   fpyboot.bin ! floppy boot image
+systemfile test.bin    ! only a single bootable image is needed
+outputfile a.img       ! generate bochs compatible image
+
+CREATING A BOOTSTRAP
+
+The primary bootstrap for any volume is a short assembly language program placed
+as the first block on the boot volume. The bootstrap is device dependent, and 
+must be custom written for each device that is to be bootstrapped from.
+
+Although the VO filesystem allows multiblock bootstraps, this feature is not 
+used for existing IBM-PC bootstraps, and the entire boot fits within a block.
+The bootstrap directly accesses and loads the target program from the VO 
+filesystem. The target file is a normal file, and can be scattered around the
+target device as any other file can. There is no requirement to specially 
+allocate it at the start of the volume, or limit its size, etc.
+
+The bootstrap file is a normal assembly file, and it is loaded to $7c00 on the
+IBM-PC. To maximize the size of TPA 1, it relocates itself to $600, just above
+the BIOS reserved area. You can find a typical bootstrap source file in 
+"fpyboot.asm".
+
+The bootstrap program must be fully resolved by the linker as a final step.
+The .obj file then represents the final binary used to create the boot block.
+
+The final step is performed by the utility creatfpy, which is run as:
+
+creatfpy <infile> <outfile>
+
+It takes any size of input from 1 to 510 bytes and creates a 512 byte block as
+a result. It takes care of padding the boot image out to a full block with 
+zeros. It also places the $55,$aa sequence at the end of the boot block to make
+the sector bootable on an IBM-PC. The BIOS checks for this signature at the end
+of the sector.
+
+This final boot block binary is then incorporated into the full boot image by
+createimg.
+
+DEBUGGING AN IMAGE
+
+An embedded image stack can be debugged on the target system, and this would be
+a final step in any case. However, we highly recommend the use of Bochs as a
+primary step to check out your boot image. Bochs is a very advanced IBM-PC
+simulator that completely emulates the different modes of the x86 CPU, such as
+16 bit real, 16 bit "unreal", 32 bit flat, and 32 bit memory managed modes,
+along with most IBM-PC peripherals. It is capable of running full modern 
+operating systems such as Windows, Linux and others.
+
+The use of Bochs will allow you to try out your boot image without the fear that
+it will crash and erase the disk on the target, which is real possibility for a
+low level embedded program. It also allows you to simply load the program under
+the same operating system you are using to develop on.
+
+It is possible to also use Bochs as a full emulation device for your final
+product. For this use you may need to compile and run your own customized copy
+of the Bochs system. Please see the Bochs web site for more details.
+
+To use Bochs, you install a Bochs binary using the instructions from the web 
+site. You will want the debugging version of Bochs NOT the normal distribution
+Bochs, since you will be debugging your program. The debugging version features
+a built in commmand line debugger for the target program.
+
+Once you get Bochs set up on your system, you will create a Bochs run 
+instruction file in your target development directory. Here is a sample file:
+
+Contents of "bochsrc" file:
+
+megs: 32
+romimage: file=$BXSHARE/BIOS-bochs-latest, address=0xf0000
+vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
+vga: extension=vbe
+floppya: 1_44=a.img, status=inserted
+boot: a
+log: bochsout.txt
+mouse: enabled=0
+ips: 15000000
+vga_update_interval: 150000
+
+This enables Bochs to boot from a floppy drive image which is represented as 
+"a.img" in the target directory.
+
+After this, you simply need to place the Bochs directory on your program path,
+then execute "bochsdbg" to start debugging the target image. Please see
+the Bochs website for more details.
+
+http://bochs.sourceforge.net/
+
+Debugging direct to target
+
+Debugging direct on the target embedded platform is more of a challenge, but it
+is not overly difficult. If you have got the basic image running and producing
+printout in Bochs, you can usually transistion over to the target system and use
+printouts to debug the final system.
+
+Typically, you get your embedded program to the target by writing the boot image
+to the media you wish to load from on the host/development IBM-PC, then transfer
+the floppy, flash or similar device to the target system and boot it.
+
+If you need the space, even a hard disc can be treated as a removable device. A
+valuable addition is a set of hard disc "carriers" such that allows you to swap
+out the hard drive much as you would unlock and slide out a tray. I have 
+personally not had good luck with the ATA version of this system, apparently
+because ATA is less tolerant of the interconnection plugs needed. However SATA
+(Serial ATA) should be a more tolerant system to use with trays.
+
+Debugging using a target OS
+
+It is certainly possible to use an OS on the target system to achieve a better
+target environment. This can be an old version of DOS, or a modern equivalent 
+such as FreeDOS or similar.
+
+The principle issue with this solution is that DOS never achieved an acceptable
+runtime environment for 32 bit programs. It only knows how to load and run 16
+bit programs, and if more modern systems have the ability to run 32 bit 
+programs, they will do it in a unique and non-standard way.
+
+It is certainly easy to place a mode switching shim at the front of your code to
+flip it into 32 bit mode. However, this negates the ability to debug it on most
+systems, which would have been the primary advantage of such a system.
+
+There are better systems becoming avialable such as FreeDOS-32, and I'll be 
+looking more at these systems as time permits. Also, the plan is to put forth
+a debugger running on IP that can be transferred to the target and used there.
+
+EMBEDDED WORKING METHODOLOGIES
+
+One of the principle advantages of running embedded is that you get full access
+to the target hardware from your program. The other would be that running 
+without an operating system creates a small footprint binary and very 
+predictable operation.
+
+On many or even most embedded projects, the standard I/O provided with the 
+programming language is simply discarded, and the programmer uses custom I/O
+statements. IP Pascal can also use this mode if you like. In this case you would
+just write your own initialization and support routines, and avoid any use of
+the standard I/O procedures and functions Pascal provides.
+
+However, I believe it makes more sense to implement the basic I/O stack using
+the system provided here. This means you can use all of the standard Pascal
+statements to peform debugging and use in your program, and then go ahead and
+bypass the stack to perform your own direct hardware I/O as required. The full
+source to the implementation stack is provided, and in most cases you will be
+able to use the standard device code we have provided.
+
+The hardware access for your target program is going to be divided into two
+classes, using formal APIs, and direct access from the program itself. We have
+given you an area in the standard stack structure to place API modules, the
+"fixed device support" covered above. Using this methodology, you create a 
+device operation module, link it into the runtime stack, then call it via the 
+API calls it exposes.
+
+In the second method, direct access from the program, you would define the 
+locations of hardware structures in memory via an assembly language file, then
+define its structure in Pascal via a Pascal source file. We have done the same
+thing to access perhiperals in the IBM-PC environment. It takes the form:
+
+hardware.asm - Contains the hardware address base equates
+hardware.pas - Contains the definition of structures to be used.

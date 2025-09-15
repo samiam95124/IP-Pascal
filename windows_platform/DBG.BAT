@@ -1,0 +1,1 @@
+\wintool\windbg test.exe

@@ -1,0 +1,30 @@
+
+Code module linker vs. 1.13.02 Copyright (C) 2005 S. A. Moore
+
+Processing fpyboot.sym
+Processing fpyboot.obj
+
+Symbols listing in value acending order:
+
+prtpass     00000000 ...d.  codsel      00000008 a..dc  
+datsel      00000010 a..dc  blocksego   00000020 ...d.  
+indexblock  00000100 ...d.  blocksize   00000200 ...d.  
+bootrel     00000600 ...d.  start       00000600 a..d.  
+_pstr       00000600 a.gd.  primeboot   0000063E a..d.  
+reloc       00000661 a..d.  bootfail    000006A0 a..d.  
+bootpass    000006A8 a..d.  go32bit     000006BE a..d.  
+goclient    000006D1 a..d.  loadblock   000006D8 a..d.  
+loadblock01 00000700 a..d.  loadblock02 0000071B a..d.  
+loadblock03 0000072C a..d.  loadblock04 00000734 a..d.  
+readblock   00000739 a..d.  prtmsg      0000075D a..d.  
+prtmsg01    00000760 a..d.  prtmsg02    00000772 a..d.  
+loaderrmsg  00000776 a..d.  gdtr        00000798 a..d.  
+gdt         0000079E a..d.  gdt_end     000007B6 a..d.  
+progadr     000007B6 a..d.  progseg     000007B8 a..d.  
+buffadr     000007BA a..d.  buffseg     000007BC a..d.  
+_pend       000007BE a.gd.  _vend       000007BE .vgd.  
+_vstr       000007BE .vgd.  bufferloc   00000800 ...d.  
+programloc  00001000 ...d.  smallstack  00001000 ...d.  
+bootloc     00007C00 ...d.  bigstack    000A0000 ...d.  
+
+Function complete

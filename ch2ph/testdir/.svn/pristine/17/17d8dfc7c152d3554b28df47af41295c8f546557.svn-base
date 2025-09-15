@@ -1,0 +1,5 @@
+pointervar         
+constcharptrstring 
+charptrstring
+clone myfunc myfunc_biteme
+chparam myfunc_biteme 1 "i: char" ""

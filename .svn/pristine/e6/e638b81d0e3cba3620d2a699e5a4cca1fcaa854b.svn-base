@@ -1,0 +1,670 @@
+                              PASCAL-S INSTRUCTION CATALOG
+
+CONTENTS =======================================================================
+
+Contains the instruction format for Pascal-S internal instructions. Pascal-S has
+64 possible instructions, labled 0 to 63. Each instruction is of the format:
+
+f	The instruction code
+x	1st operand
+y   2nd operand
+
+Each instruction either gets immediate operands from its instruction x or y
+constants, or operates on the stack. The stack is a pushup stack of variant
+records. Each location can contain an integer, real, boolean or character
+value. The stack contains all expression temporary values, as well as all
+the locals and globals for the program.
+
+The instruction numbers are grouped according to the number of parameters:
+
+0-3:   Instruction uses both x and y parameters.
+4-30:  Instruction uses y parameter.
+31-63: Instruction does not have parameters.
+
+Instruction 36, normally a "no parameter" instruction, takes a single y 
+parameter, and breaks Wirth's original rule. This was required to fix a 
+portability problem.
+
+This document is not meant to be a complete description of Pascal-S. See
+"Pascal-s: A Subset and its Implementation" by N. Wirth, for an overall
+description of Pascal-S, its language, and interpretation.
+
+INSTRUCTION QUICK REFERENCE ====================================================
+
+0  Load address, x = Display index, y = Offset addr
+1  Load value, x = Display index, y = Offset addr
+2  load indirect, x = Display index, y = Offset addr
+3  update display, x = Display update start addr, y = Display update end addr
+8  Built in functions, x = Function code
+9  Offset, y = Offset
+10 Jump, y = Addr
+11 Conditional jump, y = Addr
+12 Switch
+14 Forlup
+15 For2up
+16 For1down
+17 For2down
+18 Mark stack
+19 Call
+20 Index
+21 Index
+22 Load block
+23 Copy block
+24 Literal
+25 Load real
+26 Float
+27 Read
+28 Write string
+29 Write with default field
+30 Write with field
+31 Halt
+32 Exit procedure
+33 Exit function
+34 Fetch indirect
+35 Not
+36 Negate
+37 Write real with field and fraction
+38 Store to stack
+39 Real equal
+40 Real unequal
+41 Real less than
+42 Real less than or equal
+43 Real greater than
+44 Real greater or equal
+45 Integer equal
+46 Integer not equal
+47 Integer less than
+48 Integer less than or equal
+49 Integer greater than
+50 Integer greater or equal
+51 Boolean 'or'
+52 Integer add
+53 Integer subtract
+54 Real add
+55 Real subtract
+56 Boolean 'and'
+57 Integer multiply
+58 Integer divide
+59 Integer modulo
+60 Real multiply
+61 Real divide
+62 Read end of line
+63 Write end of line
+
+INSTRUCTION DETAILS ============================================================
+
+0  Load address
+
+x: Display index
+y: Offset address
+
+Loads an address for a stack variable by adding the value for the display
+indicated by the index y to the offset address y. The result is a stack address
+as a new top of stack.
+
+1  Load value
+
+x: Display index
+y: Offset address
+
+Loads the stack variable by adding the value for the display indicated by the
+index y to the offset address y, and fetching the value at that address. The
+result is a stack value as a new top of stack.
+
+2  load indirect
+
+x: Display index
+y: Offset address
+
+Loads the stack variable by adding the value for the display indicated by the
+index y to the offset address y, and fetching the integer value at that address,
+then fetching the stack value at that address. The result is a stack value as a
+new top of stack.
+
+3  update display
+
+x: Display update start address
+y: Display update end address
+
+Updates a block of display values between the start address and the end address
+plus one. The display is a set of block mark pointers in an array for quick
+reference during execution. Block pointers are collected from the stack, 
+starting with the currently active block mark, climbing the static links in
+the block stack, until the indicated number of display entries are updated.
+
+8  Built in functions
+
+x: Function instruction code
+y: Unused
+
+Executes a built in function, by an "extended code" in y. The y codes are:
+
+   0: abs of integer
+
+      The absolute value of the integer at stack top replaces the top of stack.
+
+   1: abs of real
+
+      The absolute value of the real at stack top replaces the top of stack.
+
+   2: sqr of integer
+
+      The square of the integer at stack top replaces the top of stack.
+
+   3: sqr of real
+
+      The square of the real at stack top replaces the top of stack.
+
+   4: odd integer
+
+      The odd or even status of the integer at stack top replaces the top
+	  of stack as a boolean.
+
+   5: chr of integer
+
+      The integer at stack top is converted to its character equivalent, and
+	  that replaces the stack top as character.
+
+   6: ord of character
+
+      The character at stack top is converted to its integer equivalent, and
+	  that replaces the stack top as integer.
+
+   7: succ of character
+
+      The successor of the character at stack top is replaces the stack top as
+	  character.
+
+   8: pred of character
+
+      The predecessor of the character at stack top is replaces the stack top as
+	  character.
+
+   9: round of real
+
+      The real at stack top is rounded to its integer equivalent, and that
+      replaces the stack top as integer.
+      
+   10: trunc
+
+      The real at stack top is truncated to its integer equivalent, and that
+      replaces the stack top as integer.
+
+   11: sin
+
+      The sine of the real at stack top is replaces the stack top as real.
+
+   12: cos
+
+      The cosine of the real at stack top is replaces the stack top as real.
+
+   13: exp
+
+      The exponential of the real at stack top is replaces the stack top as 
+      real.
+
+   14: ln
+
+      The natural logarithm of the real at stack top is replaces the stack top
+      as real.
+
+   15: sqrt
+
+      The square root of the real at stack top is replaces the stack top as
+      real.
+     
+   16: arctan
+
+      The arctangent of the real at stack top is replaces the stack top as real.
+
+   17: eof
+
+      The eof status of the "input" file replaces the stack top as boolean.
+
+   18: eoln
+
+      The eoln status of the "input" file replaces the stack top as boolean.
+
+9  Offset
+ 
+x: Unused
+y: Offset
+
+The value of y is added to the integer address at stack top, and that replaces
+the stack top as integer.
+
+10 Jump
+
+x: Unused
+y: Address
+
+The address y replaces the current execution address.
+
+11 Conditional jump
+
+x: Unused
+y: Address
+
+If the boolean at stack top is false, then the address y replaces the current
+execution address. The top of stack is removed.
+
+12 Switch
+
+x:
+y:
+
+14 Forlup
+
+x:
+y:
+
+15 For2up
+
+x:
+y:
+
+16 For1down
+
+x:
+y:
+
+17 For2down
+
+x:
+y:
+
+18 Mark stack
+
+x:
+y:
+
+19 Call
+
+x:
+y:
+
+20 Index
+
+x:
+y:
+
+21 Index
+
+x:
+y:
+
+22 Load block
+
+x: Unused
+y: Copy count
+
+Copies a number of stack entries from the address indicated by the integer at
+stack top to a new stack section added at the top after the address is removed.
+The number of stack locations to copy is indicated in y.
+
+This instruction is used to create value parameter copies of arrays and records.
+
+23 Copy block
+
+x: Unused
+y: Copy count
+
+Copies a number of stack entries from the address indicated by the integer at
+stack top to the address indicated by the integer second on stack. The number
+of stack locations is indicated in y. Both addresses are removed from the stack.
+
+This instruction is used to assign array variables.
+
+24 Literal
+
+x: Unused
+y: Constant
+
+The constant y is placed as a new stack top integer. A stack overflow check is
+performed.
+
+25 Load real
+
+x: Unused
+y: Address of real constant
+
+The real constant in the real constant holding array as indexed by y is placed
+as a new stack top real. A stack overflow check is performed.
+
+26 Float
+
+x: Unused
+y: Offset
+
+The integer at the stack location offset by y is converted from integer to real.
+
+27 Read
+
+x: Unused
+y: Type selector
+
+If the input file is not at eof, an integer, real or character is read from the
+input and placed at the stack location indirectly located at the address found
+from the integer at stack top. The stack top is removed.
+
+The type of read is encoded in y:
+
+y = 1: Integer
+y = 2: Real
+y = 4: Character
+
+28 Write string
+
+x: Unused
+y: Address of string in string table
+
+Writes a string from the string table. The y address indicates where the
+characters of the string begin in the string table. The field for the string
+is at stack top. The stack top is removed.
+
+29 Write with default field
+
+x: Unused
+y: Type select
+
+Writes an integer, real, boolean or character value from the stack top to the
+output. The value is written using the default field for that type. The value
+is removed from the stack.
+
+The type of write is encoded in y:
+
+y = 1: Integer
+y = 2: Real
+y = 3: boolean
+y = 4: Character
+
+30 Write with field
+
+x: Unused
+y: Unused
+
+Writes an integer, real, boolean or character value from the second on stack
+to the output. The value is written using the field from the top of stack 
+integer. Both values are removed from the stack.
+
+The type of write is encoded in y:
+
+y = 1: Integer
+y = 2: Real
+y = 3: boolean
+y = 4: Character
+
+31 Halt
+
+x: Unused
+y: Unused
+
+Halt program. Causes the program to halt normally, without an error.
+
+32 Exit procedure
+
+x: Unused
+y: Unused
+
+Terminates the currently running procedure. The locals and block information
+for the current procedure are removed from the stack. The execution address
+is restored from the return address in the block mark. Finally, the current
+block is reset to the value before the procedure was activated.
+
+33 Exit function
+
+x: Unused
+y: Unused
+
+Terminates the currently running function. The locals and block information
+for the current procedure are removed from the stack, but the return value for
+the function is left on the top of the stack. The execution address is restored
+from the return address in the block mark. Finally, the current block is reset
+to the value before the procedure was activated.
+
+34 Fetch indirect
+
+x: Unused
+y: Unused
+
+The stack location indexed by the integer at stack top replaces the stack top.
+
+35 Not
+
+x: Unused
+y: Unused
+
+Finds the boolean 'not' of the boolean variable at stack top, resulting in a
+boolean at stack top.
+
+36 Negate
+
+x: Unused
+y: Type selector
+
+Negates the integer or real on top of the stack.
+
+The type of negate is encoded in y:
+
+y = 1: Integer
+y = 2: Real
+
+37 Write real with field and fraction
+
+x: Unused
+y: Unused
+
+The real at third on stack is written in the "fixed point" notation. The field
+is the second on stack, and the fraction is at stack top. All three parameters
+are removed from the stack.
+
+38 Store to stack
+
+x: Unused
+y: Unused
+
+Stores the top of the stack to the stack location indicated by the second
+integer on the stack. Both the top and second on stack are removed.
+
+39 Real equal
+   
+x: Unused
+y: Unused
+
+Finds the real on top of stack equal to the real second on stack. Places
+the result in the second stack boolean and removes the top.
+
+40 Real unequal
+   
+x: Unused
+y: Unused
+
+Finds the real on top of stack unequal to the real second on stack. Places
+the result in the second stack boolean and removes the top.
+
+41 Real less than
+   
+x: Unused
+y: Unused
+
+Finds the real second on stack less than the real on top of stack. Places
+the result in the second stack boolean and removes the top.
+
+42 Real less than or equal
+   
+x: Unused
+y: Unused
+
+Finds the real second on stack less than or equal to the real on top of stack.
+Places the result in the second stack boolean and removes the top.
+
+43 Real greater than
+   
+x: Unused
+y: Unused
+
+Finds the real second on stack greater than the real on top of stack. Places
+the result in the second stack boolean and removes the top.
+
+44 Real greater or equal
+   
+x: Unused
+y: Unused
+
+Finds the real second on stack greater than or equal to the real on top of
+stack. Places the result in the second stack boolean and removes the top.
+
+45 Integer equal
+   
+x: Unused
+y: Unused
+
+Finds the integer on top of stack unequal to the integer second on stack. Places
+the result in the second stack boolean and removes the top.
+
+46 Integer not equal
+   
+x: Unused
+y: Unused
+
+Finds the integer on top of stack unequal to the integer second on stack. Places
+the result in the second stack boolean and removes the top.
+
+47 Integer less than
+   
+x: Unused
+y: Unused
+
+Finds the integer second on stack less than the integer on top of stack. Places
+the result in the second stack boolean and removes the top.
+
+48 Integer less than or equal
+   
+x: Unused
+y: Unused
+
+Finds the integer second on stack less than or equal to the integer on top of
+stack. Places the result in the second stack boolean and removes the top.
+
+49 Integer greater than
+   
+x: Unused
+y: Unused
+
+Finds the integer second on stack greater than the integer on top of stack.
+Places the result in the second stack boolean and removes the top.
+
+50 Integer greater or equal
+   
+x: Unused
+y: Unused
+
+Finds the integer second on stack greater than or equal to the integer on top of
+stack. Places the result in the second stack boolean and removes the top.
+
+51 Boolean 'or'
+   
+x: Unused
+y: Unused
+
+Finds the 'or' of the boolean on top of stack and the boolean second on stack.
+Places the result in the second stack boolean and removes the top.
+
+52 Integer add
+   
+x: Unused
+y: Unused
+
+Adds the top of stack integer to the second on stack integer, and places the
+integer result in the second on stack and removes the top.
+
+53 Integer subtract
+   
+x: Unused
+y: Unused
+
+Subtracts the top of stack integer from the second on stack integer, and places
+the integer result in the second on stack and removes the top.
+
+54 Real add
+   
+x: Unused
+y: Unused
+
+Adds the top of stack real to the second on stack real, and places the
+integer result in the second on stack and removes the top.
+
+55 Real subtract
+   
+x: Unused
+y: Unused
+
+Subtracts the top of stack real from the second on stack real, and places
+the real result in the second on stack and removes the top.
+
+56 Boolean 'and'
+   
+x: Unused
+y: Unused
+
+Finds the 'and' of the boolean on top of stack and the boolean second on stack.
+Places the result in the second stack boolean and removes the top.
+
+57 Integer multiply
+   
+x: Unused
+y: Unused
+
+Multiplies the top of stack integer by the second on stack integer, and places
+the integer result in the second on stack and removes the top.
+
+58 Integer divide
+   
+x: Unused
+y: Unused
+
+Divides the second on stack integer by the top of stack integer, and places
+the integer result in the second on stack and removes the top.
+
+59 Integer modulo
+   
+x: Unused
+y: Unused
+
+Finds the modulo of second on stack integer by the top of stack integer, and places
+the integer result in the second on stack and removes the top.
+
+60 Real multiply
+   
+x: Unused
+y: Unused
+
+Multiplies the top of stack real by the second on stack real, and places
+the real result in the second on stack and removes the top.
+
+61 Real divide
+   
+x: Unused
+y: Unused
+
+Divides the second on stack real by the top of stack real, and places
+the integer result in the second on stack and removes the top.
+
+62 Read end of line
+ 
+x: Unused
+y: Unused
+
+Reads the end of line from the input file. If eof is encountered on input, it
+is an error.
+
+63 Write end of line
+
+x: Unused
+y: Unused
+
+Writes an end of line to the output file. If the total number of output lines
+is larger than the line check limit, an error results. Pascal-S uses a limit
+to prevent programs that loop forever writing output.
+   
+   

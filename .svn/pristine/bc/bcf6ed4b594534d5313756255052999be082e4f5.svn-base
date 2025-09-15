@@ -1,0 +1,428 @@
+lmt rgt  11111111112222222222333333333344444444445555555555666666666677777777778
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+                          HOW TO USE OBJECTS IN PASCALINE
+
+Pascaline implements objects as an extention to the module concept, similar to
+the language Java, but unlike C++, Oberon and similar languages that consider 
+objects to be extended records. In practice, this makes little difference
+except minor syntax variations and that module based classes can do more and
+are more flexible than record based objects.
+
+CLASSES ARE MODULES (AND MORE)
+
+A module in Pascaline is a container for constants, types, variables, procedures
+and other definitions. A procedure or a function is also such a container. The
+difference between procedures or functions and modules is that a procedure
+allows external access through the "top" of the block:
+
+           +----- Parameter list <------> External access
+           |
+   ----------------
+   |              |
+   | Declarations |
+   |    	      |
+   | Block        |
+   |              |
+   ----------------
+
+A procedure or function allows access via the parameter list. A module:
+
+   ----------------
+   |              |
+   | Declarations <--------> External access
+   |    	      |
+   | Block        |
+   |              |
+   ----------------
+
+Allows access through the "side" of the block via the declarations. If a block
+is bonded via "uses", it is in fact bonded to the module that uses it 
+symbolically.
+
+A class is first and foremost a module, and is bonded to external blocks by the
+side. However, classes only have "joins" level bonding, meaning that all 
+accesses to class declarations must be qualidents such as:
+
+var a: myclass.newtype;
+
+In a module, var declarations are "static". That is, they are allocated at a
+fixed location and are not created anew with invocation, as procedure and 
+function locals are.
+
+A class does not create such declarations as static. In fact, a class defines
+no variable data at all. As it is, a class only defines a "template" for the
+appearance of a block of data. Lets look at a typical, but useful, class:
+
+class list;
+
+var next: reference to list;
+
+begin { constructor }
+end.
+
+The class "list" is only a description of how to layout a block of data that
+constitutes a list. In order to actually create the block of data that is a 
+list, we have to create a reference to the list element. This is an object of
+the type list:
+
+var rp: reference to list;
+
+And as you can see, the list class contains such a reference within itself.
+
+One further thing to note for this example is that the list class contains a
+constructor, abeit an empty one. The syntax of a class actually allows the
+constructor to be omitted, but I make it a habit of including a constructor
+block even if it is empty, because it clearly shows the constructor and marks
+the end of the class.
+
+CLASSES AS A CONTAINER FOR DECLARATIONS
+
+When simply serving in their role as an extended module, the class identifier
+itself can be used to access most of its definitions via a "qualident":
+
+program test;
+
+class myclass;
+
+const x = 10;
+
+type y = array x of char;
+
+fixed q: integer = 10;
+
+procedure z; begin end;
+
+begin { constructor }
+end.
+
+var x: array myclass.x of integer;
+    y: myclass.y;
+
+begin
+
+   x[5] := myclass.q;
+   myclass.z
+
+end.
+
+In fact, the only class members that cannot be referenced via the class 
+identifier are variables and certain procedures and functions (described later).
+
+CLASS REFERENCES
+
+The variable data in a class does not exist in the class declaration itself. A
+class is simply a template. To create such data, the class must be "instatiated"
+as an object:
+
+program test;
+
+class myclass;
+
+var i: integer;
+
+begin { constructor }
+end.
+
+var r: reference to myclass;
+
+begin
+
+   r := nil;
+   new(r);
+   r.i := 10;
+   dispose(r);
+
+end.
+
+First, a reference variable must be created that points to the object that will
+be created.	This is then assigned to nil (or "no object"). To create (or 
+"instantiate" an object, and point the reference variable at that, the "new(r)"
+code is used. This allocates the space for the object from dynamic storage, and
+causes r to point to it.
+
+A reference can point to the data in an object, and the access to the object is
+automatically coded when a qualident for the referenced object appears. 
+References also have a property known as "grace" that allows them to access the
+other parts of a class as well. Therefore:
+
+program test;
+
+class myclass;
+
+const x = 10;
+
+type ref = reference to myclass;
+
+var i: integer;
+
+begin { constructor }
+end.
+
+var	r: myclass.ref;
+
+begin
+
+   new(r);
+   r.i := r.x;
+
+end.
+
+In this case, the reference variable r has been used both to access the variable
+i and to access the constant x. Grace is both a convienence and a functional
+property of references. For example, the definition of myclass could later be
+rewritten as:
+
+program test;
+
+class myclass;
+
+type ref = reference to myclass;
+
+var i: integer;
+    x: integer;
+
+begin { constructor }
+
+   x := 10
+
+end.
+
+var	r: myclass.ref;
+
+begin
+
+   new(r);
+   r.i := r.x;
+
+end.
+
+This is functionally equivalent to the first example, except that x has been
+promoted from a constant to a variable that has been initialized in advance.
+
+Note also that we have included in myclass its own reference type. This is a
+common idiom for classes in Pascaline.
+
+Classes are often compared to records in that they join multiple data types into
+a whole. In Pascaline, the exact order of the elements are undefined, and the
+types of members that a class can contain is significantly expanded to include
+constants, types, fixed as well as variables and methods (procedures and 
+functions).
+
+REFERENCES AS DATA
+
+A reference is a variable, and can be used anywhere a normal variable can.
+Specifically, it can appear in a structure, passed as a parameter, returned as
+the result of a function, read and written to a file, allocated as a dynamic
+variable, etc:
+
+program test;
+
+class myclass;
+
+type ref = reference to myclass;
+
+var i: integer;
+
+begin { constructor }
+end.
+
+var ar: array 100 of myclass.ref;
+    fr: file of myclass.ref;
+	pr: ^myclass.ref;
+	i:  integer;
+
+function y(r: myclass.ref): myclass.ref; 
+
+begin
+
+   y := r
+
+end;
+
+begin
+
+   for i := 1 to 100 do new(ar[i]);
+   rewrite(fr);
+   for i := 1 to 100 do write(fr, y(ar[i]));
+   new(pr); { get pointer to reference }
+   new(pr^); { instantiate new object at reference }
+   pr^.i := 10;
+
+end.
+
+The weaving of reference types into other types can be confusing, but it can
+help to think of a reference as a simple pointer.
+
+For the last statement above:
+
+   pr^.i := 10;
+
+Think of the structure as a "pointer to a reference to an object of type 
+myclass". The pointer indirection "^" refers to the pointer, not the reference.
+The statements:
+
+   new(pr); { get pointer to reference }
+   new(pr^); { instantiate new object at reference }
+
+Do completely different things. The first allocates a standard pointer, and the
+second creates a reference, that happens to be pointed to.
+
+INHERITANCE
+
+The power of classes is that a class can inherit all of the members of another
+class:
+
+program test;
+
+class list;
+
+type ref = reference to list;
+
+var next: ref;
+
+procedure gonext; { iterate the list }
+
+begin
+
+   self := self^.next
+
+end;
+
+procedure insert(l: ref); { insert to list }
+
+begin
+
+   next := l; { link this to list }
+   l := self { and place on list }
+
+end;
+
+begin { constructor }
+end.
+
+class keylist(list);
+
+type ref = reference to keylist;
+
+var key: integer;
+
+function find(l: ref; i: integer): ref;
+
+var r, f: keylist.ref;
+
+begin
+
+   r := l; { index head of list }
+   f := nil; { set no object found }
+   while r <> nil do begin
+
+      { search objects }
+      if r.key = i then begin f := r; r := nil end
+      else r.gonext { go next object }
+
+   end;
+
+   find := f { return result }
+
+end;
+   
+begin { constructor }
+end.
+
+var root: keylist.ref; { root of list }
+    r:    keylist.ref; { data item }
+
+begin
+
+   root := nil; { clear list }
+   new(r); { create new item }
+   r.data := 1;
+   r.insert(root); { place in list }
+   new(r);
+   r.data := 4;
+   r.insert(root);
+   new(r);
+   r.data := 10;
+   r.insert(root);
+   r := find(root, 12)
+
+end.   
+
+The power of objects is that only the class members required to acheive a given
+function need be present. A new class that extends the general power of a class
+such as the list class to a specific use can inherit the general class. In the
+above example, the list class implements list handling in general, and is 
+extended by the keylist class that applies the list concept to a specific type
+of list, which has integer keys.
+
+This extention can go on to any level. The keylist can be extended to have data
+corresponding to its keys, and so on.
+
+REFERENCES AS POINTERS
+
+A reference can be visualised as a pointer to the object. Because a reference
+can appear as any variable, it is possible to copy the reference, pass it to
+a procedure or function, or imbed it in the object itself. Any number of 
+references to a single object can be present.
+
+To understand references, you must think both of the class of object it 
+references, as well as the specific object it references.
+
+COST OF OBJECTS
+
+Use of an object vs. use of of record incurs costs, both in the size and the
+access time. However, these are minimal. Nevertheless, you must judge if the
+extra cost offsets the greater usefulness of objects verses records. Logically,
+and object appears to be as a combination of a record and a pointer to that:
+
+program test;
+
+class myclass;
+
+var i: integer;
+    b: char;
+
+begin { constructor }
+end.
+
+var r: reference to myclass;
+
+begin
+end.
+
+Appears as:
+
+   r -> ---------------
+        |     i       |
+		---------------
+		|     b       |
+		---------------
+
+The difference between this and an equvalent record is that the reference r must
+contain not only a pointer to the object, but also must carry data indicating
+what class of the object is. Typically, this is a pointer to a table of class
+inheritance relations.
+
+The overhead for use of objects is therefore, the extra space needed to keep the
+extra data in the reference, the extra code generated to handle such references,
+and the code to check if a given member reference is valid.
+
+There are ways to reduce the cost of objects, as will be discussed.
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,24 @@
+                           CALLBACK THUNKING
+
+OVERVIEW
+
+Callback functions break several of the rules of language, besides
+needing a wrapper step. Unfortunately, conventional wrapper
+methods don't work with callbacks, because the user can essentially create
+new callback points at will.
+
+ANSWER
+
+Dynamic callback wrappers are small pieces of code that are placed
+into dynamic memory. The passed callback address is replaced on the
+actual call with a reference to the head of this code, and the generated
+code references that. The callback sequence occurs when the OS references
+the callback, and calls the dynamic thunk. The generated thunk then
+prepares the parameters, creates a dummy frame, calls the actual
+target function, and then returns the result to the OS.
+Callbacks are restricted to top level routines, since only globals should
+be referenced in the callback. It may be possible to actually verify at
+callback registration time if the target is indeed a top level routine
+by examining the entry code for an "enter" instruction for anything but
+a level 1 code. Even if the enter has been optimized out, this check will still
+work.

@@ -1,0 +1,20 @@
+         11111111112222222222333333333344444444445555555555666666666677777777778
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+                          PASCALINE TO VERILOG CONVERTION
+
+The idea of the Pascaline to Verilog convertion process is that the code is
+translated to a state machine. Each process is its own state machine, and the
+main program and all of its routines are such state machines.
+
+The upshot of that is that a program, even one spread across modules, must be
+compacted into a single code block by processing for inline code.
+
+Each node of the code becomes a state, and the expressions trail off each state.
+Although verilog has the ability to process loops, we instead create states for
+each node in the loop, and let the state machine run the loop.
+
+With the flow of control subtracted, and all of the procedure and function calls
+flattened, what is left is truly rtl, or a series of assignments. The data 
+mapping for the program becomes important. Each variable is mapped, each array
+and structure, and the operations on those performed as formulas.

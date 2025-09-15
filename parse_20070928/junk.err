@@ -1,0 +1,4 @@
+   bark
+       ^
+*** C:\PASCOMP\PPARSE\test.pas [5:8] Symbol 'bark' not found *** 
+*** C:\PASCOMP\PPARSE\test.pas [7:5] Symbol 'output' defined but never referenced *** 

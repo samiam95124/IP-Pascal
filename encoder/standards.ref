@@ -1,0 +1,1724 @@
+
+Pascal-S compiler/interpreter
+    0  (******************************************************************************
+    0  *                                                                             *
+    0  *                  TEST SUITE FOR ISO 7185 PASCAL/Pascals subset              *
+    0  *                                                                             *
+    0  *            Copyright (C) 1994 S. A. Moore - All rights reserved             *
+    0  *                                                                             *
+    0  * This is the standard.pas suite cut down to fit within the Pascal-s          *
+    0  * language subset. See standard.pas for more details.                         *
+    0  *                                                                             *
+    0  ******************************************************************************)
+    0  
+    0  program standards(output);
+    0  
+    0  const tcnst = 768;
+    0        tsncst = -52;
+    0        ccst = 'v';
+    0        rcnst = 43.33;
+    0        rscst = -84.22;
+    0  
+    0  type
+    0       arri  = array [1..10] of integer;
+    0       recs  = record
+    0  
+    0                 a: integer;
+    0                 b: char
+    0  
+    0              end;
+    0       arrim = array [1..2, 1..2] of array [1..2, 1..2, 1..2, 1..2] of integer;
+    0       rec = record
+    0  
+    0                i:   integer;
+    0                b:   boolean;
+    0                c:   char;
+    0                r:   real;
+    0                a:   arri;
+    0                rc:  recs
+    0  
+    0             end;
+    0  
+    0  var i, x, y, z, q, n, t : integer;
+    0      as, bs, cs, ds, es: integer;
+    0      ca, cb, cc: char;
+    0      car:  array ['a'..'z'] of integer;
+    0      r : record
+    0  
+    0             rx: integer;
+    0             rc: char;
+    0             ry: integer;
+    0             rb: boolean;
+    0             rs: array [1..10] of char
+    0  
+    0          end;
+    0      ba, bb, bc : boolean;
+    0      ra, rb, rc, rd, re: real;
+    0      avi: arri;
+    0      avi2: arri;
+    0      avb: array [1..10] of boolean;
+    0      avr: array [1..10] of real;
+    0      avc: array [1..10] of char;
+    0      avrc: array [1..10] of recs;
+    0      ai: arri;
+    0      da: array [1..10, 1..10] of integer;
+    0      mdar: arrim;
+    0      mdar2: arrim;
+    0      arec: rec;
+    0      nvr:   record
+    0  
+    0                i: integer;
+    0                r: record
+    0  
+    0                   i: integer;
+    0                   r: record
+    0  
+    0                      i: integer;
+    0                      r: record
+    0  
+    0                         i: integer;
+    0                         r: record
+    0  
+    0                            i: integer;
+    0                            r: record
+    0  
+    0                               i: integer;
+    0                               r: record
+    0  
+    0                                  i: integer;
+    0                                  r: record
+    0  
+    0                                     i: integer;
+    0                                     r: record
+    0  
+    0                                        i: integer;
+    0                                        r: record
+    0  
+    0                                           i: integer
+    0  
+    0                                        end
+    0  
+    0                                     end
+    0  
+    0                                  end
+    0  
+    0                               end
+    0  
+    0                            end
+    0  
+    0                         end
+    0  
+    0                      end
+    0  
+    0                   end
+    0  
+    0                end
+    0  
+    0             end;
+    0  
+    0  procedure junk1(z, q : integer);
+    0   
+    0  begin
+    0  
+    0     write(z:1, ' ', q:1);
+    8  
+    8  end;
+    8   
+    8  procedure junk2(var z : integer);
+    9   
+    9  begin
+    9  
+    9     z := z + 1
+   12  
+   12  end;
+   14   
+   14  function junk5(x : integer) : integer;
+   15   
+   15  begin
+   15  
+   15     junk5 := x + 1
+   18  
+   18  end;
+   20  
+   20  function junk7(a, b, c: integer): integer;
+   21  
+   21  var x, y, z: integer;
+   21  
+   21  begin
+   21  
+   21     x := 1;
+   24     y := 2;
+   27     z := 3;
+   30     write(a:1, ' ', b:1, ' ', c:1, ' ');
+   45     a := 4;
+   48     b := 5;
+   51     c := 6;
+   54     write(c:1, ' ', b:1, ' ', a:1, ' ', z:1, ' ', y:1, ' ', x:1);
+   82     junk7 := 78
+   84  
+   84  end;
+   85  
+   85  procedure junk8(a: integer; b: boolean; c: char; r: real; ar: arri; rc: rec);
+   86  
+   86  var i:  integer;
+   86      ci: char;
+   86  
+   86  begin
+   86  
+   86     writeln(a:1, ' ', b:5, ' ', c:1, ' ', r:15);
+  105     for i := 1 to 10 do write(ar[i]:1, ' '); writeln;
+  119     writeln(rc.i:1, ' ', rc.b:5, ' ', rc.c:1, ' ', rc.r:15, ' ');
+  147     for i := 1 to 10 do write(rc.a[i]:1, ' '); writeln;
+  162     writeln(rc.rc.a:1, ' ', rc.rc.b:1)
+  175  
+  175  end;
+  176  
+  176  procedure junk14;
+  177  
+  177  var i, x: integer;
+  177  
+  177  procedure junk15;
+  177  
+  177  begin
+  177  
+  177     write(i:1, ' ', x:1)
+  185  
+  185  end;
+  185  
+  185  begin
+  186  
+  186     i := 62;
+  189     x := 76;
+  192     junk15
+  192  
+  192  end;
+  194  
+  194  begin
+  195  
+  195     write('****************************************************************');
+  197     writeln('***************');
+  200     writeln;
+  201     writeln('                 TEST SUITE FOR PASCAL-S PASCAL');
+  204     writeln;
+  205     write('                 Copyright (C) 1995 S. A. Moore - All rights ');
+  207     writeln('reserved');
+  210     writeln;
+  211     write('****************************************************************');
+  213     writeln('***************');
+  216     writeln;
+  217  
+  217  (******************************************************************************
+  217  
+  217                             Control structures
+  217  
+  217  ******************************************************************************)
+  217  
+  217     writeln;
+  218     writeln('******************* Control structures tests *******************');
+  221     writeln;
+  222     write('Control1: ');
+  224     for i := 1 to 10 do write(i:1, ' ');
+  234     writeln('s/b 1 2 3 4 5 6 7 8 9 10');
+  237     write('Control2: ');
+  239     for i := 10 downto 1 do write(i:1, ' ');
+  249     writeln('s/b 10 9 8 7 6 5 4 3 2 1');
+  252     write('Control3: ');
+  254     i := 1;
+  257     while i <=10 do begin write(i:1, ' '); i := i + 1 end;
+  272     writeln('s/b 1 2 3 4 5 6 7 8 9 10');
+  275     write('Control4: ');
+  277     i := 1; repeat write(i:1, ' '); i := i + 1 until i > 10;
+  294     writeln('s/b 1 2 3 4 5 6 7 8 9 10');
+  297     write('Control6: ');
+  299     if true then write('yes') else write('no');
+  306     writeln(' s/b yes');
+  309     write('Control7: ');
+  311     if false then write('no') else write('yes');
+  318     writeln(' s/b yes');
+  321     write('Control8: ');
+  323     if true then write('yes '); write('stop');
+  329     writeln(' s/b yes stop');
+  332     write('Control9: ');
+  334     if false then write('no '); write('stop');
+  340     writeln(' s/b stop');
+  343     write('Control10: ');
+  345     for i := 1 to 10 do
+  349        case i of
+  351           1:     write('one ');
+  354           2:     write('two ');
+  357           3:     write('three ');
+  360           4:     write('four ');
+  363           5:     write('five ');
+  366           6:     write('six ');
+  369           7:     write('seven ');
+  372           8:     write('eight ');
+  375           9, 10: write('nine-ten ')
+  377  
+  377        end;
+  400     writeln;
+  401     write('Control10: s/b ');
+  403     write('one two three four five ');
+  405     writeln('six seven eight nine-ten nine-ten');
+  408  
+  408  (******************************************************************************
+  408  
+  408                              Integers
+  408  
+  408  ******************************************************************************)
+  408  
+  408     writeln;
+  409     writeln('******************* Integers *******************');
+  412     writeln;
+  413  
+  413     (* integer variables *)
+  413     x := 43; y := 78; z := y;
+  422     writeln('Integer1:   ', x + y:1, ' s/b 121');
+  432     writeln('Integer2:   ', y - x:1, ' s/b 35');
+  442     writeln('Integer3:   ', x * y:1, ' s/b 3354');
+  452     writeln('Integer4:   ', y div x:1, ' s/b 1');
+  462     writeln('Integer5:   ', y mod x:1, ' s/b 35');
+  472     writeln('Integer8:   ', chr(y), ' s/b N');
+  480     writeln('Integer9:   ', ord(chr(x)):1, ' s/b 43');
+  490     writeln('Integer10:  ', odd(x):5, ' s/b true');
+  499     writeln('Integer11:  ', odd(y):5, ' s/b false');
+  508     writeln('Integer12:  ', z = y:5, ' s/b true');
+  518     writeln('Integer13:  ', x = y:5, ' s/b false');
+  528     writeln('Integer14:  ', x < y:5, ' s/b true');
+  538     writeln('Integer15:  ', y < x:5, ' s/b false');
+  548     writeln('Integer16:  ', y > x:5, ' s/b true');
+  558     writeln('Integer17:  ', x > y:5, ' s/b false');
+  568     writeln('Integer18:  ', x <> y:5, ' s/b true');
+  578     writeln('Integer19:  ', y <> z:5, ' s/b false');
+  588     writeln('Integer20:  ', x <= y:5, ' s/b true');
+  598     writeln('Integer21:  ', z <= y:5, ' s/b true');
+  608     writeln('Integer22:  ', y <= x:5, ' s/b false');
+  618     writeln('Integer23:  ', y >= x:5, ' s/b true');
+  628     writeln('Integer24:  ', y >= z:5, ' s/b true');
+  638     writeln('Integer25:  ', x >= y:5, ' s/b false');
+  648   
+  648     (* unsigned integer constants *)
+  648     write('Integer31:  '); i := 546; writeln(i:1, ' s/b 546');
+  659     writeln('Integer32:  ', 56 + 34:1, ' s/b 90');
+  669     writeln('Integer33:  ', 56 - 34:1, ' s/b 22');
+  679     writeln('Integer34:  ', 56 * 34:1, ' s/b 1904');
+  689     writeln('Integer35:  ', 56 div 34:1, ' s/b 1');
+  699     writeln('Integer36:  ', 56 mod 34:1, ' s/b 22');
+  709     writeln('Integer39:  ', chr(65), ' s/b A');
+  717     writeln('Integer40:  ', ord(chr(65)):1, ' s/b 65');
+  727     writeln('Integer41:  ', tcnst:1, ' s/b 768');
+  735     writeln('Integer42:  ', odd(5):5, ' s/b true');
+  744     writeln('Integer43:  ', odd(8):5, ' s/b false');
+  753     writeln('Integer44:  ', 56 = 56:5, ' s/b true');
+  763     writeln('Integer45:  ', 56 = 57:5, ' s/b false');
+  773     writeln('Integer46:  ', 56 < 57:5, ' s/b true');
+  783     writeln('Integer47:  ', 57 < 56:5, ' s/b false');
+  793     writeln('Integer48:  ', 57 > 56:5, ' s/b true');
+  803     writeln('Integer49:  ', 56 > 57:5, ' s/b false');
+  813     writeln('Integer50:  ', 56 <> 57:5, ' s/b true');
+  823     writeln('Integer51:  ', 56 <> 56:5, ' s/b false');
+  833     writeln('Integer52:  ', 55 <= 500:5, ' s/b true');
+  843     writeln('Integer53:  ', 67 <= 67:5, ' s/b true');
+  853     writeln('Integer54:  ', 56 <= 33:5, ' s/b false');
+  863     writeln('Integer55:  ', 645 >= 4:5, ' s/b true');
+  873     writeln('Integer56:  ', 23 >= 23:5, ' s/b true');
+  883     writeln('Integer57:  ', 45 >= 123:5, ' s/b false');
+  893  
+  893     (* signed integer variables *)
+  893     as := -14;
+  897     bs := -32;
+  901     cs := -14;
+  905     ds := 20;
+  908     es := -15;
+  912     writeln('Integer58:  ', as + ds:1, ' s/b 6');
+  922     writeln('Integer59:  ', ds + as:1, ' s/b 6');
+  932     writeln('Integer60:  ', bs + ds:1, ' s/b -12');
+  942     writeln('Integer61:  ', as + bs:1, ' s/b -46');
+  952     writeln('Integer62:  ', ds - as:1, ' s/b 34');
+  962     writeln('Integer63:  ', bs - ds:1, ' s/b -52');
+  972     writeln('Integer64:  ', bs - as:1, ' s/b -18');
+  982     writeln('Integer65:  ', ds * as:1, ' s/b -280');
+  992     writeln('Integer66:  ', as * ds:1, ' s/b -280');
+ 1002     writeln('Integer67:  ', as * bs:1, ' s/b 448');
+ 1012     writeln('Integer68:  ', ds div as:1, ' s/b -1');
+ 1022     writeln('Integer69:  ', bs div ds:1, ' s/b -1');
+ 1032     writeln('Integer70:  ', bs div as:1, ' s/b 2');
+ 1042     writeln('Integer73:  ', odd(as):5, ' s/b false');
+ 1051     writeln('Integer74:  ', odd(es):5, ' s/b true');
+ 1060     writeln('Integer75:  ', as = cs:5, ' s/b true');
+ 1070     writeln('Integer76:  ', as = bs:5, ' s/b false');
+ 1080     writeln('Integer77:  ', as <> bs:5, ' s/b true');
+ 1090     writeln('Integer78:  ', as <> cs:5, ' s/b false');
+ 1100     writeln('Integer79:  ', as < ds:5, ' s/b true');
+ 1110     writeln('Integer80:  ', bs < as:5, ' s/b true');
+ 1120     writeln('Integer81:  ', ds < as:5, ' s/b false');
+ 1130     writeln('Integer82:  ', as < bs:5, ' s/b false');
+ 1140     writeln('Integer83:  ', ds > as:5, ' s/b true');
+ 1150     writeln('Integer84:  ', as > bs:5, ' s/b true');
+ 1160     writeln('Integer85:  ', as > ds:5, ' s/b false');
+ 1170     writeln('Integer86:  ', bs > as:5, ' s/b false');
+ 1180     writeln('Integer87:  ', as <= ds:5, ' s/b true');
+ 1190     writeln('Integer88:  ', bs <= as:5, ' s/b true');
+ 1200     writeln('Integer89:  ', as <= cs:5, ' s/b true');
+ 1210     writeln('Integer90:  ', ds <= as:5, ' s/b false');
+ 1220     writeln('Integer91:  ', as <= bs:5, ' s/b false');
+ 1230     writeln('Integer92:  ', ds >= as:5, ' s/b true');
+ 1240     writeln('Integer93:  ', as >= bs:5, ' s/b true');
+ 1250     writeln('Integer94:  ', as >= cs:5, ' s/b true');
+ 1260     writeln('Integer95:  ', as >= ds:5, ' s/b false');
+ 1270     writeln('Integer96:  ', bs >= as:5, ' s/b false');
+ 1280     writeln('Integer97:  ', abs(as):1, ' s/b 14');
+ 1289  
+ 1289     (* signed integer constants *)
+ 1289     writeln('Integer98:  ', 45 + (-30):1, ' s/b 15');
+ 1300     writeln('Integer99:  ', -25 + 70:1, ' s/b 45');
+ 1311     writeln('Integer100: ', -62 + 23:1, ' s/b -39');
+ 1322     writeln('Integer101: ', -20 + (-15):1, ' s/b -35');
+ 1334     writeln('Integer102: ', 20 - (-14):1, ' s/b 34');
+ 1345     writeln('Integer103: ', -34 - 14:1, ' s/b -48');
+ 1356     writeln('Integer104: ', -56 - (-12):1, ' s/b -44');
+ 1368     writeln('Integer105: ', 5 * (-4):1, ' s/b -20');
+ 1379     writeln('Integer106: ', (-18) * 7:1, ' s/b -126');
+ 1390     writeln('Integer107: ', (-40) * (-13):1, ' s/b 520');
+ 1402     writeln('Integer108: ', 30 div (-5):1, ' s/b -6');
+ 1413     writeln('Integer109: ', (-50) div 2:1, ' s/b -25');
+ 1424     writeln('Integer110: ', (-20) div (-4):1, ' s/b 5');
+ 1436     writeln('Integer115: ', odd(-20):5, ' s/b false');
+ 1446     writeln('Integer116: ', odd(-15):5, ' s/b true');
+ 1456     writeln('Integer117: ', -5 = -5:5, ' s/b true');
+ 1468     writeln('Integer118: ', -5 = 5:5, ' s/b false');
+ 1479     writeln('Integer119: ', -21 <> -40:5, ' s/b true');
+ 1491     writeln('Integer120: ', -21 <> -21:5, ' s/b false');
+ 1503     writeln('Integer121: ', -3 < 5:5, ' s/b true');
+ 1514     writeln('Integer122: ', -32 < -20:5, ' s/b true');
+ 1526     writeln('Integer123: ', 20 < -20:5, ' s/b false');
+ 1537     writeln('Integer124: ', -15 < -40:5, ' s/b false');
+ 1549     writeln('Integer125: ', 70 > -4:5, ' s/b true');
+ 1560     writeln('Integer126: ', -23 > -34:5, ' s/b true');
+ 1572     writeln('Integer127: ', -5 > 5:5, ' s/b false');
+ 1583     writeln('Integer128: ', -60 > -59:5, ' s/b false');
+ 1595     writeln('Integer129: ', -12 <= 4:5, ' s/b true');
+ 1606     writeln('Integer130: ', -14 <= -5:5, ' s/b true');
+ 1618     writeln('Integer131: ', -7 <= -7:5, ' s/b true');
+ 1630     writeln('Integer132: ', 5 <= -5:5, ' s/b false');
+ 1641     writeln('Integer133: ', -10 <= -20:5, ' s/b false');
+ 1653     writeln('Integer134: ', 9 >= -3:5, ' s/b true');
+ 1664     writeln('Integer135: ', -4 >= -10:5, ' s/b true');
+ 1676     writeln('Integer136: ', -13 >= -13:5, ' s/b true');
+ 1688     writeln('Integer137: ', -6 >= 6:5, ' s/b false');
+ 1699     writeln('Integer138: ', -20 >= -10:5, ' s/b false');
+ 1711     writeln('Integer139: ', abs(-6):1, ' s/b 6');
+ 1721     writeln('Integer140: ', tsncst:1, ' s/b -52');
+ 1729  
+ 1729  (******************************************************************************
+ 1729  
+ 1729                           Characters
+ 1729  
+ 1729  ******************************************************************************)
+ 1729   
+ 1729     writeln;
+ 1730     writeln('******************* Characters*******************');
+ 1733     writeln;
+ 1734  
+ 1734     (* character variables *)
+ 1734     ca := 'g'; cb := 'g'; cc := 'u';
+ 1743     writeln('Character1:   ', ca, ' ', cb, ' ', cc, ' s/b g g u');
+ 1758     writeln('Character2:   ', succ(ca), ' s/b h');
+ 1766     writeln('Character3:   ', pred(cb), ' s/b f');
+ 1774     writeln('Character4:   ', ord(ca):1, ' s/b 103');
+ 1783     writeln('Character5:   ', chr(ord(cc)), ' s/b u');
+ 1792     writeln('Character6:   ', ca = cb:5, ' s/b true');
+ 1802     writeln('Character7:   ', ca = cc:5, ' s/b false');
+ 1812     writeln('Character8:   ', ca < cc:5, ' s/b true');
+ 1822     writeln('Character9:   ', cc < ca:5, ' s/b false');
+ 1832     writeln('Character10:  ', cc > ca:5, ' s/b true');
+ 1842     writeln('Character11:  ', ca > cc:5, ' s/b false');
+ 1852     writeln('Character12:  ', ca <> cc:5, ' s/b true');
+ 1862     writeln('Character13:  ', ca <> cb:5, ' s/b false');
+ 1872     writeln('Character14:  ', ca <= cc:5, ' s/b true');
+ 1882     writeln('Character15:  ', ca <= cb:5, ' s/b true');
+ 1892     writeln('Character16:  ', cc <= ca:5, ' s/b false');
+ 1902     writeln('Character17:  ', cc >= cb:5, ' s/b true');
+ 1912     writeln('Character18:  ', cb >= ca:5, ' s/b true');
+ 1922     writeln('Character19:  ', cb >= cc:5, ' s/b false');
+ 1932     write('Character44:  ');
+ 1934     for ca := 'a' to 'z' do write(ca);
+ 1941     writeln(' s/b abcdefghijklmnopqrstuvwxyz');
+ 1944     write('Character45:  ');
+ 1946     for ca := 'z' downto 'a' do write(ca);
+ 1953     writeln(' s/b zyxwvutsrqponmlkjihgfedcba');
+ 1956     write('Character46:  ');
+ 1958     x := 0;
+ 1961     for ca := 'a' to 'z' do begin car[ca] := x; x := x + 1 end;
+ 1976     for ca := 'z' downto 'a' do write(car[ca]:1, ' ');
+ 1989     writeln;
+ 1990     writeln('Character46: s/b 25 24 23 22 21 20 19 18 17 16 15',
+ 1992        ' 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0');
+ 1995     r.rc := 'n'; writeln('Character47: ', r.rc, ' s/b n');
+ 2008     writeln('Character50:  ');
+ 2011     for ca := '0' to '9' do
+ 2015     begin
+ 2015       case ca of
+ 2017         '5': write('five ');
+ 2020         '3': write('three ');
+ 2023         '6': write('six ');
+ 2026         '8': write('eight ');
+ 2029         '0': write('zero ');
+ 2032         '9': write('nine ');
+ 2035         '7': write('seven ');
+ 2038         '4': write('four ');
+ 2041         '1': write('one ');
+ 2044         '2': write('two ');
+ 2047       end
+ 2068     end;
+ 2069     writeln;
+ 2070     writeln(' s/b zero one two three four five six ',
+ 2072             'seven eight nine');
+ 2075  
+ 2075     (* character constants *)
+ 2075     writeln('Character51:  ', 'a', ' s/b a');
+ 2082     writeln('Character52:  ', succ('a'), ' s/b b');
+ 2090     writeln('Character53:  ', pred('z'), ' s/b y');
+ 2098     writeln('Character54:  ', ord('c'):1, ' s/b 99');
+ 2107     writeln('Character55:  ', chr(ord('g')), ' s/b g');
+ 2116     writeln('Character56:  ', 'q' = 'q':5, ' s/b true');
+ 2126     writeln('Character57:  ', 'r' = 'q':5, ' s/b false');
+ 2136     writeln('Character58:  ', 'b' < 't':5, ' s/b true');
+ 2146     writeln('Character59:  ', 'g' < 'c':5, ' s/b false');
+ 2156     writeln('Character50:  ', 'f' > 'e':5, ' s/b true');
+ 2166     writeln('Character61:  ', 'f' > 'g':5, ' s/b false');
+ 2176     writeln('Character62:  ', 'h' <> 'l':5, ' s/b true');
+ 2186     writeln('Character63:  ', 'i' <> 'i':5, ' s/b false');
+ 2196     writeln('Character64:  ', 'v' <= 'y':5, ' s/b true');
+ 2206     writeln('Character65:  ', 'y' <= 'y':5, ' s/b true');
+ 2216     writeln('Character66:  ', 'z' <= 'y':5, ' s/b false');
+ 2226     writeln('Character67:  ', 'l' >= 'b':5, ' s/b true');
+ 2236     writeln('Character68:  ', 'l' >= 'l':5, ' s/b true');
+ 2246     writeln('Character69:  ', 'l' >= 'm':5, ' s/b false');
+ 2256     writeln('Character85:  ', ccst, ' s/b v');
+ 2263  
+ 2263  (******************************************************************************
+ 2263  
+ 2263                              Booleans
+ 2263  
+ 2263  ******************************************************************************)
+ 2263   
+ 2263     writeln;
+ 2264     writeln('******************* Booleans *******************');
+ 2267     writeln;
+ 2268  
+ 2268     (* boolean variables *)
+ 2268     ba := true; bb := false; bc := true;
+ 2277     writeln('Boolean1:   ', ba:5, ' ', bb:5, ' s/b true false');
+ 2290     writeln('Boolean4:   ', ord(bb):1, ' s/b 0');
+ 2299     writeln('Boolean5:   ', ord(ba):1, ' s/b 1');
+ 2308     writeln('Boolean6:   ', ba = bc:5, ' s/b true');
+ 2318     writeln('Boolean7:   ', bb = bb:5, ' s/b true');
+ 2328     writeln('Boolean8:   ', ba = bb:5, ' s/b false');
+ 2338     writeln('Boolean9:   ', bb < ba:5, ' s/b true');
+ 2348     writeln('Boolean10:  ', ba < bb:5, ' s/b false');
+ 2358     writeln('Boolean11:  ', ba > bb:5, ' s/b true');
+ 2368     writeln('Boolean12:  ', bb > ba:5, ' s/b false');
+ 2378     writeln('Boolean13:  ', ba <> bb:5, ' s/b true');
+ 2388     writeln('Boolean14:  ', ba <> bc:5, ' s/b false');
+ 2398     writeln('Boolean15:  ', bb <= ba:5, ' s/b true');
+ 2408     writeln('Boolean16:  ', ba <= bc:5, ' s/b true');
+ 2418     writeln('Boolean17:  ', ba <= bb:5, ' s/b false');
+ 2428     writeln('Boolean18:  ', ba >= bb:5, ' s/b true');
+ 2438     writeln('Boolean19:  ', bb >= bb:5, ' s/b true');
+ 2448     writeln('Boolean20:  ', bb >= ba:5, ' s/b false');
+ 2458     write('Boolean21:  ');
+ 2460     for ba := false to true do write(ba:5, ' ');
+ 2470     writeln('s/b false true');
+ 2473     write('Boolean22:  ');
+ 2475     for bb := true downto false do write(bb:5, ' ');
+ 2485     writeln('s/b true false');
+ 2488     write('Boolean23:  ');
+ 2490     ba := 1 > 0; writeln(ba:5, ' s/b true');
+ 2501     write('Boolean24:  ');
+ 2503     ba := 1 < 0; writeln(ba:5, ' s/b false');
+ 2514   
+ 2514     (* boolean constants *)
+ 2514     writeln('Boolean25:  ', true:5, ' ', false:5, ' s/b true false');
+ 2527     writeln('Boolean28:  ', ord(false):1, ' s/b 0');
+ 2536     writeln('Boolean29:  ', ord(true):1, ' s/b 1');
+ 2545     writeln('Boolean30:  ', true = true:5, ' s/b true');
+ 2555     writeln('Boolean31:  ', false = false:5, ' s/b true');
+ 2565     writeln('Boolean32:  ', true = false:5, ' s/b false');
+ 2575     writeln('Boolean33:  ', false < true:5, ' s/b true');
+ 2585     writeln('Boolean34:  ', true < false:5, ' s/b false');
+ 2595     writeln('Boolean35:  ', true > false:5, ' s/b true');
+ 2605     writeln('Boolean36:  ', false > true:5, ' s/b false');
+ 2615     writeln('Boolean37:  ', true <> false:5, ' s/b true');
+ 2625     writeln('Boolean38:  ', true <> true:5, ' s/b false');
+ 2635     writeln('Boolean39:  ', false <= true:5, ' s/b true');
+ 2645     writeln('Boolean40:  ', true <= true:5, ' s/b true');
+ 2655     writeln('Boolean41:  ', true <= false:5, ' s/b false');
+ 2665     writeln('Boolean42:  ', true >= false:5, ' s/b true');
+ 2675     writeln('Boolean43:  ', false >= false:5, ' s/b true');
+ 2685     writeln('Boolean44:  ', false >= true:5, ' s/b false');
+ 2695     writeln('Boolean45:');
+ 2698     for i := 10 downto 1 do writeln(false:i);
+ 2707     writeln('Boolean46: s/b:');
+ 2710     writeln('     false');
+ 2713     writeln('    false');
+ 2716     writeln('   false');
+ 2719     writeln('  false');
+ 2722     writeln(' false');
+ 2725     writeln('false');
+ 2728     writeln('fals');
+ 2731     writeln('fal');
+ 2734     writeln('fa');
+ 2737     writeln('f');
+ 2740     writeln('Boolean47:');
+ 2743     for i := 10 downto 1 do writeln(true:i);
+ 2752     writeln('Boolean48: s/b:');
+ 2755     writeln('      true');
+ 2758     writeln('     true');
+ 2761     writeln('    true');
+ 2764     writeln('   true');
+ 2767     writeln('  true');
+ 2770     writeln(' true');
+ 2773     writeln('true');
+ 2776     writeln('tru');
+ 2779     writeln('tr');
+ 2782     writeln('t');
+ 2785  
+ 2785  (******************************************************************************
+ 2785  
+ 2785                              Reals
+ 2785  
+ 2785  ******************************************************************************)
+ 2785  
+ 2785     writeln;
+ 2786     writeln('******************* Reals ******************************');
+ 2789     writeln;
+ 2790  
+ 2790     (* formats, input (compiler) and output *)
+ 2790     writeln('Real1:   ', 1.554:15, ' s/b  1.554000e+00');
+ 2798     writeln('Real2:   ', 0.00334:15, ' s/b  3.340000e-03');
+ 2806     writeln('Real3:   ', 0.00334e-21:15, ' s/b  3.34000e-24');
+ 2814     writeln('Real4:   ', 4e-45:15, ' s/b  4.000000e-45');
+ 2822     writeln('Real5:   ', -5.565:15, ' s/b -5.565000e+03');
+ 2831     writeln('Real6:   ', -0.00944:15, ' s/b -9.440000e-03');
+ 2840     writeln('Real7:   ', -0.006364e+32:15, ' s/b -6.364000e+29');
+ 2849     writeln('Real8:   ', -2e-14:15, ' s/b -2.000000e-14');
+ 2858     writeln('Real9:');
+ 2861     writeln('         11111111112222222222333333333344444444445');
+ 2864     writeln('12345678901234567890123456789012345678901234567890');
+ 2867     for i := 1 to 20 do writeln(1.23456789012345678901234567890:i);
+ 2876     writeln('s/b (note precision dropoff at right):');
+ 2879     writeln(' 1.2e+000');
+ 2882     writeln(' 1.2e+000');
+ 2885     writeln(' 1.2e+000');
+ 2888     writeln(' 1.2e+000');
+ 2891     writeln(' 1.2e+000');
+ 2894     writeln(' 1.2e+000');
+ 2897     writeln(' 1.2e+000');
+ 2900     writeln(' 1.2e+000');
+ 2903     writeln(' 1.2e+000');
+ 2906     writeln(' 1.23e+000');
+ 2909     writeln(' 1.234e+000');
+ 2912     writeln(' 1.2345e+000');
+ 2915     writeln(' 1.23456e+000');
+ 2918     writeln(' 1.234567e+000');
+ 2921     writeln(' 1.2345678e+000');
+ 2924     writeln(' 1.23456789e+000');
+ 2927     writeln(' 1.234567890e+000');
+ 2930     writeln(' 1.2345678901e+000');
+ 2933     writeln(' 1.23456789012e+000');
+ 2936     writeln(' 1.234567890123e+000');
+ 2939     writeln('Real10:');
+ 2942     writeln('         11111111112222222222333333333344444444445');
+ 2945     writeln('12345678901234567890123456789012345678901234567890');
+ 2948     for i := 1 to 20 do writeln(i+0.23456789012345678901234567890:1:i);
+ 2961     writeln('s/b (note precision dropoff at right):');
+ 2964     writeln('1.2');
+ 2967     writeln('2.23');
+ 2970     writeln('3.234');
+ 2973     writeln('4.2345');
+ 2976     writeln('5.23456');
+ 2979     writeln('6.234567');
+ 2982     writeln('7.2345678');
+ 2985     writeln('8.23456789');
+ 2988     writeln('9.234567890');
+ 2991     writeln('10.2345678901');
+ 2994     writeln('11.23456789012');
+ 2997     writeln('12.234567890123');
+ 3000     writeln('13.2345678901234');
+ 3003     writeln('14.23456789012345');
+ 3006     writeln('15.234567890123456');
+ 3009     writeln('16.2345678901234567');
+ 3012     writeln('17.23456789012345678');
+ 3015     writeln('18.234567890123456789');
+ 3018     writeln('19.2345678901234567890');
+ 3021     writeln('20.23456789012345678901');
+ 3024  
+ 3024     (* unsigned variables *)
+ 3024     ra := 435.23; 
+ 3027     rb := 983.67; 
+ 3030     rc := rb;
+ 3033     rd := 0.3443;
+ 3036     writeln('Real11:  ', ra + rb:15, ' s/b  1.418900e+03');
+ 3046     writeln('Rea112:  ', rb - ra:15, ' s/b  5.484399e+02');
+ 3056     writeln('Real13:  ', ra * rb:15, ' s/b  4.281227e+05');
+ 3066     writeln('Real14:  ', rb / ra:15, ' s/b  2.260115e+00');
+ 3076     writeln('Real15:  ', rc = rb:5, ' s/b true');
+ 3086     writeln('Real16:  ', ra = rb:5, ' s/b false');
+ 3096     writeln('Real17:  ', ra < rb:5, ' s/b true');
+ 3106     writeln('Real18:  ', rb < ra:5, ' s/b false');
+ 3116     writeln('Real19:  ', rb > ra:5, ' s/b true');
+ 3126     writeln('Real20:  ', ra > rb:5, ' s/b false');
+ 3136     writeln('Real21:  ', ra <> rb:5, ' s/b true');
+ 3146     writeln('Real22:  ', rb <> rc:5, ' s/b false');
+ 3156     writeln('Real23:  ', ra <= rb:5, ' s/b true');
+ 3166     writeln('Real24:  ', rc <= rb:5, ' s/b true');
+ 3176     writeln('Real25:  ', rb <= ra:5, ' s/b false');
+ 3186     writeln('Real26:  ', rb >= ra:5, ' s/b true');
+ 3196     writeln('Real27:  ', rb >= rc:5, ' s/b true');
+ 3206     writeln('Real28:  ', ra >= rb:5, ' s/b false');
+ 3216     writeln('Real29:  ', abs(ra):15, ' s/b  4.35230e+02');
+ 3225     writeln('Real30:  ', sqr(ra):15, ' s/b  1.89425e+05');
+ 3234     writeln('Real31:  ', sqrt(rb):15, ' s/b  3.13635e+01');
+ 3243     writeln('Real32:  ', sin(rb):15, ' s/b -3.44290e-01');
+ 3252     writeln('Real33:  ', arctan(ra):15, ' s/b  1.56850e+00');
+ 3261     writeln('Real34:  ', exp(rd):15, ' s/b  1.41100e+00');
+ 3270     writeln('Real35:  ', ln(ra):15, ' s/b  6.07587e+00');
+ 3279     writeln('Real36:  ', trunc(ra):1, ' s/b 435');
+ 3288     writeln('Real37:  ', round(rb):1, ' s/b 984');
+ 3297     writeln('Real38:  ', round(ra):1, ' s/b 435');
+ 3306  
+ 3306     (* unsigned constants *)
+ 3306     writeln('Real39:  ', 344.939 + 933.113:15, ' s/b  1.278052e+03');
+ 3316     writeln('Real40:  ', 883.885 - 644.939:15, ' s/b  2.389460e+02');
+ 3326     writeln('Real41:  ', 754.74 * 138.75:15, ' s/b  1.047202e+05');
+ 3336     writeln('Real42:  ', 634.3 / 87373.99:15, ' s/b  7.259598e-03');
+ 3346     writeln('Real43:  ', 77.44 = 77.44:5, ' s/b true');
+ 3356     writeln('Real44:  ', 733.9 = 959.2:5, ' s/b false');
+ 3366     writeln('Real45:  ', 883.22 < 8383.33:5, ' s/b true');
+ 3376     writeln('Real46:  ', 475.322 < 234.93:5, ' s/b false');
+ 3386     writeln('Real47:  ', 7374.3 > 6442.34:5, ' s/b true');
+ 3396     writeln('Real48:  ', 985.562 > 1001.95:5, ' s/b false');
+ 3406     writeln('Real49:  ', 030.11 <> 0938.44:5, ' s/b true');
+ 3416     writeln('Real50:  ', 1.233 <> 1.233:5, ' s/b false');
+ 3426     writeln('Real51:  ', 8484.002 <= 9344.003:5, ' s/b true');
+ 3436     writeln('Real52:  ', 9.11 <= 9.11:5, ' s/b true');
+ 3446     writeln('Real53:  ', 93.323 <= 90.323:5, ' s/b false');
+ 3456     writeln('Real54:  ', 6543.44 >= 5883.33:5, ' s/b true');
+ 3466     writeln('Real55:  ', 3247.03 >= 3247.03:5, ' s/b true');
+ 3476     writeln('Real56:  ', 28343.22 >= 30044.45:5, ' s/b false');
+ 3486     writeln('Real57:  ', abs(34.93):15, ' s/b  3.493000e+01');
+ 3495     writeln('Real58:  ', sqr(2.34):15, ' s/b  5.475600e+00');
+ 3504     writeln('Real59:  ', sqrt(9454.32):15, ' s/b  9.723333e+01');
+ 3513     writeln('Real60:  ', sin(34.22):15, ' s/b  3.311461e-01');
+ 3522     writeln('Real61:  ', arctan(343.2):15, ' s/b  1.567883e+00');
+ 3531     writeln('Real62:  ', exp(0.332):15, ' s/b  1.393753e+00');
+ 3540     writeln('Real63:  ', ln(83.22):15, ' s/b  4.421488e+00');
+ 3549     writeln('Real64:  ', trunc(24.344):1, ' s/b 24');
+ 3558     writeln('Real65:  ', round(74.56):1, ' s/b 75');
+ 3567     writeln('Real66:  ', round(83.24):1, ' s/b 83');
+ 3576     writeln('Real67:  ', rcnst:15, ' s/b  4.333000e+01');
+ 3584  
+ 3584     (* signed variables *)
+ 3584     ra := -734.2;
+ 3588     rb := -7634.52;
+ 3592     rc := ra;
+ 3595     rd := 1034.54;
+ 3598     re := -0.38483;
+ 3602     writeln('Real68:  ', ra + rd:15, ' s/b  3.003400e+02');
+ 3612     writeln('Real69:  ', rd + ra:15, ' s/b  3.003400e+02');
+ 3622     writeln('Real70:  ', rb + rd:15, ' s/b -6.599980e+03');
+ 3632     writeln('Real71:  ', ra + rb:15, ' s/b -8.368720e+03');
+ 3642     writeln('Real72:  ', rd - ra:15, ' s/b  1.768740e+03');
+ 3652     writeln('Real73:  ', rb - rd:15, ' s/b -8.669061e+03');
+ 3662     writeln('Real74:  ', rb - ra:15, ' s/b -6.900320e+03');
+ 3672     writeln('Real75:  ', rd * ra:15, ' s/b -7.595593e+05');
+ 3682     writeln('Real76:  ', ra * rd:15, ' s/b -7.595593e+05');
+ 3692     writeln('Real77:  ', ra * rb:15, ' s/b  5.605265e+06');
+ 3702     writeln('Real78:  ', rd / ra:15, ' s/b -1.409071e+00');
+ 3712     writeln('Real79:  ', rb / rd:15, ' s/b -7.379627e+00');
+ 3722     writeln('Real80:  ', rb / ra:15, ' s/b  1.039842e+01');
+ 3732     writeln('Real81:  ', ra = rc:5, ' s/b true');
+ 3742     writeln('Real82:  ', ra = rb:5, ' s/b false');
+ 3752     writeln('Real83:  ', ra <> rb:5, ' s/b true');
+ 3762     writeln('Real84:  ', ra <> rc:5, ' s/b false');
+ 3772     writeln('Real85:  ', ra < rd:5, ' s/b true');
+ 3782     writeln('Real86:  ', rb < ra:5, ' s/b true');
+ 3792     writeln('Real87:  ', rd < ra:5, ' s/b false');
+ 3802     writeln('Real88:  ', ra < rb:5, ' s/b false');
+ 3812     writeln('Real89:  ', rd > ra:5, ' s/b true');
+ 3822     writeln('Real90:  ', ra > rb:5, ' s/b true');
+ 3832     writeln('Real91:  ', ra > rd:5, ' s/b false');
+ 3842     writeln('Real92:  ', rb > ra:5, ' s/b false');
+ 3852     writeln('Real93:  ', ra <= rd:5, ' s/b true');
+ 3862     writeln('Real94:  ', rb <= ra:5, ' s/b true');
+ 3872     writeln('Real95:  ', ra <= rc:5, ' s/b true');
+ 3882     writeln('Real96:  ', rd <= ra:5, ' s/b false');
+ 3892     writeln('Real97:  ', ra <= rb:5, ' s/b false');
+ 3902     writeln('Real98:  ', rd >= ra:5, ' s/b true');
+ 3912     writeln('Real99:  ', ra >= rb:5, ' s/b true');
+ 3922     writeln('Real100: ', ra >= rc:5, ' s/b true');
+ 3932     writeln('Real101: ', ra >= rd:5, ' s/b false');
+ 3942     writeln('Real102: ', rb >= ra:5, ' s/b false');
+ 3952     writeln('Real103: ', abs(ra):15, ' s/b  7.34200e+02');
+ 3961     writeln('Real104: ', sqr(ra):15, ' s/b  5.39050e+05');
+ 3970     writeln('Real105: ', sin(rb):15, ' s/b -4.34850e-01');
+ 3979     writeln('Real106: ', arctan(ra):15, ' s/b -1.56943e+00');
+ 3988     writeln('Real107: ', exp(re):15, ' s/b  6.80566e-01');
+ 3997     writeln('Real108: ', trunc(ra):15, ' s/b -734');
+ 4006     writeln('Real109: ', round(rb):15, ' s/b -7635');
+ 4015     writeln('Real110: ', round(ra):15, ' s/b -734');
+ 4024  
+ 4024     (* signed constants *)
+ 4024     writeln('Real111: ', 45.934 + (-30.834):15, ' s/b  1.510000e+01');
+ 4035     writeln('Real112: ', -25.737 + 70.87:15, ' s/b  4.513300e+01');
+ 4046     writeln('Real113: ', -62.63 + 23.99:15, ' s/b -3.864000e+01');
+ 4057     writeln('Real114: ', -20.733 + (-15.848):15, ' s/b -3.658100e+01');
+ 4069     writeln('Real115: ', 20.774 - (-14.774):15, ' s/b  3.554800e+01');
+ 4080     writeln('Real116: ', -34.523 - 14.8754:15, ' s/b -4.939840e+01');
+ 4091     writeln('Real117: ', -56.664 - (-12.663):15, ' s/b -4.400100e+01');
+ 4103     writeln('Real118: ', 5.663 * (-4.664):15, ' s/b -2.641223e+01');
+ 4114     writeln('Real119: ', (-18.62) * 7.997:15, ' s/b -1.489041e+02');
+ 4125     writeln('Real120: ', (-40.552) * (-13.774):15, ' s/b  5.585632e+02');
+ 4137     writeln('Real121: ', 30.6632 / (-5.874):15, ' s/b -5.220157e+00');
+ 4148     writeln('Real122: ', (-50.636) / 2.8573:15, ' s/b -1.772163e+01');
+ 4159     writeln('Real123: ', (-20.7631) / (-4.85734):15, ' s/b  4.274582e+00');
+ 4171     writeln('Real124: ', -5.775 = -5.775:5, ' s/b true');
+ 4183     writeln('Real125: ', -5.6364 = 5.8575:5, ' s/b false');
+ 4194     writeln('Real126: ', -21.6385 <> -40.764:5, ' s/b true');
+ 4206     writeln('Real127: ', -21.772 <> -21.772:5, ' s/b false');
+ 4218     writeln('Real128: ', -3.512 < 5.8467:5, ' s/b true');
+ 4229     writeln('Real129: ', -32.644 < -20.9074:5, ' s/b true');
+ 4241     writeln('Real130: ', 20.763 < -20.743:5, ' s/b false');
+ 4252     writeln('Real131: ', -15.663 < -40.784:5, ' s/b false');
+ 4264     writeln('Real132: ', 70.766 > -4.974:5, ' s/b true');
+ 4275     writeln('Real133: ', -23.6532 > -34.774:5, ' s/b true');
+ 4287     writeln('Real134: ', -5.773 > 5.9874:5, ' s/b false');
+ 4298     writeln('Real135: ', -60.663 > -59.78:5, ' s/b false');
+ 4310     writeln('Real136: ', -12.542 <= 4.0848:5, ' s/b true');
+ 4321     writeln('Real137: ', -14.8763 <= -5.0847:5, ' s/b true');
+ 4333     writeln('Real138: ', -7.8373 <= -7.8373:5, ' s/b true');
+ 4345     writeln('Real139: ', 5.4564 <= -5.4564:5, ' s/b false');
+ 4356     writeln('Real140: ', -10.72633 <= -20.984:5, ' s/b false');
+ 4368     writeln('Real141: ', 9.834 >= -3.9383:5, ' s/b true');
+ 4379     writeln('Real142: ', -4.562 >= -10.74:5, ' s/b true');
+ 4391     writeln('Real143: ', -13.63 >= -13.63:5, ' s/b true');
+ 4403     writeln('Real144: ', -6.74 >= 6.74:5, ' s/b false');
+ 4414     writeln('Real145: ', -20.7623 >= -10.574:5, ' s/b false');
+ 4426     writeln('Real146: ', abs(-6.823):15, ' s/b  6.823000e+00');
+ 4436     writeln('Real147  ', sqr(-348.22):15, ' s/b  1.212572e+05');
+ 4446     writeln('Real148: ', sin(-733.22):15, ' s/b  9.421146e-01');
+ 4456     writeln('Real149: ', arctan(-8387.22):15, ' s/b -1.570677e+00');
+ 4466     writeln('Real150: ', exp(-0.8743):15, ' s/b  4.171539e-01');
+ 4476     writeln('Real151: ', trunc(-33.422):1, ' s/b -33');
+ 4486     writeln('Real152: ', round(-843.22):1, ' s/b -843');
+ 4496     writeln('Real153: ', round(-6243.76):1, ' s/b -6244');
+ 4506     writeln('Real154: ', rscst:15, ' s/b -8.422000e+01');
+ 4514  
+ 4514  (******************************************************************************
+ 4514  
+ 4514                              Arrays
+ 4514  
+ 4514  ******************************************************************************)
+ 4514  
+ 4514     writeln;
+ 4515     writeln('******************* arrays ******************************');
+ 4518     writeln;
+ 4519    
+ 4519     (* single demension, integer index *)
+ 4519     write('Array1:   ');
+ 4521     for i := 1 to 10 do avi[i] := i+10;
+ 4533     for i := 10 downto 1 do write(avi[i]:1, ' ');
+ 4546     writeln(' s/b 20 19 18 17 16 15 14 13 12 11');
+ 4549     write('Array5:   ');
+ 4551     for i := 1 to 10 do avb[i] := odd(i);
+ 4562     for i := 10 downto 1 do write(avb[i]:5, ' ');
+ 4575     writeln;
+ 4576     writeln('    s/b:   false  true false  true false  true false  true false',
+ 4578             '  true');
+ 4581     write('Array7:   ');
+ 4583     for i := 1 to 10 do avr[i] := i+10+0.12;
+ 4598     for i := 10 downto 1 do write(avr[i]:1:2, ' ');
+ 4612     writeln;
+ 4613     writeln('    s/b:   20.12 19.12 18.12 17.12 16.12 15.12 14.12 ',
+ 4615             '13.12 12.12 11.12');
+ 4618     write('Array9:   ');
+ 4620     for i := 1 to 10 do avc[i] := chr(i+ord('a'));
+ 4634     for i := 10 downto 1 do write(avc[i]:1, ' ');
+ 4647     writeln('s/b k j i h g f e d c b');
+ 4650     write('Array19:  ');
+ 4652     for i := 1 to 10 do 
+ 4656        begin avrc[i].a := i+10; avrc[i].b := chr(i+ord('a')) end;
+ 4674     for i := 10 downto 1 do write(avrc[i].a:1, ' ', avrc[i].b, ' ');
+ 4695     writeln;
+ 4696     writeln('     s/b:  20 k 19 j 18 i 17 h 16 g 15 f 14 e 13 d 12 c 11 b');
+ 4699     write('Array20:  ');
+ 4701  
+ 4701     (* multidementional arrays *)
+ 4701     writeln('Array35:');
+ 4704     z := 0;
+ 4707     for x := 1 to 10 do
+ 4711        for y := 1 to 10 do begin da[y, x] := z; z := z + 1 end;
+ 4729     for x := 1 to 10 do
+ 4733     begin
+ 4733        for y := 1 to 10 do write(da[x][y]:2, ' ');
+ 4748        writeln;
+ 4749     end;
+ 4750     writeln('s/b');
+ 4753     writeln('0 10 20 30 40 50 60 70 80 90');
+ 4756     writeln('1 11 21 31 41 51 61 71 81 91'); 
+ 4759     writeln('2 12 22 32 42 52 62 72 82 92'); 
+ 4762     writeln('3 13 23 33 43 53 63 73 83 93'); 
+ 4765     writeln('4 14 24 34 44 54 64 74 84 94'); 
+ 4768     writeln('5 15 25 35 45 55 65 75 85 95'); 
+ 4771     writeln('6 16 26 36 46 56 66 76 86 96'); 
+ 4774     writeln('7 17 27 37 47 57 67 77 87 97'); 
+ 4777     writeln('8 18 28 38 48 58 68 78 88 98'); 
+ 4780     writeln('9 19 29 39 49 59 69 79 89 99'); 
+ 4783     writeln('Array36: ');
+ 4786     t := 0;
+ 4789     for i := 1 to 2 do
+ 4793        for x := 1 to 2 do
+ 4797           for y := 1 to 2 do
+ 4801              for z := 1 to 2 do
+ 4805                 for q := 1 to 2 do
+ 4809                    for n := 1 to 2 do 
+ 4813                       begin mdar[i][x, y, z][q][n] := t; t := t+1 end;
+ 4839     for i := 2 downto 1 do
+ 4843        for x := 2 downto 1 do
+ 4847           for y := 2 downto 1 do begin
+ 4851  
+ 4851              for z := 2 downto 1 do
+ 4855                 for q := 2 downto 1 do
+ 4859                    for n := 2 downto 1 do write(mdar[i, x][y, z][q][n]:2, ' ');
+ 4884              writeln;
+ 4885  
+ 4885           end;
+ 4888     writeln('s/b:');
+ 4891     writeln('63 62 61 60 59 58 57 56');
+ 4894     writeln('55 54 53 52 51 50 49 48');
+ 4897     writeln('47 46 45 44 43 42 41 40');
+ 4900     writeln('39 38 37 36 35 34 33 32');
+ 4903     writeln('31 30 29 28 27 26 25 24');
+ 4906     writeln('23 22 21 20 19 18 17 16');
+ 4909     writeln('15 14 13 12 11 10  9  8');
+ 4912     writeln(' 7  6  5  4  3  2  1  0');
+ 4915  
+ 4915     (* assignments *)
+ 4915     writeln('Array38: ');
+ 4918     for i := 1 to 10 do avi[i] := i+10;
+ 4930     avi2 := avi;
+ 4933     for i := 10 downto 1 do write(avi2[i]:1, ' ');
+ 4946     writeln('s/b 20 19 18 17 16 15 14 13 12 11');
+ 4949     writeln('Array39: ');
+ 4952     t := 0;
+ 4955     for i := 1 to 2 do
+ 4959        for x := 1 to 2 do
+ 4963           for y := 1 to 2 do
+ 4967              for z := 1 to 2 do
+ 4971                 for q := 1 to 2 do
+ 4975                    for n := 1 to 2 do 
+ 4979                       begin mdar[i][x, y, z][q][n] := t; t := t+1 end;
+ 5005     mdar2 := mdar;
+ 5008     for i := 2 downto 1 do
+ 5012        for x := 2 downto 1 do
+ 5016           for y := 2 downto 1 do begin
+ 5020  
+ 5020              for z := 2 downto 1 do
+ 5024                 for q := 2 downto 1 do
+ 5028                    for n := 2 downto 1 do write(mdar2[i, x][y, z][q][n]:2, ' ');
+ 5053              writeln;
+ 5054  
+ 5054           end;
+ 5057     writeln('s/b:');
+ 5060     writeln('63 62 61 60 59 58 57 56');
+ 5063     writeln('55 54 53 52 51 50 49 48');
+ 5066     writeln('47 46 45 44 43 42 41 40');
+ 5069     writeln('39 38 37 36 35 34 33 32');
+ 5072     writeln('31 30 29 28 27 26 25 24');
+ 5075     writeln('23 22 21 20 19 18 17 16');
+ 5078     writeln('15 14 13 12 11 10  9  8');
+ 5081     writeln(' 7  6  5  4  3  2  1  0');
+ 5084  
+ 5084  (******************************************************************************
+ 5084  
+ 5084                              Records
+ 5084  
+ 5084  ******************************************************************************)
+ 5084  
+ 5084     writeln;
+ 5085     writeln('******************* records ******************************');
+ 5088     writeln;
+ 5089  
+ 5089     (* types in records *)
+ 5089     writeln('Record1:   ');
+ 5092     arec.i := 64;
+ 5095     arec.b := false;
+ 5099     arec.c := 'j';
+ 5103     arec.r := 4545.12e-32;
+ 5107     for i := 1 to 10 do arec.a[i] := i+20;
+ 5120     arec.rc.a := 2324;
+ 5124     arec.rc.b := 'y';
+ 5129     writeln(arec.i:1, ' ', arec.b:5, ' ', arec.c:1, ' ',
+ 5149             ' ', arec.r:15);
+ 5157     for i := 1 to 10 do write(arec.a[i]:1, ' '); writeln;
+ 5172     writeln(arec.rc.a:1, ' ', arec.rc.b:1);
+ 5186     writeln('s/b:');
+ 5189     writeln('64 false j 4.54512000e-29'); 
+ 5192     writeln('21 22 23 24 25 26 27 28 29 30');
+ 5195     writeln('2324 y');
+ 5198  
+ 5198     (* nested records *)
+ 5198     write('Record23:  ');
+ 5200     nvr.i := 1;
+ 5203     nvr.r.i := 2;
+ 5207     nvr.r.r.i := 3;
+ 5212     nvr.r.r.r.i := 4;
+ 5218     nvr.r.r.r.r.i := 5;
+ 5225     nvr.r.r.r.r.r.i := 6;
+ 5233     nvr.r.r.r.r.r.r.i := 7;
+ 5242     nvr.r.r.r.r.r.r.r.i := 8;
+ 5252     nvr.r.r.r.r.r.r.r.r.i := 9;
+ 5263     nvr.r.r.r.r.r.r.r.r.r.i := 10;
+ 5275     writeln(nvr.i:1, ' ', 
+ 5281             nvr.r.i:1, ' ', 
+ 5288             nvr.r.r.i:1, ' ',
+ 5296             nvr.r.r.r.i:1, ' ', 
+ 5305             nvr.r.r.r.r.i:1, ' ',
+ 5315             nvr.r.r.r.r.r.i:1, ' ', 
+ 5326             nvr.r.r.r.r.r.r.i:1, ' ',
+ 5338             nvr.r.r.r.r.r.r.r.i:1, ' ',
+ 5351             nvr.r.r.r.r.r.r.r.r.i:1, ' ',
+ 5365             nvr.r.r.r.r.r.r.r.r.r.i:1, ' ',
+ 5380             's/b 1 2 3 4 5 6 7 8 9 10');
+ 5383  
+ 5383  (******************************************************************************
+ 5383  
+ 5383                           Procedures and functions
+ 5383  
+ 5383  ******************************************************************************)
+ 5383   
+ 5383     writeln;
+ 5384     writeln('************ Procedures and functions ******************');
+ 5387     writeln;
+ 5388     write('ProcedureFunction1:   ');
+ 5390     x := 45; y := 89;
+ 5396     junk1(x, y);
+ 5400     writeln(' s/b 45 89');
+ 5403     write('ProcedureFunction2:   ');
+ 5405     x := 45; junk2(x);
+ 5411     writeln(x:1, ' s/b 46');
+ 5417     write('ProcedureFunction5:   ');
+ 5419     writeln(junk5(34):1, ' s/b 35');
+ 5427     write('ProcedureFunction6:   ');
+ 5429     i := junk7(10, 9, 8);
+ 5436     writeln(' ', i:1);
+ 5442     writeln('s/b:   10 9 8 6 5 4 3 2 1 78');
+ 5445     writeln('ProcedureFunction7:');
+ 5448     for i := 1 to 10 do ai[i] := i+10;
+ 5460     arec.i := 64;
+ 5463     arec.b := false;
+ 5467     arec.c := 'j';
+ 5471     arec.r := 4545.12e-32;
+ 5475     for i := 1 to 10 do arec.a[i] := i+20;
+ 5488     arec.rc.a := 2324;
+ 5492     arec.rc.b := 'y';
+ 5497     junk8(93, true, 'k', 3.1414, ai, arec); 
+ 5507     writeln('s/b:');
+ 5510     writeln('93  true k 3.14140000e+00');
+ 5513     writeln('11 12 13 14 15 16 17 18 19 20');
+ 5516     writeln('64 false j 4.54500000e-29'); 
+ 5519     writeln('21 22 23 24 25 26 27 28 29 30');
+ 5522     writeln('2324 y');
+ 5525     write('ProcedureFunction10:   ');
+ 5527     junk14;
+ 5529     writeln(' s/b 62 76');
+ 5532  
+ 5532  (******************************************************************************
+ 5532  
+ 5532                                   Metering
+ 5532  
+ 5532  ******************************************************************************)
+ 5532  
+ 5532     writeln;
+ 5533     writeln('The following are implementation defined characteristics');
+ 5536     writeln;
+ 5537     writeln('Integer default output field');
+ 5540     writeln('         1111111111222222222233333333334');
+ 5543     writeln('1234567890123456789012345678901234567890');
+ 5546     writeln(1);
+ 5549     writeln('Real default output field');
+ 5552     writeln('         1111111111222222222233333333334');
+ 5555     writeln('1234567890123456789012345678901234567890');
+ 5558     writeln(1.2);
+ 5561     writeln('Boolean default output field');
+ 5564     writeln('         1111111111222222222233333333334');
+ 5567     writeln('1234567890123456789012345678901234567890');
+ 5570     writeln(false);
+ 5573     writeln(true);
+ 5576     writeln('Char default output field');
+ 5579     writeln('         1111111111222222222233333333334');
+ 5582     writeln('1234567890123456789012345678901234567890');
+ 5585     writeln('a');
+ 5588     if (ord('a') = 97) and (ord('(') = 40) and (ord('^') = 94) then
+ 5603        writeln('Appears to be ASCII')
+ 5605     else
+ 5606        writeln('Appears to not be ASCII')
+ 5609  
+ 5609  end.
+ (eof) 
+*******************************************************************************
+
+                 TEST SUITE FOR PASCAL-S PASCAL
+
+                 Copyright (C) 1995 S. A. Moore - All rights reserved
+
+*******************************************************************************
+
+
+******************* Control structures tests *******************
+
+Control1: 1 2 3 4 5 6 7 8 9 10 s/b 1 2 3 4 5 6 7 8 9 10
+Control2: 10 9 8 7 6 5 4 3 2 1 s/b 10 9 8 7 6 5 4 3 2 1
+Control3: 1 2 3 4 5 6 7 8 9 10 s/b 1 2 3 4 5 6 7 8 9 10
+Control4: 1 2 3 4 5 6 7 8 9 10 s/b 1 2 3 4 5 6 7 8 9 10
+Control6: yes s/b yes
+Control7: yes s/b yes
+Control8: yes stop s/b yes stop
+Control9: stop s/b stop
+Control10: one two three four five six seven eight nine-ten nine-ten 
+Control10: s/b one two three four five six seven eight nine-ten nine-ten
+
+******************* Integers *******************
+
+Integer1:   121 s/b 121
+Integer2:   35 s/b 35
+Integer3:   3354 s/b 3354
+Integer4:   1 s/b 1
+Integer5:   35 s/b 35
+Integer8:   N s/b N
+Integer9:   43 s/b 43
+Integer10:   true s/b true
+Integer11:  false s/b false
+Integer12:   true s/b true
+Integer13:  false s/b false
+Integer14:   true s/b true
+Integer15:  false s/b false
+Integer16:   true s/b true
+Integer17:  false s/b false
+Integer18:   true s/b true
+Integer19:  false s/b false
+Integer20:   true s/b true
+Integer21:   true s/b true
+Integer22:  false s/b false
+Integer23:   true s/b true
+Integer24:   true s/b true
+Integer25:  false s/b false
+Integer31:  546 s/b 546
+Integer32:  90 s/b 90
+Integer33:  22 s/b 22
+Integer34:  1904 s/b 1904
+Integer35:  1 s/b 1
+Integer36:  22 s/b 22
+Integer39:  A s/b A
+Integer40:  65 s/b 65
+Integer41:  768 s/b 768
+Integer42:   true s/b true
+Integer43:  false s/b false
+Integer44:   true s/b true
+Integer45:  false s/b false
+Integer46:   true s/b true
+Integer47:  false s/b false
+Integer48:   true s/b true
+Integer49:  false s/b false
+Integer50:   true s/b true
+Integer51:  false s/b false
+Integer52:   true s/b true
+Integer53:   true s/b true
+Integer54:  false s/b false
+Integer55:   true s/b true
+Integer56:   true s/b true
+Integer57:  false s/b false
+Integer58:  6 s/b 6
+Integer59:  6 s/b 6
+Integer60:  -12 s/b -12
+Integer61:  -46 s/b -46
+Integer62:  34 s/b 34
+Integer63:  -52 s/b -52
+Integer64:  -18 s/b -18
+Integer65:  -280 s/b -280
+Integer66:  -280 s/b -280
+Integer67:  448 s/b 448
+Integer68:  -1 s/b -1
+Integer69:  -1 s/b -1
+Integer70:  2 s/b 2
+Integer73:  false s/b false
+Integer74:   true s/b true
+Integer75:   true s/b true
+Integer76:  false s/b false
+Integer77:   true s/b true
+Integer78:  false s/b false
+Integer79:   true s/b true
+Integer80:   true s/b true
+Integer81:  false s/b false
+Integer82:  false s/b false
+Integer83:   true s/b true
+Integer84:   true s/b true
+Integer85:  false s/b false
+Integer86:  false s/b false
+Integer87:   true s/b true
+Integer88:   true s/b true
+Integer89:   true s/b true
+Integer90:  false s/b false
+Integer91:  false s/b false
+Integer92:   true s/b true
+Integer93:   true s/b true
+Integer94:   true s/b true
+Integer95:  false s/b false
+Integer96:  false s/b false
+Integer97:  14 s/b 14
+Integer98:  15 s/b 15
+Integer99:  45 s/b 45
+Integer100: -39 s/b -39
+Integer101: -35 s/b -35
+Integer102: 34 s/b 34
+Integer103: -48 s/b -48
+Integer104: -44 s/b -44
+Integer105: -20 s/b -20
+Integer106: -126 s/b -126
+Integer107: 520 s/b 520
+Integer108: -6 s/b -6
+Integer109: -25 s/b -25
+Integer110: 5 s/b 5
+Integer115: false s/b false
+Integer116:  true s/b true
+Integer117:  true s/b true
+Integer118: false s/b false
+Integer119:  true s/b true
+Integer120: false s/b false
+Integer121:  true s/b true
+Integer122:  true s/b true
+Integer123: false s/b false
+Integer124: false s/b false
+Integer125:  true s/b true
+Integer126:  true s/b true
+Integer127: false s/b false
+Integer128: false s/b false
+Integer129:  true s/b true
+Integer130:  true s/b true
+Integer131:  true s/b true
+Integer132: false s/b false
+Integer133: false s/b false
+Integer134:  true s/b true
+Integer135:  true s/b true
+Integer136:  true s/b true
+Integer137: false s/b false
+Integer138: false s/b false
+Integer139: 6 s/b 6
+Integer140: -52 s/b -52
+
+******************* Characters*******************
+
+Character1:   g g u s/b g g u
+Character2:   h s/b h
+Character3:   f s/b f
+Character4:   103 s/b 103
+Character5:   u s/b u
+Character6:    true s/b true
+Character7:   false s/b false
+Character8:    true s/b true
+Character9:   false s/b false
+Character10:   true s/b true
+Character11:  false s/b false
+Character12:   true s/b true
+Character13:  false s/b false
+Character14:   true s/b true
+Character15:   true s/b true
+Character16:  false s/b false
+Character17:   true s/b true
+Character18:   true s/b true
+Character19:  false s/b false
+Character44:  abcdefghijklmnopqrstuvwxyz s/b abcdefghijklmnopqrstuvwxyz
+Character45:  zyxwvutsrqponmlkjihgfedcba s/b zyxwvutsrqponmlkjihgfedcba
+Character46:  25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0 
+Character46: s/b 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0
+Character47: n s/b n
+Character50:  
+zero one two three four five six seven eight nine 
+ s/b zero one two three four five six seven eight nine
+Character51:  a s/b a
+Character52:  b s/b b
+Character53:  y s/b y
+Character54:  99 s/b 99
+Character55:  g s/b g
+Character56:   true s/b true
+Character57:  false s/b false
+Character58:   true s/b true
+Character59:  false s/b false
+Character50:   true s/b true
+Character61:  false s/b false
+Character62:   true s/b true
+Character63:  false s/b false
+Character64:   true s/b true
+Character65:   true s/b true
+Character66:  false s/b false
+Character67:   true s/b true
+Character68:   true s/b true
+Character69:  false s/b false
+Character85:  v s/b v
+
+******************* Booleans *******************
+
+Boolean1:    true false s/b true false
+Boolean4:   0 s/b 0
+Boolean5:   1 s/b 1
+Boolean6:    true s/b true
+Boolean7:    true s/b true
+Boolean8:   false s/b false
+Boolean9:    true s/b true
+Boolean10:  false s/b false
+Boolean11:   true s/b true
+Boolean12:  false s/b false
+Boolean13:   true s/b true
+Boolean14:  false s/b false
+Boolean15:   true s/b true
+Boolean16:   true s/b true
+Boolean17:  false s/b false
+Boolean18:   true s/b true
+Boolean19:   true s/b true
+Boolean20:  false s/b false
+Boolean21:  false  true s/b false true
+Boolean22:   true false s/b true false
+Boolean23:   true s/b true
+Boolean24:  false s/b false
+Boolean25:   true false s/b true false
+Boolean28:  0 s/b 0
+Boolean29:  1 s/b 1
+Boolean30:   true s/b true
+Boolean31:   true s/b true
+Boolean32:  false s/b false
+Boolean33:   true s/b true
+Boolean34:  false s/b false
+Boolean35:   true s/b true
+Boolean36:  false s/b false
+Boolean37:   true s/b true
+Boolean38:  false s/b false
+Boolean39:   true s/b true
+Boolean40:   true s/b true
+Boolean41:  false s/b false
+Boolean42:   true s/b true
+Boolean43:   true s/b true
+Boolean44:  false s/b false
+Boolean45:
+     false
+    false
+   false
+  false
+ false
+false
+fals
+fal
+fa
+f
+Boolean46: s/b:
+     false
+    false
+   false
+  false
+ false
+false
+fals
+fal
+fa
+f
+Boolean47:
+      true
+     true
+    true
+   true
+  true
+ true
+true
+tru
+tr
+t
+Boolean48: s/b:
+      true
+     true
+    true
+   true
+  true
+ true
+true
+tru
+tr
+t
+
+******************* Reals ******************************
+
+Real1:    1.5540000e+000 s/b  1.554000e+00
+Real2:    3.3400000e-003 s/b  3.340000e-03
+Real3:    3.3400000e-024 s/b  3.34000e-24
+Real4:    4.0000000e-045 s/b  4.000000e-45
+Real5:   -5.5650000e+000 s/b -5.565000e+03
+Real6:   -9.4400000e-003 s/b -9.440000e-03
+Real7:   -6.3640000e+029 s/b -6.364000e+29
+Real8:   -2.0000000e-014 s/b -2.000000e-14
+Real9:
+         11111111112222222222333333333344444444445
+12345678901234567890123456789012345678901234567890
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.23e+000
+ 1.234e+000
+ 1.2345e+000
+ 1.23456e+000
+ 1.234567e+000
+ 1.2345678e+000
+ 1.23456789e+000
+ 1.234567890e+000
+ 1.2345678900e+000
+ 1.23456789000e+000
+ 1.234567890000e+000
+s/b (note precision dropoff at right):
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.2e+000
+ 1.23e+000
+ 1.234e+000
+ 1.2345e+000
+ 1.23456e+000
+ 1.234567e+000
+ 1.2345678e+000
+ 1.23456789e+000
+ 1.234567890e+000
+ 1.2345678901e+000
+ 1.23456789012e+000
+ 1.234567890123e+000
+Real10:
+         11111111112222222222333333333344444444445
+12345678901234567890123456789012345678901234567890
+1.2
+2.23
+3.234
+4.2345
+5.23456
+6.234567
+7.2345678
+8.23456789
+9.234567890
+10.2345678900
+11.23456789000
+12.234567890000
+13.2345678900000
+14.23456789000000
+15.234567890000000
+16.2345678900000000
+17.23456789000000000
+18.234567890000000000
+19.2345678900000000000
+20.23456789000000000000
+s/b (note precision dropoff at right):
+1.2
+2.23
+3.234
+4.2345
+5.23456
+6.234567
+7.2345678
+8.23456789
+9.234567890
+10.2345678901
+11.23456789012
+12.234567890123
+13.2345678901234
+14.23456789012345
+15.234567890123456
+16.2345678901234567
+17.23456789012345678
+18.234567890123456789
+19.2345678901234567890
+20.23456789012345678901
+Real11:   1.4189000e+003 s/b  1.418900e+03
+Rea112:   5.4844000e+002 s/b  5.484399e+02
+Real13:   4.2812269e+005 s/b  4.281227e+05
+Real14:   2.2601153e+000 s/b  2.260115e+00
+Real15:   true s/b true
+Real16:  false s/b false
+Real17:   true s/b true
+Real18:  false s/b false
+Real19:   true s/b true
+Real20:  false s/b false
+Real21:   true s/b true
+Real22:  false s/b false
+Real23:   true s/b true
+Real24:   true s/b true
+Real25:  false s/b false
+Real26:   true s/b true
+Real27:   true s/b true
+Real28:  false s/b false
+Real29:   4.3523000e+002 s/b  4.35230e+02
+Real30:   1.8942515e+005 s/b  1.89425e+05
+Real31:   3.1363513e+001 s/b  3.13635e+01
+Real32:  -3.4430594e-001 s/b -3.44290e-01
+Real33:   1.5684987e+000 s/b  1.56850e+00
+Real34:   1.4110018e+000 s/b  1.41100e+00
+Real35:   6.0758746e+000 s/b  6.07587e+00
+Real36:  435 s/b 435
+Real37:  984 s/b 984
+Real38:  435 s/b 435
+Real39:   1.2780520e+003 s/b  1.278052e+03
+Real40:   2.3894600e+002 s/b  2.389460e+02
+Real41:   1.0472017e+005 s/b  1.047202e+05
+Real42:   7.2595975e-003 s/b  7.259598e-03
+Real43:   true s/b true
+Real44:  false s/b false
+Real45:   true s/b true
+Real46:  false s/b false
+Real47:   true s/b true
+Real48:  false s/b false
+Real49:   true s/b true
+Real50:  false s/b false
+Real51:   true s/b true
+Real52:   true s/b true
+Real53:  false s/b false
+Real54:   true s/b true
+Real55:   true s/b true
+Real56:  false s/b false
+Real57:   3.4930000e+001 s/b  3.493000e+01
+Real58:   5.4756000e+000 s/b  5.475600e+00
+Real59:   9.7233327e+001 s/b  9.723333e+01
+Real60:   3.3114727e-001 s/b  3.311461e-01
+Real61:   1.5678825e+000 s/b  1.567883e+00
+Real62:   1.3937528e+000 s/b  1.393753e+00
+Real63:   4.4214877e+000 s/b  4.421488e+00
+Real64:  24 s/b 24
+Real65:  75 s/b 75
+Real66:  83 s/b 83
+Real67:   4.3330000e+001 s/b  4.333000e+01
+Real68:   3.0034000e+002 s/b  3.003400e+02
+Real69:   3.0034000e+002 s/b  3.003400e+02
+Real70:  -6.5999800e+003 s/b -6.599980e+03
+Real71:  -8.3687200e+003 s/b -8.368720e+03
+Real72:   1.7687400e+003 s/b  1.768740e+03
+Real73:  -8.6690600e+003 s/b -8.669061e+03
+Real74:  -6.9003200e+003 s/b -6.900320e+03
+Real75:  -7.5955926e+005 s/b -7.595593e+05
+Real76:  -7.5955926e+005 s/b -7.595593e+05
+Real77:   5.6052645e+006 s/b  5.605265e+06
+Real78:  -1.4090711e+000 s/b -1.409071e+00
+Real79:  -7.3796276e+000 s/b -7.379627e+00
+Real80:   1.0398420e+001 s/b  1.039842e+01
+Real81:   true s/b true
+Real82:  false s/b false
+Real83:   true s/b true
+Real84:  false s/b false
+Real85:   true s/b true
+Real86:   true s/b true
+Real87:  false s/b false
+Real88:  false s/b false
+Real89:   true s/b true
+Real90:   true s/b true
+Real91:  false s/b false
+Real92:  false s/b false
+Real93:   true s/b true
+Real94:   true s/b true
+Real95:   true s/b true
+Real96:  false s/b false
+Real97:  false s/b false
+Real98:   true s/b true
+Real99:   true s/b true
+Real100:  true s/b true
+Real101: false s/b false
+Real102: false s/b false
+Real103:  7.3420000e+002 s/b  7.34200e+02
+Real104:  5.3904964e+005 s/b  5.39050e+05
+Real105: -4.3483206e-001 s/b -4.34850e-01
+Real106: -1.5694343e+000 s/b -1.56943e+00
+Real107:  6.8056632e-001 s/b  6.80566e-01
+Real108:            -734 s/b -734
+Real109:           -7635 s/b -7635
+Real110:            -734 s/b -734
+Real111:  1.5100000e+001 s/b  1.510000e+01
+Real112:  4.5133000e+001 s/b  4.513300e+01
+Real113: -3.8640000e+001 s/b -3.864000e+01
+Real114: -3.6581000e+001 s/b -3.658100e+01
+Real115:  3.5548000e+001 s/b  3.554800e+01
+Real116: -4.9398400e+001 s/b -4.939840e+01
+Real117: -4.4001000e+001 s/b -4.400100e+01
+Real118: -2.6412232e+001 s/b -2.641223e+01
+Real119: -1.4890414e+002 s/b -1.489041e+02
+Real120:  5.5856324e+002 s/b  5.585632e+02
+Real121: -5.2201566e+000 s/b -5.220157e+00
+Real122: -1.7721625e+001 s/b -1.772163e+01
+Real123:  4.2745823e+000 s/b  4.274582e+00
+Real124:  true s/b true
+Real125: false s/b false
+Real126:  true s/b true
+Real127: false s/b false
+Real128:  true s/b true
+Real129:  true s/b true
+Real130: false s/b false
+Real131: false s/b false
+Real132:  true s/b true
+Real133:  true s/b true
+Real134: false s/b false
+Real135: false s/b false
+Real136:  true s/b true
+Real137:  true s/b true
+Real138:  true s/b true
+Real139: false s/b false
+Real140: false s/b false
+Real141:  true s/b true
+Real142:  true s/b true
+Real143:  true s/b true
+Real144: false s/b false
+Real145: false s/b false
+Real146:  6.8230000e+000 s/b  6.823000e+00
+Real147   1.2125716e+005 s/b  1.212572e+05
+Real148:  9.4212449e-001 s/b  9.421146e-01
+Real149: -1.5706771e+000 s/b -1.570677e+00
+Real150:  4.1715392e-001 s/b  4.171539e-01
+Real151: -33 s/b -33
+Real152: -843 s/b -843
+Real153: -6244 s/b -6244
+Real154: -8.4220000e+001 s/b -8.422000e+01
+
+******************* arrays ******************************
+
+Array1:   20 19 18 17 16 15 14 13 12 11  s/b 20 19 18 17 16 15 14 13 12 11
+Array5:   false  true false  true false  true false  true false  true 
+    s/b:   false  true false  true false  true false  true false  true
+Array7:   20.12 19.12 18.12 17.12 16.12 15.12 14.12 13.12 12.12 11.12 
+    s/b:   20.12 19.12 18.12 17.12 16.12 15.12 14.12 13.12 12.12 11.12
+Array9:   k j i h g f e d c b s/b k j i h g f e d c b
+Array19:  20 k 19 j 18 i 17 h 16 g 15 f 14 e 13 d 12 c 11 b 
+     s/b:  20 k 19 j 18 i 17 h 16 g 15 f 14 e 13 d 12 c 11 b
+Array20:  Array35:
+ 0 10 20 30 40 50 60 70 80 90 
+ 1 11 21 31 41 51 61 71 81 91 
+ 2 12 22 32 42 52 62 72 82 92 
+ 3 13 23 33 43 53 63 73 83 93 
+ 4 14 24 34 44 54 64 74 84 94 
+ 5 15 25 35 45 55 65 75 85 95 
+ 6 16 26 36 46 56 66 76 86 96 
+ 7 17 27 37 47 57 67 77 87 97 
+ 8 18 28 38 48 58 68 78 88 98 
+ 9 19 29 39 49 59 69 79 89 99 
+s/b
+0 10 20 30 40 50 60 70 80 90
+1 11 21 31 41 51 61 71 81 91
+2 12 22 32 42 52 62 72 82 92
+3 13 23 33 43 53 63 73 83 93
+4 14 24 34 44 54 64 74 84 94
+5 15 25 35 45 55 65 75 85 95
+6 16 26 36 46 56 66 76 86 96
+7 17 27 37 47 57 67 77 87 97
+8 18 28 38 48 58 68 78 88 98
+9 19 29 39 49 59 69 79 89 99
+Array36: 
+63 62 61 60 59 58 57 56 
+55 54 53 52 51 50 49 48 
+47 46 45 44 43 42 41 40 
+39 38 37 36 35 34 33 32 
+31 30 29 28 27 26 25 24 
+23 22 21 20 19 18 17 16 
+15 14 13 12 11 10  9  8 
+ 7  6  5  4  3  2  1  0 
+s/b:
+63 62 61 60 59 58 57 56
+55 54 53 52 51 50 49 48
+47 46 45 44 43 42 41 40
+39 38 37 36 35 34 33 32
+31 30 29 28 27 26 25 24
+23 22 21 20 19 18 17 16
+15 14 13 12 11 10  9  8
+ 7  6  5  4  3  2  1  0
+Array38: 
+20 19 18 17 16 15 14 13 12 11 s/b 20 19 18 17 16 15 14 13 12 11
+Array39: 
+63 62 61 60 59 58 57 56 
+55 54 53 52 51 50 49 48 
+47 46 45 44 43 42 41 40 
+39 38 37 36 35 34 33 32 
+31 30 29 28 27 26 25 24 
+23 22 21 20 19 18 17 16 
+15 14 13 12 11 10  9  8 
+ 7  6  5  4  3  2  1  0 
+s/b:
+63 62 61 60 59 58 57 56
+55 54 53 52 51 50 49 48
+47 46 45 44 43 42 41 40
+39 38 37 36 35 34 33 32
+31 30 29 28 27 26 25 24
+23 22 21 20 19 18 17 16
+15 14 13 12 11 10  9  8
+ 7  6  5  4  3  2  1  0
+
+******************* records ******************************
+
+Record1:   
+64 false j   4.5451200e-029
+21 22 23 24 25 26 27 28 29 30 
+2324 y
+s/b:
+64 false j 4.54512000e-29
+21 22 23 24 25 26 27 28 29 30
+2324 y
+Record23:  1 2 3 4 5 6 7 8 9 10 s/b 1 2 3 4 5 6 7 8 9 10
+
+************ Procedures and functions ******************
+
+ProcedureFunction1:   45 89 s/b 45 89
+ProcedureFunction2:   46 s/b 46
+ProcedureFunction5:   35 s/b 35
+ProcedureFunction6:   10 9 8 6 5 4 3 2 1 78
+s/b:   10 9 8 6 5 4 3 2 1 78
+ProcedureFunction7:
+93  true k  3.1414000e+000
+11 12 13 14 15 16 17 18 19 20 
+64 false j  4.5451200e-029 
+21 22 23 24 25 26 27 28 29 30 
+2324 y
+s/b:
+93  true k 3.14140000e+00
+11 12 13 14 15 16 17 18 19 20
+64 false j 4.54500000e-29
+21 22 23 24 25 26 27 28 29 30
+2324 y
+ProcedureFunction10:   62 76 s/b 62 76
+
+The following are implementation defined characteristics
+
+Integer default output field
+         1111111111222222222233333333334
+1234567890123456789012345678901234567890
+         1
+Real default output field
+         1111111111222222222233333333334
+1234567890123456789012345678901234567890
+ 1.20000000000000e+000
+Boolean default output field
+         1111111111222222222233333333334
+1234567890123456789012345678901234567890
+     false
+      true
+Char default output field
+         1111111111222222222233333333334
+1234567890123456789012345678901234567890
+a
+Appears to be ASCII
+
+      17296 steps

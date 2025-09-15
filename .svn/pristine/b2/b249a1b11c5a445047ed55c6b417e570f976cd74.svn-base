@@ -1,0 +1,98 @@
+********************************************************************************
+                                 IPIDE NOTES
+
+==================================== BUGS ======================================
+
+1. On a blank edit, you cannot move off line 1 until you type something.
+
+2. When hitting line down from the starting screen, when the scroll takes
+place, the scrollbar jumps. I suspect that the scroll position is set
+from the cursor and not the top of page as should be.
+
+3. The horizontal scrollbar does nothing.
+
+4. Most of the FX keys do nothing.
+
+5. Clicking on areas outside the text window removes the cursor and focus
+from the text window. This problem needs gralib help to solve, either to
+reject focus from areas that shouldn't have it, or a specific command to
+direct focus to a given window.
+
+6. Moving the cursor to mid screen, then hitting page down, then page up
+several times results in the vertical slider unable to return to top. This
+is likely because the check in page up for "already at top screen, go to top"
+does not sync the slider position.
+
+7. There is lots of tabbar flashes on redraws/resize. This seems to be
+a feature of tabbars in Windows.
+
+8. The tabbars are getting their stacking order flipped by a resize. This is
+a longstanding issue with gralib/windows, and we may have to force widget
+stacking order on such events.
+
+9. For consistency with the "virtual space" model, we can remove the limit
+on moving down into blank space. The scroll slider will simply remain at max
+for these excursions.
+
+=================================== Enhancements ===============================
+
+1. Block copy, paste, move, in line and collumar mode.
+
+2. Have a zone at line start that clicked, selects whole line.
+
+3. Undo/redo.
+
+4. Macros (goes with undo/redo).
+
+5. Search, search/replace.
+
+6. Toolbars.
+
+7. Multiple split windows for views.
+
+8. Help.
+
+9. Save and restore previous position of window, and files and views being
+worked on.
+
+10. Implement regular expression searches and search/replace.
+
+11. Add an options page to menu.
+
+12. Add scanner or parser/scanner.
+
+13. Color code program text.
+
+14. Automatically load (or virtually load) all parts of a project.
+
+15. Have the right side tabs actually come from source scans, or
+disappear if document is not a Pascal source.
+
+16. Have a bottom tab that lists extention types of the present name.
+
+17. Ability to run compile/link/run from the interface, and capture error
+files.
+
+18. A cli command interface and language.
+
+19. Have undo/redo present actions in cli form.
+
+20. Ability to edit a graphical layout sheet, and generate a
+program section to perform that layout.
+
+21. Generate a left line that presents change bars from previous
+(backup) version of document.
+
+22. Allow right clicks on symbols in document to bring down
+cross references and other info.
+
+23. Tear off windows, menus and other items.
+
+24. Version control.
+
+25. Tree listing with its own window.
+
+26. Ability to change keyword languages on the fly.
+
+27. Ability to handle a bug tracking db for files, including
+separate window, priority sorting, etc.

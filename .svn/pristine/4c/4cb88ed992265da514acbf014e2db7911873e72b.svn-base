@@ -1,0 +1,58 @@
+                      STRING HANDLING IN THE AGE OF OVERLOADS
+
+OVERVIEW
+
+Overloading gives the ability to greatly expand string handling capabilities
+without introducing a series of complex names. However, the types and modes
+of strings must be consistently handled, including their interactions with
+each other.
+
+STRING TYPES
+
+There are several basic string types:
+
+1. Right space padded strings.
+
+2. Fixed length strings.
+
+3. Dynamic strings.
+
+Padded strings may have one or more spaces at the end of the string, and
+the data in the string is considered to be with the end padding subtracted.
+
+Fixed length strings do not have padding, but it is not possible to create
+such a string, so operations involving these strings may not involve creating
+new strings. Examples of such operations are lcase and index. Fixed length
+routines can often handle either padded or dynamic string inputs.
+
+Dynamic strings can be created to any length. In addition, they can be disposed
+at will, and returned from functions.
+
+CREATE TO FREE DESIGNS
+
+Dynamic strings can fully substitute for string types as used in other
+implementations of Pascal where string is a built in type, by obeying a few
+rules.
+
+1. Strings must be specifically created. A copy(pstring, 'string') construct
+is used.
+
+2. Strings must be used or copied when used. For example, cat(stringa, stringb)
+must result in a new string.
+
+3. The result of a string function can be used in an assign:
+
+var s: pstring;
+
+s := dstring('hi there'); { place the constant as a dynamic and assign it }
+s := cat(s, ' george'); { add ' george' to that and store }
+
+The principle problem with such "carefree" designs is that dynamic strings are
+lost when used as temps this way. The above restated as "safe" appears:
+
+dispose(s); { remove previous contents of s }
+s := dstring('hi there'); { place the constant as a dynamic and assign it }
+s := cat(s, ' george'); { add ' george' to that and store }
+
+??? How to recover the "lost" original s after the cat ?
+

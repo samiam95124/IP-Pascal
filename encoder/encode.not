@@ -1,0 +1,134 @@
+================================================================================
+            
+                                ENCODER NOTES
+
+================================================================================
+
+*********************************** BUGS ***************************************
+
+
+******************************** IMPROVEMENTS **********************************
+
+1. "dribbling" of registers can be eliminated by 1. separating the push/pop mask
+into different push and pop masks, then 2. introducing a separate pass that
+finds dribbled registers in intermediates and eliminates all of the middle push
+and pop orders. Do this along with statistics so we can tell how effective it 
+is.
+
+2. Implement the "long distance" cache for registers. In this method, each
+intermediate gets a "copy order" that states one register is copied to another
+(or a pair). The long distance cache is then a structure that holds loaded
+values or addresses as a pointer to their intermediates. It is cleared when
+normal context is cleared, and also when all registers are allocated (meaning
+that there would be no extra registers to carry the value forward). When an
+item is found in the long distance cache, the original intermediate gets a copy
+order to an extra register, the item is placed in the normal cache, and 
+allocation continues.
+
+3. Reintegrate N-length sets.
+
+[there are actually unresolved issues with this. When building a set, the system
+loads a nil set, then executes single and range sets into the empty set. There
+is no way to know how big the set is before the operation is done, nor what its
+offset is. One possibility is to stack up the set orders, keeping min and max
+numbers on them, then create the set and execute the set orders into it.]
+
+4. Need option to critically pack record fields.
+
+[difficult]
+
+5. The intermediate tree is treated in most areas as a single way linked list.
+"up" entries already exist for the intermediate list, and "back" links would be
+easy to add. This would clean up the code considerably for delete/replace cases
+in the list.
+
+6. Finish graph operators document.
+ 
+7. "for" loop unrolling needs to be moved up to the intermediate level. This
+involves making an intermediate copy that can both take full graphs, and
+duplicate jump/label pairs.
+
+8. Add a system to page out floating points to temps so that overflows won't
+occur. As it is, the system is designed with a fixed limit of 8.
+
+9. Prevent thrashing when multiple operands of an intermediate use the same
+register, ie., stop multiple push/pops under the same intermediate. 
+
+[This is addressed by 1]
+
+10. Detect constant for loops used to set arrays, and implement more efficient
+vectorized sets for this.
+
+11. Implement write of enumerated types. This can be done by storing all the ids
+of an enumerated type into the runtime, then changing the write of an enumerated
+to a cased string write.
+
+12. Is there a way to suppress the system block from being output ?
+
+13. Implement sorts for global variables, locals, and possibly record fields.
+This will remove the inefficiencies of alignments.
+
+14. Restrict mode needs effort to work with signing. By moving restriction
+points down to loads, it creates the situation were a load must also perform
+any bounds checking. This is an issue with the many routines like gendoi that
+can directly code such loads into an instruction.
+
+15. Upgrade the context system to handle double register allocations.
+
+16. It might be more effective to fill the skippy trip countermeasures with
+false, but apparently valid, code. This could be a mode that is invoked
+at random.
+
+17. One reveng cm that would be effective is to form calls by pushing the
+return address on the stack, then jumping to the routine. What this allows is
+to put skippy trips or other trash in after the jump, and the return resumes
+after that.
+
+18. There is nothing technically wrong with providing overrides of any nested
+virtual with any other override. This would give the ability for a overrider
+to access local variables even during the override. In any case, the virtual
+vectors would have to be locals, and currently the compiler is not set up for
+that.
+
+************************************ 2010 OVERHAUL *****************************
+
+The 2010 overhaul candidates follow.
+
+1. Breakdown products. The workings of this were detailed in "brkdown.txt". 
+Basically it means to convert standard intermediates to simpler, lower level
+(but still machine indepenent) intermediates to simplify register allocation
+and code generation.
+
+2. Moving the "for" loop unrolling up a level as was previously described. This
+dovetails into other initiatives detailed here.
+
+3. Structure rip out. In this idea, all of the structures would be devolved into
+jumps in the final code. This would, in fact, flatten all of the code outside
+expression trees. All of the structure handling could then be removed from the
+machine code section. This flatten operation would be called by the machine
+module to accomodate generators that wish to keep the structures.
+
+4. Expression tree flattening. A pass is made to flatten the expression trees.
+This would allow the entire intermediate to be a linear list. It is dependent on
+not having any use in the generator routines for subtrees, which the breakdown
+products idea would enable. This would greatly simplify the machine module.
+
+Lcc also has the idea that the intermediate is linked into a double way linear
+list, outside of the tree structure. This leaves the tree intact, and allows
+dual way traversing of the intermediate, for, say, "distance" of use 
+calculations.
+
+5. Register allocation. The "logical registers" plan used in the lcc compiler 
+would be used. Then, we would use a "briging" pass to enable the temps to be
+replaced by push/pop sequences.
+
+We can also investigate register coloring.
+
+6. N-Sets. It should be fairly simple to integrate N-sets that are zero based.
+This is becoming a problem with Unicode and also the increasing sizes of the
+enumerations IP uses for itself. See comments above.
+
+7. Record and array packing. This is not easy, but worth it, since it allows
+arbitrary structure representation (like being able to break out IEEE floats in
+their native format), and does interesting things like bring arrays of bits to
+the same level as sets.

@@ -1,0 +1,287 @@
+                              PTOCMAC DOCUMENTATION
+
+                        Copyright (C) 2006 Scott A. Moore
+                        The information in this document is
+                       proprietary to Scott A. Moore, is not
+                       to be used or reproduce without express
+                        written permission by Scott A. Moore
+
+OVERVIEW
+
+PTOMAC stands for "Pascal to C Macros". When interfacing Pascal generated code
+to C, each function goes to the operating system or other library via a 
+"wrapper" function that serves three basic purposes:
+
+1. The calling convention for IP Pascal on the given CPU is converted to the
+specific calling convention for the C based operating system or library to
+be interfaced.
+
+2. Differences in the format of parameters are converted to and from C format.
+For example, C style zero terminated strings are converted to and from C to
+Pascal address/length format.
+
+3. Data structures are converted to and from the particular operating system
+or library in use. For example, a structure containing a zero terminated
+string is converted to Pascal format, etc.
+
+The wrapper file, which is usually named for the particular operating system
+or library in use, is a collection of such wrapper functions, along with
+the startup code for that particular system, plus any equates, data or any
+other objects needed.
+
+MACRO FORMAT
+
+The wrapper file started as an ad-hoc interface file. The next step in the
+evolution of wrappers was the PTOCMAC package. PTOCMAC allows a typical call
+from Pascal to C to be described in a fairly machine and calling convention
+way:
+
+ptocf sname, aname, return, param1, param1, ... paramn
+
+The name of the macro stands for "Pascal to C function". This is somewhat of a
+misnomer, because procedures are also described by specifing a void return value
+for the function.
+
+The meaning of each field in the macro is as follows:
+
+sname
+
+Contains the Pascal source name for the call. This is the name of the function
+or procedure that the Pascal source will call. It is usually coined to make
+the fully qualified name of the function or procedure. Typical coins are:
+
+sc_name
+windows_name
+linux386_name
+
+The module coin "sc_" is the old style, meaning "System Call". With the new
+modular naming system, the coin is the same as the name of the containing
+module.
+
+aname
+
+Contains the assembly name for the call. This is the name of the actual entry
+point in the system or library that the wrapper function will call. It is not
+automatically coined, but typically has the name of the module that will be
+called. For example:
+
+user32_drawtexta
+
+Is the windows name for the getclientrect call, in the user32 module. The
+trailing "a" means ASCII (vs. Unicode) in the windows call naming convention.
+
+return
+
+Gives the descriptor for the return value (which could be void).
+
+ParamXX
+
+Each parameter has a descriptor, which will be described below.
+
+The macro format describes the function and its parameters in the same order as
+the parameters appear. For a typical call (Windows):
+
+function sc_getstdhandle(hdlrc: integer): integer; external;
+
+The equivalent macro is:
+
+ptocf getstdhandle, kernel32_getstdhandle, int, int
+
+Going through the macro parameters in order, "getstdhandle" is coined to
+"sc_getstdhandle" for the name of the function, "kernel32_getstandardhandle"
+gives the Windows entry point name for the function, "int" gives the descriptor
+of the return value (integer), and the final "int" gives the descriptor of the
+parameter for the function (integer).
+
+CLIENTS AND GENERATORS OF THE PTOCMAC FORMAT
+
+The appearance of the macro generates a wrapper for the call. In this way, the
+wrapper file can mix automatically generated function wrappers, manually
+written function wrappers, other routines, and needed data to complete the 
+entire wrapper file.
+
+The calling convention and machine dependent conventions are contained within
+the macro itself. In this way, ptocmac generation statements can be constructed
+according to the format of the C call, and this same ptocmac statement used for
+different machines and operating systems. Typically, if the operating system
+involved is machine transportable, then so will the ptocmac statements be.
+The ptocmac statements must be custom written for the particular operating
+system or library in use, but the return and parameter descriptors can be 
+reused, since they mostly refer to the C types being converted to and from.
+
+Because of this, the parameter descriptors form a catalog that is standardized
+even between different systems. For example, Windows and Linux use the same
+descriptor names, even though the ptocmac files for each system are very
+different, and generate for different calling conventions.
+
+As said, the ptocmac package started as an augumentation for a manually created
+wrapper file. The next stage of evolution was to automatically generate the 
+macro descriptions automatically from C header files, which is performed by the
+"ch2ph" program.
+
+ptocmac relies on a very complex macro to create its wrapper functions. While
+only one such macro exists, ptocf, it was planned that other macros are
+possible, such as a macro that creates the callback functions that are currently
+created manually. The ability to mix manual and automatic methods like this is
+what makes the ptocmac system highly flexible.
+
+When the ptocmac system originated, the ptomac system was much simpler, and it
+was believed that it would be replaced with a Pascal program that would read
+function descriptors and generate the wrappers using optimized placement of
+parameters and registers. However, simple improvements to the macro capability
+of AS have allowed ptocmac to grow to cover the increasing complexity required
+from the calling convention, and ptocmac has a sufficient number of different
+cases that generates reasonably efficient wrappers. This has the added benifit
+that the macro generator in AS is improved and tested at the same time. When and
+if the system is replaced by a Pascal program, it will likely use the same
+format as the current macros, since that is standard between existing tools.
+
+RETURN VALUE DESCRIPTORS
+
+The return value descriptors tell if a return value is returned at all, and if
+so, how to treat it. A function without a return value is the same as a 
+procedure, so a Pascal procedure is essentially a function returning nothing,
+just as C does.
+
+void
+
+Void indcates that there is no return value. It is a procedure.
+
+int
+
+The function returns a standard integer value, which usually fits in a single
+word or register.
+
+bool
+
+The return value is converted from a C style boolean to Pascal style boolean.
+If the value is 0, it is left alone, otherwise it is replaced by a 1.
+
+ptr
+
+The return value is a pointer. Usually treated identically to int.
+
+err
+
+Used in Unix, the return value is checked for negative. If it is negative, the
+absolute value of it is placed in the global variable "errno", and is replaced
+by -1 in the return. If it isn't negative, errno is cleared to 0, and the value
+returned as is.
+
+PARAMETER VALUE DESCRIPTORS
+
+Parameter values are special, because they may have convertions performed both
+before and after the call. The convertions performed before the call are "in"
+convertions. The convertions performed after the call are "out" convertions.
+
+int
+
+The value passed is an integer, and has the same size as a word or register in
+the current CPU model.
+
+ptr
+
+The value is an address of another data element. Occupies a word or register,
+is probally identical to int. A separate code for pointers exists so that the
+fact that the value represents a pointer is documented.
+
+ptrl
+
+The value is a tagged pointer, and is converted to an address followed by a
+length for the C call.
+
+lptr
+
+The value is a tagged pointer, and is converted to a length followed by an
+address for the C call.
+
+ptrd
+
+The value is a tagged pointer, but only the address is used for the C call. The
+length is dropped.
+
+str
+
+The in value is a Pascal address/length string. The in convertion moves the
+string to a buffer with a zero termination, and passes that to C.
+This descriptor is not used in the current windows.asm file, with pstrz being
+preferred. That removes any right padding first. str is typically needed only
+where a very literal string needs to be passed, including any trailing spaces.
+
+strl
+
+The in value is a Pascal address/length string. The address with length
+following is passed to C. This is the same as ptrl, but documents the fact that
+characters are pointed to. No convertion or buffering is done.
+
+lstr
+
+The in value is a Pascal address/length string. The length, followed by the
+address, is passed to C. This is the same as lptr, but documents the fact that
+characters are pointed to. No convertion or buffering is done.
+
+pstrz
+
+The in value is a Pascal address/length string. A buffer is created, and the 
+string placed there, without the right hand space padding, then the string is
+zero terminated, and passed to C as the string address only.
+
+zstrp
+
+A Pascal address/length string is passed for use as an out parameter. On return,
+the zero terminated string in the buffer has the zero removed, then the string
+is padded right with spaces to fit the full string length. The address and
+length is passed to C.
+
+lzstrp
+
+A Pascal address/length string is passed for use as an out parameter. On return,
+the zero terminated string in the buffer has the zero removed, then the string
+is padded right with spaces to fit the full string length. As zstrp, but the
+length, followed by the address is passed to C.
+
+zstrpd
+
+As zstrp, but the length is dropped on the C call. This descriptor is rarely
+used, with zstrp being preferred.
+
+lstro
+
+The in value is a Pascal address/length string. The address with length
+following is passed to C. If the mode is unencoded, this directive is identical
+to strl. In encoded mode, the string is translated to encoded on output.
+
+strlz
+
+The same as zstrp, for Linux. This needs to be merged.
+
+zer
+
+This code does not mark an input parameter at all, but places a zero in the
+corresponding C calling order. This is used to mark an unused parameter in the
+C function. Typically it is used with overloads.
+
+one
+
+This code does not mark an input parameter at all, but places a one in the
+corresponding C calling order. This is used to mark an unused parameter in the
+C function. Typically it is used with overloads.
+
+bool
+
+The value passed is a Pascal boolean value. Because Pascal values are already
+limited to 0 and 1, this is effectively the same as int and ptr. Used to
+document the type of a parameter.
+
+wclsptr
+
+The value passed is a Windows class record pointer. The embedded Pascal string
+field(s) in the record are converted to zero terminated strings by copying the
+entire record and replacing the strings. Used in Windows only.
+
+evl
+
+The value passed is a Pascal string set for environment, which is a series of
+linked string records to set the environment in Windows. Windows expects a 
+buffer filled with zero terminated string data, so the string set is converted
+into a buffer and send via the C function. Windows only.

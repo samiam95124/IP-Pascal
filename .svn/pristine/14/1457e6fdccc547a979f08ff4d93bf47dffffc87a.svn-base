@@ -1,0 +1,87 @@
+           Procedure/function call stack layouts for I80386 encoder
+
+For the function:
+
+function a(b, c, d, e, f, g, h, i: integer; j, k, l, m, n, o, p, q, r, s: real)
+          : integer;
+
+      ~             ~
+      |             |
+	  ---------------
+	  |      s      |
+	  ---------------
+	  |      r      |
+	  --------------- -> Start of FPU parameter gallery
+	  |      i      |
+	  ---------------
+	  |      h      |
+	  --------------- -> Start of standard parameter gallery
+	  |    Return   |
+      |   address   |
+	  ---------------
+EBP ->|   Main EBP  |
+      ---------------
+      |   Main EBP  |
+	  ---------------
+	  |    A EBP    |
+	  ---------------
+	  |	 A Locals	|
+      |				|
+	  ~				~
+	  ~				~
+	  |             |
+	  ---------------
+	  |   EFLAGS    |
+	  ---------------
+	  |  A Result	|
+	  --------------- -> Start of register saves
+	  |  B -> EDI   |
+	  ---------------
+	  |  C -> ESI   |
+	  ---------------
+	  |  D -> EDX   |
+	  ---------------
+	  |  E -> ECX   |
+	  ---------------
+	  |  F -> EBX   |
+	  ---------------
+      |  G -> EAX   |
+	  --------------- -> Start of FPU saves
+	  |  J -> ST(0) |
+	  ---------------
+	  |  K -> ST(1) |
+	  ---------------
+	  |  L -> ST(2) |
+	  ---------------
+	  |  M -> ST(3) |
+	  ---------------
+	  |  N -> ST(4) |
+	  ---------------
+	  |  O -> ST(5) |
+	  ---------------
+	  |  P -> ST(6) |
+	  ---------------
+ESP-> |  Q -> ST(7) |
+	  ---------------
+
+Notes:
+
+1. The offset to locals should not have changed from the check encoder.
+
+2. The result can be 32 bits, or 64 bits if the result is real.
+
+3. There will be no result for a procedure.
+
+4. From 1-6 parameters (NOT real) can be found below the result or
+flags (in case of procedure). Registers are only saved if they are
+used in the routine or are occupied by parameters. The registers are
+saved in reverse order to preserve the rule that tagged pointers are found
+address-length ascending order in memory. This means that there can be a
+gap in the register save sequence that must be compensated for.
+
+5. From 1 to 8 real parameters, in full 64 bit, can be found below the standard
+parameter area. The overflow real parameters will be temp pointers ontop
+the normal stack.
+
+6. The display is only an example, it depends on nesting level. Shown
+is the case for a function at the main level.

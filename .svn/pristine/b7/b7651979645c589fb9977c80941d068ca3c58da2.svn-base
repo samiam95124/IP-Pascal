@@ -1,0 +1,89 @@
+         11111111112222222222333333333344444444445555555555666666666677777777778
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+                             BREAKDOWN PRODUCTS
+
+                            THEORY OF OPERATION
+
+Overview
+--------
+
+The current register to operation algorithim exhibits a high degree of 
+complexity. This is due to the fact that a separate pass exists for register
+allocation on intermediate trees, and this code must mirror the sometimes
+complex algorithims required to produce optimum code for different situations,
+especially for CISC operations on processors such as the I80386.
+
+A Solution
+----------
+
+The idea of breakdown products is to produce a series of increasingly small
+operations out of the present large ones. This is already done in the encoder.
+For example, a series of store directs such as tistoint are constructed only
+within the encoder to recognize that a store to a fixed address is a special
+case of the istiint intermediate.
+
+The new operators would be processor independent, but their use or non-use
+would be processor dependent. Lets go through an example.
+
+tistoint takes a single intermediate tree and stores it into a directly 
+specified variable represented by its base type. If the intermediate is an
+immediate, represented by tilimint, it is turned into one of several 
+instructions that store an immediate to a variable, as represented by 
+genstoimmr.
+
+If we recognize that, and generate the special instruction:
+
+tistoimm
+
+Which takes no trees, but has a base that is the variable, and a base that is
+the immediate to store. This then takes a slice of complexity out of the 
+tistoint instruction. Another example would be:
+
+tiincvar
+
+Which would have only one base, which is a variable, then increment it in place.
+
+For a CISC processor, this would generate a large series of very specific
+operations. However, they would still be understandable in a processor 
+independent way. The tiincvar instruction would have no meaning in, for example,
+a RISC design that is strictly load/store based. So it would only be generated
+for a CISC design that needs it.
+
+The appearance of such a series of breakdown products would simplify the coding
+of individual cases, at the cost of creating more of them. It would also 
+eliminate the need to have the register pass constantly mirror the work of the
+coding pass below.
+
+The breakdown product has two other features that make it attractive. First,
+since it is processor independent (in operation if not in the set of breakdown
+products), it can be incorporated as a machine independent pass.
+
+Second, it is incremental, meaning that more and more special instructions can
+be generated to strip individual cases out of the code and reduce complexity.
+
+Table driven operator coining
+-----------------------------
+
+The running of the breakdown products pass can be table driven, which would 
+allow its use in several different processors. The table would simply give a 
+list of breakdown intermediates that the processor backend will accept. Then,
+the breakdown products pass will enable or disable the finding and generation
+of the products based on that.
+
+Flat list code generation
+-------------------------
+
+If we have the rule that code generation routines are not allowed to examine
+leaves, which this spec allows for, then the genxxx routines can change from
+tree traversal to reforming the intermediate as a list based on that same 
+traversal. This is arranged as a linear list of intermediates, as now, but
+without the tree structure.
+
+The advantage of this is it enhances the chances for further optimization.
+Jump to jump elimination can be run, and if the new register assignment 
+algorithm is run, the flat code can be used to bridge temporary use to register
+use by successively replacing the shortest gaps where a registerable temporary
+is used by a push and pop. This allows the register allocation to be dramtically
+simplified.
+

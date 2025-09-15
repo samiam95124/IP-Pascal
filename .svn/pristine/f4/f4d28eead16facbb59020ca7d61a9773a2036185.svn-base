@@ -1,0 +1,1 @@
+void myproc(int i, int j, int k);

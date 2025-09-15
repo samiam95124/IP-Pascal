@@ -1,0 +1,248 @@
+program test2;
+
+uses strlib;
+
+type
+
+   typptr = ^typ; { type pointer }
+   symptr = ^sym; { symbol pointer }
+   types  = (tudf,     { no type, used to mark errors }
+             tnil,     { 'nil' universal pointer }
+             tlab,     { goto label }
+             ticst,    { integer constant }
+             tscst,    { string constant }
+             tccst,    { character constant }
+             trcst,    { real constant }
+             tstcst,   { set constant }
+             tstet,    { set constant entry }
+             tarrcst,  { array constant entry }
+             tarrcel,  { array constant element }
+             treccst,  { record constant entry }
+             treccel,  { record constant element }
+             tenum,    { enumerated }
+             tenme,    { enumerated constant }
+             tsub,     { subrange }
+             tptr,     { pointer }
+             tarray,   { array }
+             tgarry,   { general array }
+             tfile,    { file }
+             tset,     { set }
+             trecord,  { record }
+             tfield,   { record field }
+             tftag,    { record tag field }
+             tfcas,    { record variant case }
+             tvar,     { variable }
+             tfix,     { fixed }
+             tproc,    { procedure }
+             tfunc,    { function }
+             tpar,     { parameter }
+             tvpar,    { variable parameter }
+             twpar,    { view parameter }
+             tpproc,   { procedure parameter }
+             tpfunc,   { function parameter }
+             tinteger, { integer }
+             tchar,    { character }
+             tboolean, { boolean }
+             treal,    { real }
+             tsreal,   { short real }
+             ttext,    { text }
+             teset,    { empty set }
+             tddf);     { delayed definition }
+   typ    = record { type entry }
+            
+               next: typptr; { next list entry }
+               list: typptr; { general list maker link }
+               pack: boolean; { packed type flag }
+               lvl:  integer; { level number of type entry }
+               num:  integer; { sequence number of type entry }
+               case t: types of { types }
+
+                  tudf:     ();              { dummy entry to mark errors }
+                  tnil:     ();              { 'nil' universal pointer }
+                  tlab:     (ldef: boolean;  { label has been defined }
+                             lref: integer;  { number of 'goto' references }
+                             slvl: integer;  { statement level at definition }
+                             mlvl: integer;  { mimumum reference level }
+                             extr: boolean;  { block external references 
+                                               exist }
+                             lnxt: typptr);  { next label in block list }
+                  ticst:    (ival: integer); { the value of the integer }
+                  tscst:    (sval: pstring); { the value of the string }
+                  tccst:    (cval: char);    { character constant }
+                  trcst:    (rval: real);    { the value of the real }
+                  tstcst:   (stct: typptr;   { base type of set }
+                             stcc: typptr);  { set constant list }
+                  tstet:    (sten: typptr;   { next set element }
+                             stes: integer;  { starting value }
+                             stee: integer;  { ending value }
+                             steh: typptr);  { head entry }
+                  tarrcst:  (arcn: typptr);  { first list entry }
+                  tarrcel:  (aren: typptr;   { next list entry }
+                             arec: typptr);  { constant link }
+                  treccst:  (recn: typptr);  { first list entry }
+                  treccel:  (reen: typptr;   { next list entry }
+                             reec: typptr);  { constant link }
+                  tenum:    (enc:  typptr);  { list of enumerated constants }
+                  tenme:    (enx:  typptr;   { next enumeration entry }
+                             enh:  typptr;   { head entry pointer }
+                             env:  integer); { enumerated constant }
+                  tsub:     (subt: typptr;   { base type }
+                             subl: integer;  { lower bound }
+                             subu: integer); { upper bound }
+                  tptr:     (ptrt: typptr);  { base type }
+                  tarray:   (arrt: typptr;   { base type }
+                             arri: typptr);  { index type }
+                  tgarry:   (gart: typptr);  { base type }
+                  tfile:    (filt: typptr);  { base type }
+                  tset:     (sett: typptr;   { base type }
+                             setc: boolean); { set is 'in context' }
+                  trecord:  (recf: typptr;   { field list }
+                             recl: symptr);  { list of field labels }
+                  tfield:   (fldn: typptr;   { next field pointer }
+                             fldh: typptr;   { head entry pointer }
+                             fldt: typptr);  { base type }
+                  tftag:    (ftgc: typptr;   { case list }
+                             ftgh: typptr;   { head entry pointer }
+                             ftgt: typptr;   { base type }
+                             ftge: boolean); { exists flag }
+                  tfcas:    (fcsn: typptr;   { next case entry pointer }
+                             fcsf: typptr;   { field list }
+                             fcsc: integer); { case constant }
+                  tvar:     (vart: typptr;   { base type }
+                             varr: integer;  { threat count }
+                             varf: integer;  { 'for' use count }
+                             vare: boolean;  { variable is external }
+                             varh: typptr;   { used to form header file lists }
+                             varp: boolean); { was threatened by subroutine }
+                  tfix:     (fixt: typptr;   { base type }
+                             fixc: typptr;   { constant fill }
+                             fixe: boolean); { fixed is external }
+                  tproc:    (prcp: typptr;   { parameter list }
+                             prcf: boolean;  { procedure is forwarded }
+                             prcs: symptr;   { parameter symbols save for fwd }
+                             prct: typptr;   { parameter types save for fwd }
+                             prce: boolean;  { procedure is external }
+                             prco: typptr;   { overload list link }
+                             prch: typptr;   { overload list head }
+                             prcx: boolean;  { overload collide flag }
+                             prcq: boolean); { procedure is a deleted forward
+                                               overload }
+                  tfunc:    (fncp: typptr;   { parameter list }
+                             fncr: typptr;   { function result }
+                             fncc: integer;  { reference counter }
+                             fncf: boolean;  { function is forwarded }
+                             fncs: symptr;   { parameter symbols save for fwd }
+                             fnct: typptr;   { parameter types save for fwd }
+                             fnce: boolean;  { function is external }
+                             fnco: typptr;   { overload list link }
+                             fnch: typptr;   { overload list head }
+                             fncx: boolean;  { overload collide flag }
+                             fncq: boolean); { function is a deleted forward
+                                               overload }
+                  tpar:     (parn: typptr;   { next parameter }
+                             part: typptr;   { base type }
+                             parh: typptr;   { head entry pointer }
+                             parr: integer); { threat count }
+                  tvpar:    (vprn: typptr;   { next parameter }
+                             vprt: typptr;   { base type }
+                             vprh: typptr;   { head entry pointer }
+                             vprr: integer); { threat count }
+                  twpar:    (wprn: typptr;   { next parameter }
+                             wprt: typptr;   { base type }
+                             wprh: typptr);  { head entry pointer }
+                  tpproc:   (pprp: typptr;   { parameter list }
+                             pprn: typptr);  { next parameter }
+                  tpfunc:   (pfnp: typptr;   { parameter list }
+                             pfnr: typptr;   { function result }           
+                             pfnn: typptr);  { next parameter }
+                  tinteger: ();              { integer }
+                  tchar:    ();              { character }
+                  tboolean: (bnc:  typptr);  { list of enumerated constants }
+                  treal:    ();              { real }
+                  tsreal:   ();              { short real }
+                  ttext:    ();              { text file }
+                  teset:    ();              { empty set }
+                  tddf:     (ddfs: symptr;   { undefined symbol }
+                             ddft: typptr;   { base type }
+                             ddfd: boolean;  { type has been defined }
+                             ddfe: boolean); { error has been processed }
+
+               { end }
+
+            end;
+   sym    = record { symbol entry }
+     
+               next: symptr;  { next list entry }
+               rnxt: symptr;  { next field label entry (for records),
+                                also used for general listing }
+               lvl:  integer; { block level }
+               dup:  boolean; { symbol is duplicated (2-N times) }
+               mis:  boolean; { symbol is the target of a mispell }
+               udf:  boolean; { symbol is missing definition }
+               ddf:  boolean; { symbol undergoing delayed definition }
+               hld:  boolean; { symbol is being 'held' pending definition }
+               exp:  boolean; { symbol is exportable }
+               out:  boolean; { symbol has been output to intermediate }
+               ref:  integer; { reference count }
+               typ:  typptr;  { pointer to symbol type }
+               lab:  pstring; { symbol label }
+               use:  boolean  { symbol is part of "uses" file }
+
+            end;
+   error = (eforviu, efixth, eviewth);
+   cset = set of char;
+
+var level, wthlvl: integer;
+    extlab: packed array [1..20] of char;
+
+procedure perror(e: error; s, d: cset);
+
+begin
+end;
+
+procedure threaten(sp: symptr; tp: typptr); { object to threaten }
+
+begin
+
+   if tp^.t in [tvar, tfix, tpar, tvpar, twpar] then begin
+
+      copy(extlab, sp^.lab^); { place error label }
+      case tp^.t of
+   
+         { variable, increment threat count }
+         tvar:  begin
+
+            tp^.varr := tp^.varr + 1;
+            { check in use by 'for' }
+            if tp^.varf <> 0 then perror(eforviu, [], []); { variable in use }
+            { if we are in a subroutine contained by the block that contains
+              the variable, then we register a subroutine threat to the var }
+            if sp^.lvl < level-wthlvl then tp^.varp := true
+
+         end;
+         tfix: 
+            { threats to fixed are allways an error }
+            perror(efixth, [], []);
+         tpar:  tp^.parr := tp^.parr + 1;
+         tvpar: tp^.vprr := tp^.vprr + 1;
+         twpar: 
+            { threats to view parameters are allways an error }
+            perror(eviewth, [], [])
+
+      end
+   
+   end
+
+end;
+
+type 
+
+   filrec = record
+
+               nam:    integer;  { filename }
+
+            end;
+
+begin
+
+end.

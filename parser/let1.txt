@@ -1,0 +1,779 @@
+Mr. Artur Zaroda,
+
+We recently went through a bug scrub cycle on IP Pascal, and your
+issues were, in addition to others, addressed during that.
+
+Please find a new version of the demo on line that contains these
+changes and has been recertified.
+
+Please find explainations of what was or was not fixed below.
+
+> Hello,
+> 
+> I have tested the demo version of IP Pascal, which I downloaded from
+> www.moorecad.com, and I have noticed some problems, which I would like
+> to report to You.
+> 
+> All the tests where performed by executing "pc" compiler driver with
+> "/s" option.
+> 
+> I will try to give a brief explanation to each test case. Where possible,
+> and necessary, I will indicate relevant parts of ISO 7185.
+> 
+> To begin with, here are programs, which are violating requirements of
+> ISO 7185. IP Pascal does not report those violations.
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest01;
+>     begin
+>       if 1=1then
+>     end.
+> 
+> is incorrect, because standard requires separator between "1" and "then"
+> (see 6.1.8).
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest02(output);
+>     begin
+>       writeln('')
+>     end.
+> 
+> is incorrect, because character-string should have at least one element
+> (see 6.1.7).
+
+STATUS: Resolved.
+
+EXPLANATION:
+
+Now produces an error when the /s flag is on, but not when off. Null strings
+are acceptable in the extended IP Pascal language.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest03(output);
+>     begin
+>       writeln(1 and 2 or 3)
+>     end.
+> 
+> is incorrect, because "and" and "or" are boolean operators
+> (see 6.7.2.3).
+
+STATUS: Resolved.
+
+EXPLANATION:
+
+Now produces an error when the /s flag is on, but not when off. 'and, 'or', 
+'xor' and 'not' of integer is valid in extented IP Pascal language.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest04(output);
+>     label 1;
+>     var i:integer;
+>     begin
+>       begin goto 1 end;
+>       for i:=10 to 10 do
+>         1:writeln(i)
+>     end.
+> 
+> is incorrect, because label "1" is not permitted in "goto 1" statement
+> (see 6.8.1).
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> Now, there are programs which, in my opinion, IP Pascal should not have
+> rejected.
+> 
+> ###########################################################################
+> 
+> For the following program:
+> 
+>     program iptest05(input,output);
+>     begin
+>       writeln(eof)
+>     end.
+> 
+> compiler displays:
+> 
+> *** C:\iptest\iptest05.pas:4 Symbol 'input' defined but never referenced
+> ***
+> 
+> It is a false complaint. "input" is referenced by "eof" just like "output"
+> is referenced by "writeln".
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> For the following program:
+> 
+>     program iptest06(output);
+>     type month=(jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec);
+>     var t:array [month] of 28..31;
+>         m:month;
+>         i:1..31;
+>     begin
+>       for m:=jan to jul do
+>         t[m]:=31-ord(m) mod 2;
+>       for m:=aug to dec do
+>         t[m]:=30+ord(m) mod 2;
+>       t[feb]:=28;
+>       for m:=jan to dec do begin
+>         for i:=1 to t[m] do
+>           write('*');
+>         writeln
+>       end
+>     end.
+> 
+> compiler displays:
+> 
+> *** C:\iptest\iptest06.pas:17 Symbol 'mar' defined but never referenced ***
+> *** C:\iptest\iptest06.pas:17 Symbol 'apr' defined but never referenced ***
+> *** C:\iptest\iptest06.pas:17 Symbol 'oct' defined but never referenced ***
+> *** C:\iptest\iptest06.pas:17 Symbol 'may' defined but never referenced ***
+> *** C:\iptest\iptest06.pas:17 Symbol 'sep' defined but never referenced ***
+> *** C:\iptest\iptest06.pas:17 Symbol 'jun' defined but never referenced ***
+> *** C:\iptest\iptest06.pas:17 Symbol 'nov' defined but never referenced ***
+> 
+> It is true that those constant-identifiers are not referenced, but I do not
+> think that this program should be rejected by compiler. As far as I can
+> see, it does not violate standard and those constants do have their use
+> even when not directly referenced.
+
+STATUS: Unchanged
+
+EXPLANATION:
+
+Reference checking is not part of the standard. Please use the flag "/nrf" to
+turn off reference checking if these kinds of references are to be passed
+without error.
+
+This is a side effect of the IP policy not to have warning messages, but to
+either skip such checks, or produce an error. In other environments, I have
+seen programmers get used to seeing warnings in compilations, resulting in
+serious errors mixed with irrelivant errors.
+
+There are a couple of situations where you really need to leave unreferenced
+symbols in the program. In your example, if you wanted to "placehold" the
+other (unreferenced) months, you do this:
+
+program iptest06(output);
+type month=(jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec);
+var t:array [month] of 28..31;
+    m:month;
+    i:1..31;
+begin
+  refer(feb, mar, apr, may, jun, jul, aug, sep, oct, nov);
+  for m:=jan to jul do
+    t[m]:=31-ord(m) mod 2;
+  for m:=aug to dec do
+    t[m]:=30+ord(m) mod 2;
+  t[feb]:=28;
+  for m:=jan to dec do begin
+    for i:=1 to t[m] do
+      write('*');
+    writeln
+  end
+end.
+
+Of course, this is non-standard. The "refer" procedure just causes every
+symbol enclosed to be referenced, so it solves this problem, and problems
+like where you want to have a parameter in a procedure that you are not
+going to use until later, or a dummy procedure/function.
+
+It is not documented in the demo docs.
+
+The other topic, and I suspect what you meant, is "why can't the compiler
+just leave certain usages, like unused enumerations alone" (perhaps with
+a rule such as if any other members are referenced) ? I see that
+point, but I am uncomfortable with the idea. It turns compiler reference
+checking from black and white to shades of grey, and complicates the
+understanding of the reference check facillity for users. Instead of
+"it is or is not referenced" we have to talk about the context of the
+reference.
+
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest07;
+>     var t:array (.1..1.) of 1..1;
+>     begin
+>       t(.1.):=1
+>     end.
+> 
+> is being rejected with message:
+> 
+> *** Error: invalid real format
+> 
+> I believe, that the program is legal (see 6.1.9).
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> Compilation (with option /s) of the following program:
+> 
+>     program iptest08;
+>     procedure p;forward;
+>     procedure p;begin end;
+>     begin
+>       p
+>     end.
+> 
+> results in:
+> 
+> *** C:\iptest\iptest08.pas:2 'begin' expected ***
+> 
+> I do not see, why compiler complains about the use of "forward" directive.
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> For the following program:
+> 
+>     program iptest09;
+>     type t1=integer;
+>     procedure p;
+>     type t2=^t1;
+>          t1=char;
+>     var x:t1;
+>         y:t2;
+>     begin
+>       x:='a';
+>       new(y);
+>       y^:=x
+>     end;
+>     begin
+>       p
+>     end.
+> 
+> compiler displays:
+> 
+> *** C:\iptest\iptest09.pas:12 Type of expression not assignment compatible
+> ***
+> 
+> Apparently, it is confusing definitions of "t1". I believe, that my program
+> is correct (see 6.2.2.9).
+
+STATUS: Resolved.
+
+COMMENT:
+
+Now this program, using the /s switch, will give an error:
+
+*** C:\PASCOMP\PPARSE\test.pas:15 Symbol 't1' defined but never referenced ***
+
+Because the program block 't1' was indeed, never referenced.
+
+> 
+> ###########################################################################
+> 
+> For the following, obviously correct, program:
+> 
+>     PROGRAM iptest10(OUTPUT);
+>     BEGIN
+>       WRITELN
+>     END.
+> 
+> I am getting:
+> 
+> *** C:\iptest\iptest10.pas:1 'program' expected ***
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> In a number of tests I have noticed unusual behavior of compiler.
+> 
+> ###########################################################################
+> 
+> For the following program:
+> 
+>     program iptest11;
+>     var s:set of 200..300;
+>     begin
+>       s:=[256]
+>     end.
+> 
+> I get:
+> 
+> *** Invalid set element
+
+STATUS: Unchanged
+
+EXPLANATION:
+
+IP Pascal, at present, only implements sets in the size of 256 bits, and
+those are fixed at the ordinals 0..255. Thus, set elements of ordinal value
+256 or higher are invalid in the current compiler.
+
+> 
+> ###########################################################################
+> 
+> For the following program:
+> 
+>     program iptest12(f);
+>     var f:file of set of boolean;
+>     begin
+>       rewrite(f);
+>       write(f,[]);
+>       close(f)
+>     end.
+> 
+> I get:
+> 
+> *** set temporary left after expression
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> For the following (incorrect) program:
+> 
+>     program iptest13(output);
+>     begin
+>       writeln('bye)
+>     end.
+> 
+> I get:
+> 
+> *** Runtime error: Paslib: Value out of range
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> For the following (incorrect) program:
+> 
+>     program iptest14(output);
+>     begin
+>       with output do
+>     end.
+> 
+> I get an odd error message:
+> 
+> *** C:\iptest\iptest14.pas:3 c9+69/^n 9ZZn88 &k8; /n 9 +nZ3+$ ***
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> For the following (incorrect) program:
+> 
+>     program iptest15;
+>     begin
+>       case 1 of
+>         1:''
+>       end
+>     end.
+> 
+> I get:
+> 
+> *** C:\iptest\iptest15.pas:5 System fault #26: Notify Moore/CAD
+> (compilation aborted) ***
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> For the following (incorrect) program:
+> 
+>     program iptest16;
+>     begin
+>       case 1 of 1.1: end
+>     end.
+> 
+> I get:
+> 
+> *** C:\iptest\iptest16.pas:3 System fault #3: Notify Moore/CAD
+> (compilation aborted) ***
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> For the following program:
+> 
+>     program iptest17(output);
+>     begin
+>       writeln([]=[[]=[]])
+>     end.
+> 
+> I get:
+> 
+> *** System fault 262: Notify S. A. Moore software
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> For the following program:
+> 
+>     program iptest18;
+>     procedure p(procedure q);
+>     begin
+>       q
+>     end;
+>     procedure q;begin end;
+>     begin
+>       p(q)
+>     end.
+> 
+> I get:
+> 
+> *** Duplicate symbol 'iptest18_q'
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> In some cases program, generated by compiler, crashed on run time.
+> 
+> ###########################################################################
+> 
+> Running the executable generated for:
+> 
+>     program iptest19;
+>     var f:file of record end;
+>     begin
+>       assign(f,'file_of_empty_records');
+>       rewrite(f);
+>       put(f);
+>       close(f)
+>     end.
+> 
+> I see:
+> 
+> *** Runtime error: Syslib: File transfer length is zero
+
+STATUS: Resolved
+
+COMMENT:
+
+Try this one:
+
+program test(output);
+
+var f: file of record end;
+    i: integer;
+
+begin
+
+   assign(f, 'file_of_empty_records');
+   rewrite(f);
+   for i := 1 to 10 do put(f);
+   reset(f);
+   i := 0;
+   while not eof(f) do begin
+
+      get(f);
+      i := i+1
+
+   end;
+   writeln('Count of records in file: ', i:1)
+
+end.
+
+Why does that work ? Because records exist in the file even if they are empty.
+
+By the way, the ISO 7185 standard way to state your test above is:
+
+program iptest19(f);
+var f:file of record end;
+begin
+  rewrite(f);
+  put(f)
+end.
+
+The reason is that IP Pascal knows how to link header files to actual files.
+You execute the above this way:
+
+iptest19 file_of_empty_records
+
+
+> 
+> ###########################################################################
+> 
+> Running the executable generated for:
+> 
+>     program iptest20(output);
+>     label 1;
+>     var x:integer;
+>     begin
+>       x:=2;
+>       if x=2 then
+>         if true
+>           then goto 1
+>           else 1:;
+>       writeln('bye')
+>     end.
+> 
+> I see:
+> 
+> *** Runtime error: Paslib: File is open
+
+STATUS: Resolved.
+
+COMMENT:
+
+Note that ISO 7185 forbids jumps within the different statements of an
+"if" statement, so this program now generates an error:
+
+      else 1:;
+            ^
+*** C:\PASCOMP\PPARSE\test.pas [9:13] Label '1' referenced by different nested s
+tatement ***
+
+This error was formerly not detected on "if" and "case", but has been corrected.
+Let me know if you have questions on this result.
+
+> 
+> ###########################################################################
+> 
+> Running the executable generated for:
+> 
+>     program iptest21(output);
+>     function f:integer;
+>     begin
+>       f:=1
+>     end;
+>     begin
+>       writeln(1 in [f])
+>     end.
+> 
+> I see:
+> 
+> *** Runtime error: Paslib: Value out of range
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> Finally, in some tests the result of program was incorrect.
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest22(output);
+>     var t:array [1..1] of record end;
+>     begin
+>       t[1]:=t[1];
+>       writeln('bye')
+>     end.
+> 
+> should write "bye", but instead, it just silently quits.
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest23(output);
+>     var x:integer;
+>     begin
+>       x:=2;
+>       writeln(x,sqr(x))
+>     end.
+> 
+> should write "2 4", but only "2" is being displayed.
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest24(output);
+>     var i:integer;
+>     begin
+>       i:=-1;
+>       writeln(i in [])
+>     end.
+> 
+> should write "false", but writes "true".
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest25(output);
+>     function f:integer;
+>     begin
+>       writeln('hello');
+>       f:=1
+>     end;
+>     begin
+>       case f of
+>         1:
+>       end
+>     end.
+> 
+> should write "hello", but it does not do that.
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest26(output);
+>     var x:integer;
+>     begin
+>       x:=-1;
+>       writeln((-1) mod 2,x mod 2)
+>     end.
+> 
+> should write "1 1", not "-1 1".
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest27(output);
+>     label 1;
+>     var i:integer;
+>     begin
+>       i:=15;
+>       for i:=10 to 20 do
+>         goto 1;
+>       1:writeln(i)
+>     end.
+> 
+> should write "10", but writes "8".
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest28(output);
+>     var i,j:integer;
+>     function f:integer;
+>     begin
+>       f:=j;
+>       j:=j+1
+>     end;
+>     begin
+>       j:=1;
+>       for i:=f to f do
+>         writeln(i)
+>     end.
+> 
+> should write "1" and "2" (see 6.8.3.9), but does not.
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest29(output);
+>     procedure p(i:integer);
+>     begin
+>       writeln(i);
+>       if i mod 3<>0
+>         then p(i-1)
+>     end;
+>     begin
+>       p(1)
+>     end.
+> 
+> should write "1" and "0", but loops instead.
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> The following program:
+> 
+>     program iptest30(output);
+>     label 1;
+>     procedure p(procedure q);
+>     var x:integer;
+>     procedure s;
+>     begin
+>       writeln(x);
+>       goto 1
+>     end;
+>     begin
+>       x:=10;
+>       q;
+>       x:=20;
+>       p(s)
+>     end;
+>     procedure r; begin end;
+>     begin
+>       p(r);
+>       1:
+>     end.
+> 
+> should write "20", not "10"
+
+STATUS: Resolved.
+
+> 
+> ###########################################################################
+> 
+> That is all.
+> 
+> Regards,
+> 
+> Artur Zaroda
+> zaroda@mimuw.edu.pl
+> 
+
+That was a great set of tests, thanks again. If you don't mind, I have retained
+them for incorporation into our test suites.
+
+Good luck with your classes,
+
+Scott A. Moore

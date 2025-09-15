@@ -1,0 +1,44 @@
+                                   CH2PH NOTES
+
+1. A lot of the unresolved #defines are unres because they involve casts.
+See if the cast can be safely ignored, ie., ends up as an integer type.
+
+On thinking about this, I see a lot of casts to unrepresentable objects
+(like (char *) 5). What is casted is or is not going to be a constant, 
+and it either is or is not going to be casted to a reasonable type.
+If not, like the char * case, then there is nothing we can do about it
+anyways, so we can pass it and leave it to the programmer to deal with
+it. Either way, this argues for ignoring the cast.
+
+2. Some coined #define names (that appear in the report), don't appear
+to be in any list.
+
+3. Should see if a coined #define is actually going to be used (resolved)
+before including it in the coin report. Unsed items make no sense to list
+there.
+
+4. Should we place the post macro-resolved string in the unresolved report,
+instead of/in addition to, the source macro ?
+
+5. Find out what text("....") means.
+
+6. L"string" is a wide character string. Recognize and treat as a string
+in macros.
+
+7. "ch2ph" could theoretically be extended to "ctop" by storing the
+intermediate graph of the program mesh encountered, and processing that.
+This is mentioned here mainly because that would also help header translations.
+Seeing how variables are actually used could help resolve declarations.
+For example:
+
+void myfunc(int *a)
+
+{
+
+    while (*a) a++;
+    ...
+
+}
+
+Establishes "a" as an array reference, and not a var reference because the
+pointer is used to walk past the first element of a. 

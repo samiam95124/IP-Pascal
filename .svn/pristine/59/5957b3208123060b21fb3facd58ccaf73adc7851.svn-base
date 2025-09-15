@@ -1,0 +1,1 @@
+c:\cygwin\bin\time prime

@@ -1,0 +1,4 @@
+                           PASLIB NOTES
+
+1. ps_wrtint does gives invalid input on $80000000. It should either give an
+error, or handle this case.

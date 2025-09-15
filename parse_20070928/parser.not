@@ -1,0 +1,146 @@
+To do on parser:
+
+1. In \assm\ln\common, why can't I place the fixed chrtrn array above the
+var definitions ?
+
+2. Two form feeds back to back generate an error:
+
+overload procedure chrspcy(s: integer); 
+
+"
+begin
+
+   refer(s) { stub out }
+
+end;
+
+
+{******************************************************************************
+
+Sets extra character space x
+
+Sets the extra character space to be added between characters, referred to
+as "spacing".
+"
+
+3. Respell now outputs the wrong message:
+
+   unlock { end exclusive access }
+         ^
+*** C:\PASCOMP\windows\gralib.pas [3550:10] 'unlock' assumed to be misspelled 'unlock' ***
+
+4. For misspells of the "overload" tolken, like "overlood", I don't see
+respell attempts.
+
+5. After a "not found" error, a subsequent definition gets a "duplicate
+type" error, because it default defined it. Should not do this.
+
+6. The inclusion of expressions as constants must be compensated for by
+including the operator tolkens in expected sets.
+
+
+7. Is it necessary to define a "with" statement as a threat ? Ie., can't
+the reference defined by the "with" only be classified as threatened
+if the with statement itself includes a threatening reference ?
+
+8. Cannot have a program/module name be the same as a system defined
+symbol. This is a consequence of moving the location of this definition.
+
+9. Control characters, specifically tabs, appear to not be equivalent to spaces
+anymore (encoded version).
+
+10. Parsing:
+
+readln(file, num:7);
+
+A field on a read parameter, causes the parser to give an error and then
+hang up.
+
+11. The source file specification in output files is trashed, suspect it is 
+getting output encoded.
+
+PROPOSED EXTENTIONS/IMPROVEMENTS ===============================================
+
+1. There is an issue with force sequences:
+
+'\$a01234'
+
+Where the desired interpretetation is '\$a' followed by '01234' is
+not possible. This can be fixed by limiting the number of digits
+in each of hex(2), octal(3), and binary(8). Then it becomes:
+
+'\$0a01234'
+
+2. The "update" primitive can't work on a text file. However, an "append"
+procedure, which would be defined as "update(f); position(length(f)+1)" on a 
+binary file, would work on text. This is because the contents of a file
+is coordinated for lines. The only thing that could complicate this is
+systems (like CP/M) that have a specific end of file marker. However, even this
+can be overcome.
+
+3. We implement a restriction that external procedures and functions that take
+procedure or function parameters, can only be called with a global level
+procedure or function as a parameter. This allows implementation of stored
+callbacks without worrying about access to non-existant local variables.
+It is true that the module which implements the callback could violate this
+by calling itself. However, there is no standard language construct for
+creation of callback routines, so the callback implementor is already
+a specialized module, with assembly or type escapes. We could well have the
+rule that procedure and function parameters not be allowed to cross module
+lines.
+
+4. Unsigned integer support.
+
+5. Double precision integer support.
+
+6. Implement complex modularity. See "complex.txt".
+
+7. Implement readback of types in intermediate file. In order to do this,
+we need to be able to check and match the date/time on a file to determine
+if the source file has a more recent date/time than the .int file. If so,
+we would revert to the source file. This should also be a mode by "safe"
+option. [this will be part of the complex modularity fix]
+
+8. Oberon implements case constant ranges, so I guess we are too.
+
+9. Propose we allow "max" to give the max of any type, and add "min"
+that can do the same. max(integer) = maxint. These functions work on
+variables and types, including the current case of arrays. max(real)
+and min(real) give floating point results, as well as max(sreal) and
+min(sreal).
+
+10. Expression operators shr (shift right) and shl (shift left) operators.
+
+11. The predefined procedure "assert", such:
+
+assert(expr)
+
+If the assertion fails, it becomes a runtime error:
+
+*** Runtime: Assert fails
+
+It can also be evaluated for constant expression during compile time.
+
+12. A general array can be useful in fixed declarations:
+
+fixed a: array of char = 'hi there bob';
+
+The actual demensions of the array are taken from the supplied data,
+and so don't have to be specified directly as now.
+
+13. Implement a "dma" or Direct Machine Access option.
+
+14. Under the /dma option, the general function datatype(x) will convert any
+ordinal or pointer value to the ordinal or pointer type result. It won't
+convert reals to integer or vice versa.
+[about all this does we can't do now is convert to and from pointers.]
+
+15. Under /dma option, the function ptr(x) will perform a variable reference
+to x, and return a pointer that is (like nil) compatible with any other
+pointer type.
+
+16. Under /dma option, the function size(x) will perform a variable reference
+to x, and return the size, in bytes, of the data that is referenced. The
+result is type integer.
+
+

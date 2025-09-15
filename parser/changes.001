@@ -1,0 +1,109 @@
+SUMMARY OF NEW PARSER CHANGES
+
+The following changes affect the intermediate, and will need to be addressed:
+
+1. Creating a set from a long integer type is fixed.
+
+2. The iproc and ifunc intermediates now have a "static" flag at the end.
+This flag indicates that the procedure or function can be allocated statically,
+but otherwise can be ignored.
+
+[read into added fields in type, otherwise unused]
+
+3. iappend is added. It expects a file on stack top. The file is moved to the
+end and opened for writing.
+
+[stubbed]
+
+4. isemaphore is added. This is a type, and occupies a single byte.
+
+[stubbed]
+
+5. isignal is added. It expects a semaphore address on stack, and generates
+a signal() call.
+
+[stubbed]
+
+6. isignalone is added. It expects a semaphore address on stack, and generates
+a signalone() call.
+
+[stubbed]
+
+7. iwait is added. It expects a semaphore address on stack, and generates
+a wait() call.
+
+[stubbed]
+
+8. itrybgn is added. It opens a try..except sequnce. It is terminated by itryend.
+In between, it may have itryexp (except), and ielse (else). It behaves like
+a simple block, with either the else clause or following to the next statement.
+
+[stubbed]
+
+9. ithrow is added. It generates a call to ithrow, which (since it is not system
+dependent), is found in maclib.
+
+[stubbed]
+
+10. iassert is added. It expects a boolean on stack. It generates a call
+to assert(), which is likely in syslib.
+
+[stubbed]
+
+11. icassrng is added. This is an entry instead of icassint, and has both a start
+and end value, instead of just a case value. It is to be treated the same as
+if a range of values between the start and end values were declared as cases.
+
+[stubbed]
+
+12. The iproc and ifunc intermediates now have a "virtual" flag at the end
+(after the new "static" flag above), then a link to the type entry for either
+the virtual or the override routine. Each virtual and override routine in a
+form a pair that link to each other. There is no "override" flag, but having a
+override link but no virtual flag (or external) means it is the override half of
+the pair. When the block containing an override procedure/function is
+initalized, it must hook the overrided routine, probally via a call to
+_override_<x>. When a block contains a virtual call, it must provide a vectored
+version of the routine, an override call, and an inherited call. Two new 
+intermediates exist for inherited calls, iprccalo and ifnccalo (original). These
+tolkens call the original version of the routine. There is no indirect call,
+because procedure and function parameters always pass the vectored call.
+
+[read into added fields in type, otherwise unused]
+
+13. iclass, iatom, and ithread types are added, for each of the class marker 
+types. Each of ivar, iproc and ifunc have a new link at the bottom that carries
+the address of the marker types. This is required because each of these types
+are treated differently when they are part of class. Variables are addressed as
+record offsets from the object. Procedures and functions have special calling
+and handling conventions.
+
+[stubbed]
+
+14. The iobjoff operator is added. The format is:
+
+iobjmem <addr> <addr>
+
+Expects the referenced address of an object on the stack in tagged format. 
+The tag, in this case, contains the indication of what the actual object
+pointed to is. The first address parameter is the class of the object. The
+second address parameter is the variable within the class.
+
+[stubbed]
+
+15. The iis operator is added. The format is:
+
+iis <addr>
+
+Expects the referenced address of an object on the stack in tagged format.
+The address parameter is the class for which the reference is to be checked.
+If the reference is the same as, or contains, the given class, then the result
+is true, otherwise false. The reference pointer is removed from the stack, and
+a boolean result replaces it.
+
+[stubbed]
+
+16. The iprcbgn and ifncbgn intermediates no longer have the procedure or function
+type embedded in the intermediate. The reason is that there is no way to know 
+what procedure or function is going to be called during the parameter list build
+in the case of overloads.

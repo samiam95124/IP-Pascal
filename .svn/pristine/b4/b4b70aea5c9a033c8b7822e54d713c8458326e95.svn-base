@@ -1,0 +1,165 @@
+                    REVERSE ENGINEERING COUNTERMEASURES PROCEDURES
+
+The reverse engineering counter measures are several options that are built
+into the encoder. There are two classes of revengcm. Revengcm options make it
+more difficult to disassemble the output code and/or trace it.
+
+There are two types of revengcm options. The first type can be invoked at any
+time, without changing the run result of the program. The second type does
+affect the way the program work, and requires compensation by the program to
+return it to working status.
+
+The revengcm package is designed to be removed completely for distribution
+packages, from the encoder. This is done by swapping the module file
+revengcm.pas for an enabled or disabled version. The enable or disable is done
+with if/then statements, so it is important that the dead code elimination
+option ('dce' or 'deadcodeeliminate') be enabled on production versions so that
+the code is completely removed from the output.
+
+Each option, and the consequences of its use, will be covered in this file.
+This file, and all of th revengcm procedures and methods, should be kept
+internal and never released.
+
+#cxt, #charactertransliterate ==================================================
+
+This option causes the constant strings in the constant area to be encoded with
+a user specified pattern. This makes it more difficult to find strings in the
+code, because the will no longer be in ASCII code.
+
+With this option enabled, the encoder will look for a file by the name:
+
+chrtrn.xlt
+
+In the current directory. An error will occur, and compilation will stop, if it
+is not found.
+
+chrtrn.xlt is a text file, containing N lines of the following format:
+
+A*
+F&
+NY
+BT
+...
+
+Each line contains two characters. The first is the original ASCII character
+that is to be re-encoded. The second is what it should encode to. Any other
+characters on the line are ignored. There is no arrangements for quoting or
+comments in the file.
+
+Any number of transliteration entries may appear, in any order. If a character
+is not indicated for encoding, it is output unchanged. Any character in the
+range 0..255 may be specified, but of course it is difficult to specify
+control characters using the current setup.
+
+Any transliteration can be specified. However, there are some important
+attributes that might limit the choices that are acceptable.
+
+1. Space not encoded. If spaces are not encoded, the padding procedures in
+strlib will still work on the encoded strings.
+
+2. No control character translation. This is easier to work with, and control
+characters are less obvious in the code in any case.
+
+3. Sequential codes. If the series 'a'..'z', 'A'..'Z' and '0'..9' are kept
+sequential in the code, the strlib procedures to sort for order will still
+work.
+
+At the present, we use a code that does not encode spaces or control characters,
+but is not sequential. This allows most of the strlib procedures and hashing
+to work, but not the compare procedures.
+
+The character transliteration option DOES affect the way the program runs, and
+the program must compensate for it. First of all, only multiple character string
+constants are encoded. For example:
+
+writeln('hello');
+
+Would output garbage, since the string 'hello' would be encoded. However:
+
+writeln('h', 'e', 'l', 'l', 'o');
+
+Would work, because it is a series of single character constants.
+
+When working with strings, the normal or encoded status must be compensated for.
+If a encoded string is to be output, it must be decoded first. If two strings
+are to be compared (for equality), they must either both be encoded, or neither
+encoded. This applies to hashing, as well.
+
+A hidden effect exists in the use of header files:
+
+program test(input, output, myfile);
+
+...
+
+would NOT work, because the filenames "_input", "_output", and "_myfile" would
+be generated internally to handle the header files. Instead, you must open these
+files manually, using the assign, reset and/or rewrite procedures.
+
+To make use of transliterated files easier, a module exists:
+
+xltlib
+
+Which contains the following procedures and functions:
+
+function nrmchr(c): char;
+
+   Translate from encoded character to normal character.
+
+procedure nrmstr(var s: string);
+
+   Translate string from encoded characters to normal characters.
+
+function xltchr(c): char;
+
+   Translate from normal charcter to encoded character.
+
+procedure xltstr(var s: string);
+
+   Translate string from normal characters to encoded characters.
+
+There are two versions of this module,
+
+xltlib_xlt
+xltlib_nrm
+
+That are copied to the xltlib file. The first, xltlib_xlt, peforms the encode
+and decode mentioned above. The file xltlib_nrm is a no-op, and simply returns
+what it is sent. What this allows is the swapping of a module file so that both
+non-encoded and encoded files can be used.
+
+Encoded and non-encoded objects can be freely intermixed. It is up to the
+programmer, however, to resolve what constants come from an encoded file, and
+what constants come from a normal file. The best policy is to ensure that 
+encoded strings never leave the encoded file.
+
+#discm, #disassemblycountermeasures ===========================================
+
+This option causes disassembly countermeasures to be placed in the code. 
+Disassembly countermeasures are features that only make sense when executed,
+and a disassembler cannot follow. For example, after each unconditional
+control transfer, a disassembler must assume that the next instruction is valid
+code. Instead, a very short leader to a very long instruction is placed there,
+causing a disassembler to throw away several instructions before falling back
+into sync.
+
+These "opportunity" slots are filled, and also, at random, a deliberate jump
+over is inserted in-line to code. The result is a general disabling of proper
+code disassembly.
+
+The in-line code generated is completely without effect to the run of the 
+program, other than negatively affecting its speed. The frequency of such code
+trips is ballanced between impacting code speed, and being frequent enough to
+cause significant disassembly problems.
+
+===============================================================================
+
+FUTURE RESEARCH
+
+* Use of "cmp r32,imm32" type of instructions, where a flow joins at the imm32.
+The imm32 can contain no-ops, or even valid instructions, if it can be 
+determined that a simple sequence fits there.
+
+* Checksums or crcs of the program code section for a module. This may not need
+to be built into the encoder. For example, a .exe examination program can
+determine the entire chksum/crc for the program section, and implace that in
+the program for the check.

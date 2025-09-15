@@ -1,0 +1,157 @@
+General overview of "SOS" and principles
+
+SOS, or "simple operating system", is a progressive implementation of the IP modules 
+system on a standalone system. There are several logical stages of such a system, not all of 
+which it makes sense to implement:
+
+1. A stand alone stack of linked IP binaries.
+
+2. A core system that supports one TPA.
+
+3. A core system that supports multiple TPAs.
+
+4. A virtual memory system.
+
+The first, a stack based system, is the simplest. It just takes the normal application stack 
+and adds the modules necessary to achieve runability direct to the hardware. For 
+example, syslib could itself separate device calls out by type and call an ad-hoc collection 
+of packages to implement them.
+
+This would work, but would be inflexible. Each new device would have to be specifically 
+built in to syslib. Instead, we implemented a driver registration system.
+
+Standard Drivers
+
+The standard driver system allows a series of drivers to be registered by organizing each 
+drivers' name, type, and a series of service vectors as a record and storing it in a driver 
+list. This is done by the driver registration package, which consists of devcal and devreg. 
+Devcal is an assembly language module that gives the ability to get and call vectors to 
+predefined device routine classes. Devreg maintains the device registration list, giving the
+ability to get a device registration entry, place it active in the list, and search for drivers 
+by name. The setting of fields in the device entry, and placement of device vectors into it, 
+are performed by the device itself.
+
+The drivers list forms the basic "root" namespace in IP/SOS implementation. Filesystems 
+are "device rooted", in that the root of each filesystem is a device, and all devices are 
+rooted in an abstract global root that is the device list. Thus:
+
+/hd1
+
+Is a device (the hard disk), and
+
+/hd1/usr/file1.txt
+
+is a full path specification. Since device rooting inherently creates a dependency on the 
+particular device used, IP/SOS implements the concept of "logical devices" to allow files 
+to be specified in a device independent way:
+
+/sys/bin/cc
+
+Here "sys" is a logical device that gives the fixed storage volume for which most program 
+and data storage occurs.
+
+Each driver exists in the application stack after the driver registration package, and 
+registers itself into the device root list on startup. Typically, all devices will so be 
+registered before syslib in the stack. In this way, when syslib starts, it will have access to 
+all defined devices.
+
+After each of the drivers, an essential step is the appearance of the logical device module. 
+The logical device module performs the final step of connecting real physical devices to 
+logical I/O devices. For example, the _input and _output devices have to be connected to 
+real physical devices.
+
+The ability to define logical devices flows naturally from the device registry process. A 
+new device can be created that is just a copy of an existing device registration entry, or a 
+device can be created that simply modifies some of the characteristics of the device, but 
+uses the underlying device (a so called "layered" device), or any combination thereof. The 
+logcal device module both assigns logical devices as copies of the existing physical
+devices, and also creates layered devices.
+
+For example, the _output device is simply a copy of an existing physical device, but the 
+_input device both attaches to existing physical devices and uses layered processing. It 
+must typically echo to an output device, and may in fact fully buffer its input lines and 
+even provide line edit and history functions.
+
+Advanced Drivers
+
+The driver system can extend to advanced devices. The unification factor here is the 
+ability to act as a stream device. For example, a terminal stream covers everything from 
+elementry I/O to 3D graphical functions in IP/SOS methodogy. However, the basic idea 
+of a driver is to include only essential functions and leaving it to application stacks to 
+cover the remaining software fill work.
+
+Of course, this sounds like a fundamental feature of IP, and that is true to a varying 
+degree. IP starts as an essential device coverage, and moves upwards towards pure 
+software functions. For example, graphics output starts at the hardware level, and moves 
+toward a windowing capability that is software implemented.
+
+Some of the difference can be illustrated by example. The trmlib standard can be 
+implemented at base by these calls (over and above basic serial implementation):
+
+
+
+metics(x, y);
+position(x, y);
+setattr(attset);
+setcolor(color);
+cursor(onoff);
+auto(onoff);
+scroll(x, y);
+
+The interface is simplified considerably by the lack of any input, the implementation of 
+many of the "convience" calls such as "up", "down", and the tabbing system, and the lack 
+of need to unify such devices as the timer, joystick, etc.
+
+There are many other kinds of devices that make no sense as serial devices at all. For 
+example, the timers, joystick and mouse have no use as a serial paradygm. However, the 
+use of the drivers list mechanisim allows them to be registered, controlled and 
+multiplexed as other devices.
+
+Interface to the Application
+
+The application gets a view of the devices via its IP application support modules, and a 
+limited view of devices in general. For example, opening different devices gives a view of 
+devices as intermediated by syslib.
+
+A single TPA Based System
+
+An IP/SOS with a single TPA is achieved by creating a modular connection method for 
+the TPA application to the core software. This can be done by hardware or software 
+means, for example a software interrupt or a single vector via an understood location.
+
+A TPA based system differs from a simple stack implementation in that the application 
+libraries are transferred to the TPA, and the basic implementations are left as OS vectors. 
+Since the direct device vectors must at least be covered by a buffering layer to remove the 
+direct interface via device registration objects, what occurs is more of a split down the 
+middle of each IP module into what makes sense for the portability of the application, 
+and what makes sense to implement in general. In practice this is a very light layer. For
+example, it does not make sense to implement aliasing functions or a function to 
+determine what line ending to output in the system functions, but the graphical package is 
+essentially turned into a vectored call equivalent.
+
+In a single TPA based system, Each application is linked and loaded for a single TPA 
+address. This means also that multiple applications can only be implemented by swapping. 
+This tends to inherently be an ineffective management strategy on modern systems that 
+are not memory limited.
+
+
+
+A Multiple TPA System
+
+A MULTPLE TPA system requires the ability to relocate each application to a separate 
+partition, and may or may not include the ability to provide hardware protection between 
+applications. Each applications load format must include a relocation dictionary sufficient 
+to indicate and change all of the address dependent data in the binary.
+
+A Virtual Memory System
+
+The virtual memory system is a straightforward improvement on a single TPA based 
+system in that it also needs vectorized system I/O, and has similar division of labor issues.
+
+In the majority of cases, the single TPA step will be skipped over for a full VMA based 
+system. Most modern processors have VMA hardware, and VMA is the winning choice 
+for the method to manage multiple programs, processes and threads.
+
+IP/SOS can implement a simple VMA based system as an alternative to VO/SO based 
+systems.
+

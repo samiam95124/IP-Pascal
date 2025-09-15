@@ -1,0 +1,49 @@
+COMPLEX MODULARITY
+
+================================================================================
+
+In the current compiler, levels are represented in the block stack, and the 
+fixed symbol table.
+
+In complex modularity, we add the module as a level. Each module has its own
+block stack and symbol table. There is both a linear module list for all
+modules processed in the system, active or not, and a stack that represents
+the current nesting level of modules. When a symbol is looked for, the search,
+if global, proceeds though any number of module levels to find it. The work
+is minimized by using the same hash to move from module to module, and the
+search is that of a single list as interrupted by the module system.
+
+The first module created is the system module. This sits at the bottom of
+the module stack for the run of the program. Next, any uses modules are
+created. As each module is parsed, a new module level is opened. When a
+module opens a submodule, that is either stacked anew, and the module
+parsed into that, or a previous module is retrived from the list and
+set active. Because each module dictates its own ordering, modules must
+be stacked up and torn down at will, which is why having them as self
+contained units is a good idea.
+
+When a symbol is processed, it goes through the module stack, as mentioned.
+We also have a "qualident" format of:
+
+out.str
+
+Where the module of origin is directly specified. This then searches through
+the module list to find the appropriate entry directly.
+
+The intermediate file format changes for complex modularity. Instead of
+having the system symbols as another, outter block, each module in the list
+is output to the file, without regard for order, except that the client
+module is output last. Each module is introduced by a card that gives the
+module number, 1 to N, in the file. Each intermediate link then specifies
+the module number as well as the level and sequence of its target.
+
+As now, each intermediate completely specifies its modules used, although
+the change would make it easier to move to a distributed format. When
+the parser wants to use a file for its precompilation, it loads the
+modules in the file into the module list, ending up with the used module
+itself.
+
+An alternative to the "uses" statement is the "joins" statement. This
+performs the same action as uses, except that the resulting module is
+sent to the module list, and taken out of scope. It will only be able
+to be accessed by a qualident.

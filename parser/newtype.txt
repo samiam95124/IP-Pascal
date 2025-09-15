@@ -1,0 +1,103 @@
+The strict implementation of overrange types uses the idea that such types can be coined at
+any time from subrange constructions, like:
+
+type cardinal = 0..4294967296;
+
+The existence of an overrange type is indicated anytime the range lies outside of -maxint..maxint.
+All overrange types are considered integers within the parser. Therefore, such overrange types
+are carried as integer types and treated as integer types until they reach the encoder. Thus, in
+theory, nothing else than special evaluation of such overranges are required to achieve them.
+
+However, there is the issue of how to specify overrange types in a non-overrange parser. Also,
+the type integer and the constant maxint give an abstract method of specifying numeric types
+in Pascal. The "meaning" of integer is to give the numeric type that is most natural and
+efficient for the processor at hand. This "natural word size" existed when Pascal was created,
+and indeed was a hard limitation on the CDC 6000 computer of its origination. 
+Processors have become more adept at various size of word manipulation, but there still 
+exists the concept of preferred word size such that it is more efficient to promote smaller types 
+to that size so that they can be handled in common registers.
+
+Its to that end that the overrange types also extend the logical numeric typing system, to provide
+a logical and abstract method of specifying numeric types. These types, and their limit constants
+are:
+
+cardinal
+maxcard
+
+Cardinal specifies an unsigned numeric of the same class as integer. It has the value:
+
+type cardinal = 0..maxcard;
+
+where maxcard >= maxint, that is, a cardinal is at least the unsigned portion of a standard
+integer.
+
+A cardinal represents an unsigned numeric that is the natural word size of the processor.
+Thus, it is the unsigned equivalent of an integer. Typically, it will be processed with the same
+efficiency as an integer, since virtually all modern processors have both signed and unsigned
+modes.
+
+linteger
+maxlint
+
+linteger is a long integer, and it has the value:
+
+type linteger = -maxlint..maxlint;
+
+where maxlint >= maxint, that is, a long integer is at least the size of a standard integer.
+
+A long integer is most commonly implemented as a double precision integer. It will take
+two registers and require more instructions to process than an integer, but is a reasonably
+optimized operation. Most commonly, maxlint = maxint*maxint*2 or maxint*maxcard.
+
+lcardinal
+maxlcard
+
+lcardinal is a long cardinal, and it has the value:
+
+type lcardinal = 0..maxlcard;
+
+where maxlcard is >= maxcard, that is, a long cardinal is at least the size of a standard
+cardinal.
+
+A long cardinal is most commonly implemented as a double precision cardinal. It will take
+two registers and require more instructions to process than a cardinal, but is a reasonably
+optimized operation. Most commonly, maxlcard = maxcard*maxcard.
+
+The existence of logical numeric types makes the "bootstrapping" of overrange types in the
+parser simple. When the parser starts the process, the types are a simple alias of integer.
+The encoder then treats them as special types, and can generate a new parser that has
+the extended type ability. Then, the parser itself is extended to cover the new 
+range types.
+
+All types, cardinal, long integer and long cardinal, are considered aliases of integer in
+parsing. As said, overrange types are considered subranges of standard integer in
+parsing, since any idea of their being out of range is a machine dependent concept.
+When math is done in the parser, it is done via separated sign math with long cardinal
+values, which means that any constant value of any type is manageable.
+
+Each type, cardinal, long integer and long cardinal, is shipped via intermediate using
+a special type constructor. But on reaching the encoder, these types are sematically
+treated as being integers. They are treated differently in the backend, however.
+
+The new cases for the backend divide into two separate methods, one for cardinals,
+and another for long integers and long cardinals. When the backend sees a subrange,
+it is effectively classified as a cardinal, long integer or long cardinal based 
+on its values.
+
+For cardinals, the minimum case, the net processing is to use unsigned operations
+instead of signed. This is already done in many parts of the backend based on both
+valid subranges of integer (0..maxint) and also on address math operations.
+
+For long integers and long cardinals, this takes changes to both the register allocator
+and to the final code generation. The register allocator must allocate two registers for
+each operand, similar to the current allocation of fat or tagged pointers. As parameters,
+double precision has the same rules as fat pointers, that is, limited to certain pairs of
+registers. The final coder must also generate operations for double precision. Finally,
+a double precision function result must be allowed for.
+
+A final issue, which will be covered at some future time (since it does not cause 
+problems until we implement multiple CPU support), is the treatment of constants
+maxint, maxlint, maxcard and maxlcard. Presently, these are hard equates in the 
+parser.
+They need to be logical constants that are passed on into the intermediate. The encoder
+should be responsible for determining what the meaning of the constants are.

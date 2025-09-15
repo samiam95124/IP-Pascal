@@ -1,0 +1,60 @@
+{*******************************************************************************
+*                                                                              *
+*                            VERSION NUMBER MODULE                             *
+*                                                                              *
+* Carries the version number information. This is in a separate module to make *
+* it easy for automated version number programs to find.                       *
+*                                                                              *
+* The format of version numbers is that of:                                    *
+*                                                                              *
+* <major>.<minor>.<build>                                                      *
+*                                                                              *
+* The major and minor numbers indicate a release number, and are incremented   *
+* each time an outside release is done.                                        *
+*                                                                              *
+* The major version number is not limited, but is small (typically less than   *
+* 10) by definition.                                                           *
+*                                                                              *
+* The minor number is generally from 0 to 99, and formatted in 2 digits. This  *
+* is not a hard limit, but is the prevailing standard.                         *
+*                                                                              *
+* The build number is 4 digits, from 0000-9999, and is formatted in 4 digits.  *
+* The build is incremented for each build, usually a successful one,           *
+* automatically. If the build is zero, then it should be elided from the       *
+* output. All outside releases have, or should have, zero build numbers.       *
+*                                                                              *
+* The build number gives 10,000 possible builds if it overflows, it "sticks"   *
+* at 9999 and an error should result, since build numbers should never roll    *
+* automatically into valid release numbers.									   *
+*                                                                              *
+* The tracking number gives another way to exactly specify builds. It contains *
+* the S2000 time of the build, which is always positive now. To output it, it  *
+* is xored with $58748936, an arbitrary number used to obfuscate the purpose   *
+* of it.                                                                       *
+*                                                                              *
+* When the version numbers are updated, they are "rolled", meaning that for    *
+* each version number increment, the numbers to the right are zeroed. A major  *
+* release rolls the minor number and build number. A minor release rolls the   *
+* build number.                                                                *
+*                                                                              *
+* Version numbers start at major zero for a test version, then go to 1 on      *
+* first release. From then on, major numbers climb according to releases of    *
+* major new software. Minor numbers are used to indicate bug fix releases      *
+* between major releases.                                                      *
+*                                                                              *
+* The version numbers block is fixed to allow in-program utilities to access   *
+* them. For example, they are typically part of the blotter, and the blotter   *
+* points to them.                                                              *
+*                                                                              *
+*******************************************************************************}
+
+module version;
+
+{ Note: these should be fixed, there is a compiler bug }
+const version_major = 1;  { major version number }
+      version_minor = 13; { minor version number }
+	   version_build = 11; { build number }
+	   version_track = 0;  { tracking number }
+
+begin
+end.

@@ -1,0 +1,6 @@
+                       SYSTEM LIBRARY NOTES
+
+1. The runtime error dialog does not go to the front, nor does it perform
+repaints (is overwritten by other windows).
+
+2. Should have "exists" check for special files.

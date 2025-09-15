@@ -1,0 +1,5 @@
+rem
+rem Prepare a complete bootstrap debug run
+rem
+call cfpyboot
+creatimg

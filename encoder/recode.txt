@@ -1,0 +1,22 @@
+RECODE PROPOSAL FOR ENCODER BACKEND
+
+Instead of passing a full tree to the backend, the encoder passes fully
+flattened code. Each procedure/block is passed as such a list. The tree is
+flattened by translating each operation to temp results, with typed temps, as is
+done in the backend at present. All structures are devolved to jumps, and
+special items like case tables are done by a new instruction.
+
+The register allocation becomes one of assigning registers to active operands so
+that the real machine can process them. Either concurrently, or in a later pass,
+the loads and stores in the list are eliminated, moved or changed to a special
+register to register copy.
+
+Advantages
+
+The main advantage of the system is that it simplifies the final encode process,
+and makes it easier to move the loads and stores around, since it is a simple
+linear list.
+
+Disadvantages
+
+The order of evaluation of left and right trees is left to a higher level pass.

@@ -1,0 +1,2734 @@
+{*******************************************************************************
+*                                                                              *
+*                           Encoder Optimization Module                        *
+*                             MACHINE ENCODER                                  *
+*                                                                              *
+*                       Copyright (C) 2010 S. A. Moore                         *
+*                                                                              *
+* Contains optimization routines for the IP Pascal encoder program.            *
+* optimization routines are defined as procedures run across the intermediate  *
+* form that improve the code, but are optional, as they do not change the      *
+* functionality of the code. The support routines for the optimization         *
+* routines are also included here.                                             *
+*                                                                              *
+*******************************************************************************}
+
+module optimize;
+
+uses strlib,   { string library }
+     extlib,   { extention library }
+     sepsgn,   { separated sign library }
+     encdef,   { encoder definitions }
+     encode;   { encoder module (for aborts) }
+
+{*******************************************************************************
+
+                               Module Interface
+
+*******************************************************************************}
+
+procedure cstopr(var mip: intptr); forward;
+procedure remdead(var mip: intptr); forward;
+procedure bol2jmp(var mip: intptr); forward;
+
+{*******************************************************************************
+
+                                Private section
+
+*******************************************************************************}
+
+private
+
+{*******************************************************************************
+
+                 Forwards for recursive procedures and functions
+
+*******************************************************************************}
+
+procedure delinttree(ip: intptr); forward;
+
+{******************************************************************************
+
+Dispose of set
+
+Releases all entries making up a set. The set must be allocated in auxillary
+symbols.
+
+******************************************************************************}
+
+procedure putset(st: typptr);
+
+var tp: typptr;
+
+begin
+
+   if st^.t <> tstcst then error(esysflt40);
+   while st^.stcc <> nil do begin
+
+      tp := st^.stcc; { index top element }
+      if tp^.t <> tstet then error(esysflt41);
+      st^.stcc := tp^.sten; { gap out }
+      deltyp(tp); { remove type }
+      puttyp(tp) { and free it }
+
+   end;
+   deltyp(st); { remove set head }
+   puttyp(st) { and free it }
+
+end;
+
+{******************************************************************************
+
+Normalize set
+
+"normalizes" a set, by sorting for order, and removing illogical ranges like
+9..0, mergin redundant ranges like 0..9, 5..12, and forming ranges from 
+singles. Set normalization is used to establish a base for comparing or
+performing constant operations on sets in list form.
+
+Set normalize should be done on set constants in the alternate type list. If
+they are in the main type list, they really should not be rearranged, or
+especially, deleted. If any constant or part of is not in the alternate list,
+an error will result. The way to get around this is to make copies of each
+constant that might come from the main list.
+
+******************************************************************************}
+
+procedure normset(st: typptr); { set constant pointer }
+
+var tp, tp1, tp2: typptr;
+    lp:           typptr;
+    s, e:         ssint;
+
+begin
+
+   { validate set constant }
+   if st^.t <> tstcst then error(esysflt34);
+
+   { eliminate illogical entries }
+
+   tp := st^.stcc; { index top of list }
+   lp := nil; { clear last entry }
+   while tp <> nil do begin
+
+      if ssgtn(tp^.stes, tp^.stee) then begin { illogical entry, delete }
+         if lp = nil then st^.stcc := tp^.sten { gap from list top }
+         else lp^.sten := tp^.sten; { gap midlist }
+         tp1 := tp; { save entry }
+         tp := tp^.sten; { index next }
+         deltyp(tp1); { delete from type system }
+         puttyp(tp1) { free it }
+      
+      end else begin
+
+         lp := tp; { save last }
+         tp :=tp^.sten { next entry }
+
+      end
+
+   end;
+
+   { sort entries into order according to the start value }
+
+   tp := st^.stcc; { index top of list }
+   st^.stcc := nil; { clear destination list }
+   while tp <> nil do begin { until list empty }
+
+      tp1 := tp; { index entry }
+      tp := tp^.sten; { gap from source list }
+      tp1^.sten := nil; { clear next }
+      if st^.stcc = nil then st^.stcc := tp1 { destination is empty }
+      else begin { move down until greater entry is found }
+
+         tp2 := st^.stcc; { index top of destination list }
+         lp := nil; { clear last }
+         { move down until greater entry is found }
+         while ssltn(tp2^.stes, tp1^.stes) and (tp2^.sten <> nil) do begin
+
+            lp := tp2; { set last }
+            tp2 := tp2^.sten { next }
+
+         end;
+         { check end of list encountered }
+         if ssgeq(tp2^.stes, tp1^.stes) then
+            { end of list encountered, place past this entry }
+            tp2^.sten := tp1
+         else begin { place before this entry }
+
+            tp1^.sten := tp2; { link to next }
+            if lp = nil then st^.stcc := tp1 { place as root }
+            else lp^.sten := tp1 { link last to this }
+
+         end
+
+      end
+      
+   end;
+
+   { Remove overlapping entries, and merge ajoining entries }
+
+   tp := st^.stcc; { index top of list }
+   while tp <> nil do begin { for all list }
+
+      if tp^.sten <> nil then begin { there are two entries left }
+
+         { Check this entry and next entry overlap at any point, or
+           adjoin each other }
+         s := tp^.sten^.stes; { find start -1 }
+         s.v := ssadd(s, true, 1);
+         s.s := ssadds(s, true, 1);
+         e := tp^.sten^.stes; { find end +1 }
+         e.v := ssadd(e, false, 1);
+         e.s := ssadds(e, false, 1);
+         if ssgeq(tp^.stes, e) and ssleq(tp^.stee, s) then begin
+
+            { form a range that includes both }
+            s := tp^.stes; { find start }
+            if ssgtn(s, tp^.sten^.stes) then s := tp^.sten^.stes;
+            e := tp^.stes; { find end }
+            if ssltn(e, tp^.sten^.stee) then e := tp^.sten^.stee;
+            { reassign first entry to that range }
+            tp^.stes := s;
+            tp^.stee := e;
+            tp1 := tp^.sten; { save next entry }
+            tp^.sten := tp1^.sten; { gap out of list }
+            deltyp(tp1); { remove from system }
+            {puttyp(tp1)} { free it }
+            { will remain on same entry to compare with next }
+      
+         end else tp := tp^.sten { link next }
+
+      end else tp := tp^.sten { link next }
+
+   end
+
+end;
+
+{******************************************************************************
+
+Find intersection of sets
+
+Finds the intersection of two sets to form a new constant set. The lists must
+be normalized.
+
+Note that the result may contain a null list.
+
+******************************************************************************}
+
+procedure intset(var ds:     typptr;  { destination set }
+                     sl, sr: typptr); { source sets }
+
+
+var pa, pb, tp: typptr;
+    s, e:       ssint;
+
+{ check ranges overlap }
+
+function intersect(sea, seb: typptr): boolean;
+
+begin
+
+   intersect := ssleq(sea^.stes, seb^.stee) and ssgeq(sea^.stee, seb^.stes)
+
+end;
+
+begin
+
+   gettypa(ds, tstcst); { get the constant head }
+   ds^.stcc := nil; { clear list }
+   ds^.stct := gblsbs; { set base type }
+   pa := sl^.stcc; { index source left list }
+   pb := sr^.stcc; { index right list }
+   while (pa <> nil) and (pb <> nil) do begin { traverse }
+
+      { check next entries intersect }
+      if not intersect(pa, pb) then begin
+
+         { no intersect, discard the lowest }
+         if ssltn(pa^.stes, pb^.stes) then pa := pa^.sten
+         else pb := pb^.sten
+
+      end else begin { entries intersect }
+
+         { find minimum overlap }
+         s := pa^.stes; { find maximum entry }
+         if ssltn(pa^.stes, pb^.stes) then s := pb^.stes;
+         e := pa^.stee; { find minimum entry }
+         if ssltn(pb^.stee, pa^.stee) then e := pb^.stee;
+         gettypa(tp, tstet); { get set element }
+         tp^.stes := s; { set range }
+         tp^.stee := e;
+         tp^.steh := ds; { link to head }
+         tp^.sten := ds^.stcc; { push onto list }
+         ds^.stcc := tp;
+         { check which one, or both, to discard now }
+         if ssequ(pa^.stee, pb^.stee) then begin
+
+            { discard both }
+            pa := pa^.sten; { advance left }
+            pb := pb^.sten { advance right }
+
+         end else if ssltn(pa^.stee, pb^.stee) then
+            pa := pa^.sten { advance left }
+         else
+            pb := pb^.sten { advance right }
+
+      end
+
+   end
+
+end;
+
+{******************************************************************************
+
+Find difference of sets
+
+Finds the difference of two sets to form a new constant set. The lists must
+be normalized.
+
+Note that the result may contain a null list.
+
+******************************************************************************}
+
+procedure difset(var ds:     typptr;  { destination set }
+                     sl, sr: typptr); { source sets }
+
+
+var pa, pb: typptr;
+    ps:     typptr;
+    start:  ssint;
+    t:      ssint;
+
+{ check ranges overlap }
+
+function intersect(sea, seb: typptr): boolean;
+
+begin
+
+   intersect := ssleq(sea^.stes, seb^.stee) and ssgeq(sea^.stee, seb^.stes)
+
+end;
+
+{ enter new range to result }
+
+procedure newrange(s, e: ssint);
+
+var tp: typptr;
+
+begin
+
+   if ssgeq(e, s) then begin { range makes sense }
+
+      gettypa(tp, tstet); { get set element }
+      tp^.stes := s; { set range }
+      tp^.stee := e;
+      tp^.steh := ds; { link to head }
+      tp^.sten := ds^.stcc; { push onto list }
+      ds^.stcc := tp
+
+   end
+
+end;
+
+begin
+
+   gettypa(ds, tstcst); { get the constant head }
+   ds^.stcc := nil; { clear list }
+   ds^.stct := gblsbs; { set base type }
+   pa := sl^.stcc; { index source left list }
+   pb := sr^.stcc; { index right list }
+   while (pa <> nil) and (pb <> nil) do begin { traverse }
+
+      { check next entries intersect }
+      if not intersect(pa, pb) then begin
+
+         { no intersect, discard the lowest }
+         if ssltn(pa^.stes, pb^.stes) then begin
+
+            newrange(pa^.stes, pa^.stee); { enter range to result }
+            pa := pa^.sten { skip }
+
+         end else pb := pb^.sten
+
+      end else begin { entries intersect }
+
+         { The intersecting a might have to be broken into peices. We stay with
+           A until it is replaced by another entry }
+         ps := pa; { save this entry }
+         start := pa^.stes; { save the start }
+         while (ps = pa) and (pb <> nil) do begin
+
+            t.v := ssadd(pb^.stes, true, 1);
+            t.s := ssadds(pb^.stes, true, 1);
+            newrange(start, t); { enter first part }
+            start := pb^.stee; { skip over b block }
+            t.v := ssadd(start, false, 1);
+            t.s := ssadds(start, false, 1);
+            start := t;
+            { if we passed the block, skip a }
+            if ssgtn(start, pa^.stee) then pa := pa^.sten
+            else begin
+
+               pb := pb^.sten; { skip b }
+               if pb = nil then begin { no more, output rest and skip }
+
+                  newrange(start, pa^.stee);
+                  pa := pa^.sten
+
+               end
+
+            end
+
+         end
+
+      end
+
+   end;
+   { enter the remaining ranges of left to result }
+   while pa <> nil do begin
+
+      newrange(pa^.stes, pa^.stee); { enter range to result }
+      pa := pa^.sten { skip }
+
+   end;
+   normset(ds) { normalize result }
+
+end;
+
+{******************************************************************************
+
+Find sets equal
+
+Returns true if the two constant sets are equal. The sets must be normalized.
+
+******************************************************************************}
+
+function equset(sta, stb: typptr): boolean;
+
+var tp, tp1: typptr;
+    f:       boolean; { equal flag }
+
+begin
+
+   if (sta^.t <> tstcst) or (stb^.t <> tstcst) then error(esysflt89);
+   f := true; { set equals }
+   tp := sta^.stcc;
+   tp1 := stb^.stcc;
+   while (tp <> nil) and (tp1 <> nil) do begin
+
+      if (tp^.t <> tstet) or (tp1^.t <> tstet) then error(esysflt43);
+      { match start and end for range }
+      if (tp^.stes.s <> tp1^.stes.s) or (tp^.stes.v <> tp1^.stes.v) then 
+         f := false;
+      if (tp^.stee.s <> tp1^.stee.s) or (tp^.stee.v <> tp1^.stee.v) then 
+         f := false;
+      tp := tp^.sten;
+      tp1 := tp1^.sten
+
+   end;
+   { both lists must end }
+   if (tp <> nil) or (tp1 <> nil) then f := false;
+
+   equset := f { return result }
+
+end;
+
+{******************************************************************************
+
+Find set less than or equal
+
+Finds that set a does not contain any element that is not also in set b, and
+returns true if so. The lists must be normalized.
+
+******************************************************************************}
+
+function leqset(sta, stb: typptr): boolean;
+
+var pa, pb, ps: typptr;
+    f:          boolean; { equal flag }
+    start:      ssint;
+    t:          ssint;
+
+{ check ranges overlap }
+
+function intersect(sea, seb: typptr): boolean;
+
+begin
+
+   intersect := ssleq(sea^.stes, seb^.stee) and ssgeq(sea^.stee, seb^.stes)
+
+end;
+
+begin
+
+   if (sta^.t <> tstcst) or (stb^.t <> tstcst) then error(esysflt42);
+   f := true; { set true }
+   pa := sta^.stcc;
+   pb := stb^.stcc;
+   while (pa <> nil) and (pb <> nil) do begin
+
+      if not intersect(pa, pb) then begin
+
+         { no intersect, discard the lowest }
+         if ssltn(pa^.stes, pb^.stes) then begin
+
+            f := false; { unmatched a content, set false }
+            pa := pa^.sten { skip }
+
+         end else pb := pb^.sten
+
+      end else begin { entries intersect }
+
+         { The intersecting a might be covered by peices of b. We stay with
+           A until it is replaced by another entry }
+         ps := pa; { save this entry }
+         start := pa^.stes; { save the start }
+         while (ps = pa) and (pb <> nil) do begin
+
+            if ssltn(start, pb^.stes) then f := false; { content unmatched }
+            start := pb^.stee; { skip over b block }
+            t.v := ssadd(start, false, 1);
+            t.s := ssadds(start, false, 1);
+            start := t;
+            { if we passed the block, skip a }
+            if ssgtn(start, pa^.stee) then pa := pa^.sten
+            else begin
+
+               pb := pb^.sten; { skip b }
+               if pb = nil then begin { no more, output rest and skip }
+
+                  if ssgeq(pa^.stee, start) then 
+                     f := false; { content unmatched }
+                  pa := pa^.sten { next }
+
+               end
+
+            end
+
+         end
+
+      end
+
+   end;
+   { If there are remaining entries in a after end of b, then the condition
+     fails }
+   if pa <> nil then f := false;
+
+   leqset := f { return result }
+
+end;
+
+{******************************************************************************
+
+Find set inclusion
+
+Finds if the given integer exists in the set.
+
+******************************************************************************}
+
+function inset(st: typptr; i: ssint): boolean;
+
+var tp: typptr;
+    f:  boolean;
+
+begin
+
+   if st^.t <> tstcst then error(esysflt44);
+   f := false; { set not in set }
+   tp := st^.stcc;
+   while tp <> nil do begin
+
+      if tp^.t <> tstet then error(esysflt45);
+      { check included in this range }
+      if ssgeq(i, tp^.stes) and ssleq(i, tp^.stee) then f := true;
+      tp := tp^.sten { next }
+
+   end;
+
+   inset := f { return result }
+
+end;
+
+{******************************************************************************
+
+Delete intermediate expression
+
+Releases an entire intermediate expression to the free intermediates list,
+including all subbranches.
+
+******************************************************************************}
+
+procedure delintexp(ip: intptr);
+
+begin
+
+   { free subentries }
+   case ip^.i of { intermediate }
+
+      { no parameter entries }
+      tilodset, tilimns, tilodint, tilimint, tilodrel, tilimrel, tilodsrl, tilodchr, 
+      tilodbol, tilodsrc, tilodptr, tilodtgp, tilodadr, tilodfadr: ;
+
+      { unary }
+      tildiint, tildibol, tildirel, tildiset, tildichr, tildisrl, tildisrc, tildiptr,
+      tilditgp, tieolt, tieof, tinotbol, tiodd, tiexist, tiloc, tilen, tinotint, tilodlen,
+      tinegint, tiabsint, tisqrint, tirnd, titrc, ticvtitr, tinegrel, tiabsrel, tisqrrel,
+      tiatnrel, ticosrel, tiexprel, tilgnrel, tisinrel, tisqtrel, tirngchk, tilodafbuft,
+      tilodafbuf, tirecoff, tisucint, tiprdint, ticvtgtf, ticvtftg, ticvtntg, 
+      ticvtrtsr, tiaddintimm, timltintimm, tiandintimm, tiequintimm, 
+      tiequtgpimm, tineqintimm, tineqtgpimm, tiorintimm,  tixorintimm, 
+      tileqintimm, tigeqintimm, tiltnintimm, tigtnintimm, tisubintimm,
+      tiaddintlod, timltintlod, tiandintlod, tiequintlod,
+      tiequtgplod, tineqintlod, tineqtgplod, tiorintlod, tixorintlod, tileqintlod,
+      tigeqintlod, tiltnintlod, tigtnintlod, tisubintlod: delintexp(ip^.left);
+
+      { binary }
+      tidivint, timodint, timltint, tiaddint, tisubint, tiandint, tiorint, 
+      tixorint, tiintset, tiuniset, tidifset, tiequset, tineqset, tileqset, tigeqset,
+      tiequrel, tineqrel, tileqrel, tigeqrel, tiltnrel, tigtnrel, tiequgst, tineqgst, 
+      tigeqgst, tiltngst, tigtngst, tiequtgp, tineqtgp, tiequint, tineqint, tileqint,
+      tigeqint, tiltnint, tigtnint, tiequstr, tineqstr, tileqstr, tigeqstr, tiltnstr,
+      tigtnstr, tiincset, timltrel, tidivrel, tiaddrel, tisubrel, tisinset, tiarrref,
+      tiarfgar, tileqgst, tiaddintldi, timltintldi, tiandintldi, tiequintldi,
+      tiequtgpldi, tineqintldi, tineqtgpldi, tiorintldi, tixorintldi,
+      tileqintldi, tigeqintldi, tiltnintldi, tigtnintldi, tisubintldi: begin
+
+         delintexp(ip^.left); 
+         delintexp(ip^.right);
+
+      end;
+
+      { trinary }
+      tirngset: begin
+
+         delintexp(ip^.left); 
+         delintexp(ip^.right);
+         delintexp(ip^.xtra)
+
+      end;
+
+      tifnccal, tifnccalo: delinttree(ip^.flow2); { parameter list }
+
+      tifnccali: begin
+
+         delintexp(ip^.left); { address of function }
+         delinttree(ip^.flow2) { parameter list }
+
+      end
+
+      { trap other cases }
+      else error(esysflt77) { should not occur }
+
+   end;
+   putint(ip) { free this entry }
+
+end;
+
+{******************************************************************************
+
+Delete intermediate tree
+
+Releases an entire intermediate tree to the free intermediates list, including
+all subbranches.
+
+******************************************************************************}
+
+procedure delinttree(ip: intptr);
+
+var ips: intptr;
+
+{ load/store operator }
+
+procedure delinttreeop(ip: intptr);
+
+begin
+
+   case ip^.i of { intermediate }
+
+      tigoto, tilabequ, tihalt: ; { no action }
+
+      tiprccal, tiprccalo: delinttree(ip^.flow2); { parameter list }
+
+      tiprccali: begin { procedure/function call }
+
+         delintexp(ip^.left); { address }
+         delinttree(ip^.flow2) { parameter list }
+
+      end;
+
+      { unary }
+      tigotot, tigotof, tiwrteolt, tiredeolt, tiget, tigett, tiput, tireset, tirewrite,
+      ticlose, tiupdate, tiappend, tipaget, tidel, tinew, tidisp, tistoint,
+      tistosrl, tistorel, tistochr, tistobol, tistoset, tistosrc, tistofint,
+      tistofsrl, tistofrel, tistofchr, tistofbol, tidspgar, tistogar, tistotgp,
+      tistoftgp, ticalpar, tisignal, tisignalone, tiwait: delintexp(ip^.left);
+
+      { binary }
+      tistiint, tistisrl, tistirel, tistichr, tistibol, tistiset, tistisrc, tistifint,
+      tistifsrl, tistifrel, tistifchr, tistifbol, tistigar, tistitgp, tistiftgp,
+      tiwrtsrc, tiwrtintt, tiwrtchrt, tiwrtbolt, tiwrtrelt, tiwrtstrt,
+      tiwrtsrl, tiwrtrel, tiwrtset, tiwrtbol, tiwrtchr, tiwrtint, tiredsrc, tiredintt,
+      tiredchrt, tiredrelt, tiredsrlt, tipos, tichg, tiwrtgstt, tiassign, 
+      tinewgar, tiassert: begin
+
+         delintexp(ip^.left);
+         delintexp(ip^.right);
+
+      end;
+   
+      { trinary }
+      tiwrtintft, tiwrtchrft, tiwrtbolft, tiwrtrelft, tiwrtstrft, tipack,
+      tiunpack, tiwrtgstft: begin
+
+         delintexp(ip^.left);
+         delintexp(ip^.right);
+         delintexp(ip^.xtra);
+
+      end;
+
+      { quad }
+      tiwrtrelfft: begin
+
+         delintexp(ip^.left); 
+         delintexp(ip^.right);
+         delintexp(ip^.xtra); 
+         delintexp(ip^.xtra2);
+
+      end;
+
+      { structured entries }
+
+      tiifbgn: begin { if statement }
+
+         delintexp(ip^.left);
+         delinttree(ip^.flow2); { process true flow }
+         delinttree(ip^.flow3) { process false flow }
+
+      end;
+
+      tiwhlbgn, tirptbgn, ticasbgn: begin
+
+         delintexp(ip^.left);
+         delinttree(ip^.flow2) { process enclosed flow }
+
+      end;
+
+      tiwthbgn: begin
+
+         delintexp(ip^.left); { record base address }
+         delinttree(ip^.flow2) { process enclosed flow }
+
+      end;
+
+      tifortint, tifortchr, tifortbol, tifordint, tifordchr,
+      tifordbol: begin
+
+         delintexp(ip^.left); { start }
+         delintexp(ip^.right); { end }
+         delinttree(ip^.flow2) { for loop }
+
+      end;
+
+      ticasstb, ticasels: delinttree(ip^.flow2) { case entry }
+
+      { trap other cases }
+      else error(esysflt67) { should not occur }
+
+   end
+
+end;
+
+begin
+
+   while ip <> nil do begin { traverse this forward flow }
+
+      delinttreeop(ip); { follow secondary flows single node }
+      ips := ip; { save entry }
+      ip := ip^.flow;  { next in flow }
+      putint(ips) { delete old entry }
+
+   end
+
+end;
+
+{*******************************************************************************
+
+Compress constant operations
+
+Performs all constant operations in the intermediate. Each constant operation
+that is performed removes the original operators from the source tree.
+
+Overflows are checked for, as enabled by option. Note that most, but not all,
+such error conditions are announced by the parser, which evaluates expression
+trees consisting of constants specifically to enable overflow error checking
+and reporting at source read time. However, since the parser does not have
+the full tree, there are associative cases that are not caught. The errors
+here stop the encode and don't output a source line. This is a subject for
+further improvement.
+
+Note: We free up intermediate entries found, but don't free type entries that
+were created specifically to use in that entry. This is a subject for further
+improvement.
+
+To be done:
+
+1. Does not look for associative relationships. Ie., 1+a+2 does not get
+resolved to a+3.
+
+2. Does not fold the irecoff and iarrref instructions. These would be done
+by forming an offset to a base address with the constant address offset.
+
+*******************************************************************************}
+
+procedure cstopr(var mip: intptr);
+
+var ip, ip1: intptr;
+    tp, tp1, tp2: typptr;
+
+{ constant expression }
+
+procedure cstoprexp(var ip: intptr);
+
+var ip1, ip2: intptr;
+    l, r, t:  ssint; { value holders }
+    lr, rr:   real;
+    ls, rs:   pstring;
+
+procedure copystcst(var nt: typptr; ot: typptr);
+
+var tp, tp1: typptr;
+
+begin
+
+   gettypa(nt, tstcst); { get a new head entry }
+   nt^.stct := ot^.stct; { set same base type }
+   nt^.stcc := nil; { clear list }
+   tp := ot^.stcc; { index top of old constant list }
+   while tp <> nil do begin { copy all list elements }
+
+      gettypa(tp1, tstet); { get a new set element }
+      tp1^.stes := tp^.stes; { copy start }
+      tp1^.stee := tp^.stee; { copy end }
+      tp1^.steh := nt; { link to head }
+      tp1^.sten := nt^.stcc; { push onto list }
+      nt^.stcc := tp1;
+      tp := tp^.sten { link next old list element }
+
+   end
+
+end;
+    
+begin
+
+{ ;write('cstoprexp: intermediate: '); prtic(ip^.i, 1); writeln; }
+
+   case ip^.i of { intermediate }
+
+      { no action required entries }
+      tilodset, tilimns, tilodint, tilimint, tilodrel, tilimrel, tilodsrl, tilodchr, 
+      tilodbol, tilodsrc, tilodptr, tilodtgp, tilodadr, tilodfadr: ;
+
+      { unary }
+      tildiint, tildibol, tildirel, tildiset, tildichr, tildisrl, tildisrc, tildiptr,
+      tilditgp, tieolt, tieof, tiexist, tiloc, tilen, tilodlen, tilodafbuft,
+      tilodafbuf, tirecoff, ticvtgtf, ticvtftg, ticvtntg, 
+      ticvtrtsr,
+      { Note that these intermediates should not be created before constant 
+        folding. If they were foldable, that should have been done at the 
+        original operator }
+      tiaddintimm, timltintimm, tiandintimm, tiequintimm, tiequtgpimm, 
+      tineqintimm, tineqtgpimm, tiorintimm, tixorintimm, tileqintimm,
+      tigeqintimm, tiltnintimm, tigtnintimm, tisubintimm, tiaddintlod,
+      timltintlod, tiandintlod, tiequintlod, tiequtgplod, tineqintlod,
+      tineqtgplod, tiorintlod, tixorintlod, tileqintlod, tigeqintlod,
+      tiltnintlod, tigtnintlod, tisubintlod: cstoprexp(ip^.left);
+
+      { binary }
+      tiequgst, tineqgst, tigeqgst, tiltngst, tigtngst, tiequtgp, tineqtgp, tiarrref,
+      tiarfgar, tileqgst, tiaddintldi, timltintldi, tiandintldi, tiequintldi,
+      tiequtgpldi, tineqintldi, tineqtgpldi, tiorintldi, tixorintldi, tileqintldi,
+      tigeqintldi, tiltnintldi, tigtnintldi, tisubintldi: begin
+
+         cstoprexp(ip^.left); 
+         cstoprexp(ip^.right)
+
+      end;
+
+      tifnccal, tifnccalo: cstopr(ip^.flow2); { parameter list }
+
+      tifnccali: begin
+
+         cstoprexp(ip^.left); { address of function }
+         cstopr(ip^.flow2) { parameter list }
+
+      end;
+
+      tirngchk: begin
+
+         cstoprexp(ip^.left); { fold leaf first }
+         if ip^.left^.i = tilimint then begin
+
+            { its foldable }
+            l.v := consti(ip^.left^.base); { get value }
+            l.s := constis(ip^.left^.base); { get sign }
+            gettypa(tp, ticst); { get type entry }
+            { set new result }
+            tp^.ival := l;
+            if fchkcst then { perform range check }
+               if ssltn(l, lbounds(ip^.base), lbound(ip^.base)) or 
+                  ssgtn(l, ubounds(ip^.base), ubound(ip^.base)) then
+                  error(erngchk); { out of range }
+            putint(ip^.left); { free left }
+            getint(ip2, tilimint); { get entry }
+            ip2^.base := tp; { place }
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      ticvtitr: begin
+
+         cstoprexp(ip^.left); { fold leaf first }
+         if ip^.left^.i = tilimint then begin
+
+            { its foldable }
+            l.v := consti(ip^.left^.base); { get value }
+            l.s := constis(ip^.left^.base); { get sign }
+            lr := l.v; { convert to real }
+            if l.s then lr := lr*(-1); { place sign }
+            gettypa(tp, trcst); { get type entry }
+            { set new result }
+            tp^.rval := lr;
+            putint(ip^.left); { free left }
+            getint(ip2, tilimrel); { get entry }
+            ip2^.base := tp; { place }
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tirnd, titrc: begin
+
+         cstoprexp(ip^.left); { fold leaf first }
+         if ip^.left^.i = tilimrel then begin
+
+            lr := ip^.left^.base^.rval; { get operand value }
+            { process operator }
+            if ip^.i = tirnd then l.v := abs(round(lr))
+            else l.v := abs(trunc(lr));
+            l.s := lr < 0;
+            gettypa(tp, ticst); { get type entry }
+            { set new result }
+            tp^.ival := l;
+            putint(ip^.left); { free left }
+            getint(ip2, tilimint); { get entry }
+            ip2^.base := tp; { place }
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tinegrel, tiabsrel, tisqrrel, tiatnrel, ticosrel, tiexprel, tilgnrel, tisinrel,
+      tisqtrel: begin
+
+         cstoprexp(ip^.left); { fold leaf first }
+         if ip^.left^.i = tilimrel then begin
+
+            lr := ip^.left^.base^.rval; { get operand value }
+            case ip^.i of { operator }
+
+               tinegrel: lr := -lr;
+               tiabsrel: lr := abs(lr);
+               tisqrrel: lr := sqr(lr);
+               tiatnrel: lr := arctan(lr);
+               ticosrel: lr := cos(lr);
+               tiexprel: lr := exp(lr);
+               tilgnrel: lr := ln(lr);
+               tisinrel: lr := sin(lr);
+               tisqtrel: lr := sqrt(lr)
+
+            end;
+            gettypa(tp, trcst); { get type entry }
+            { set new result }
+            tp^.rval := lr;
+            { we can put it into the left side entry }
+            ip^.left^.base := tp;
+            ip1 := ip; { save the add entry }
+            ip := ip^.left; { move new constant up }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tinotbol, tiodd, tinotint, tinegint, tiabsint, tisqrint, tisucint, tiprdint: begin
+
+         cstoprexp(ip^.left); { fold leaf first }
+         if ip^.left^.i = tilimint then begin
+
+            { its foldable }
+            l.v := consti(ip^.left^.base); { get value }
+            l.s := constis(ip^.left^.base); { get sign }
+            case ip^.i of { operator }
+
+               tinotbol: if l.v = 0 then begin
+
+                  l.v := ord(true);
+                  l.s := false
+
+               end else begin
+
+                  l.v := ord(false);
+                  l.s := false
+
+               end;
+               tiodd:    begin
+
+                  l.v := ord(odd(l.v));
+                  l.s := false
+
+               end;
+               tinotint: begin
+
+                  if fchkcst then { check negative operand }
+                     if l.s then error(ebolneg);
+                  l.v := not l.v
+
+               end;
+               tinegint: l.s := not l.s;
+               tiabsint: l.s := false;
+               tisqrint: begin
+
+                  if fchkcst then { check for overflow }
+                     if not l.s and (l.v > maxint div l.v) then 
+                        error(enumovf); { overflows }
+                  l.v := sqr(l.v); { find sqr }
+                  l.s := false { always positive }
+
+               end;
+               tisucint: begin
+
+                  if fchkcst then 
+                     if not l.s and (l.v >= maxint) then 
+                        error(enumovf); { overflows }
+                  t.v := ssadd(l, false, 1); { find succ value }
+                  t.s := ssadds(l, false, 1); { find succ sign }
+                  l := t
+
+               end;
+               tiprdint: begin
+
+                  if fchkcst then 
+                     if l.s and (l.v >= maxint) then 
+                        error(enumovf); { overflows }
+                  t.v := ssadd(l, true, 1); { find pred value }
+                  t.s := ssadds(l, true, 1); { find pred sign }
+                  l := t
+
+               end
+
+            end;
+            gettypa(tp, ticst); { get type entry }
+            { set new result }
+            tp^.ival := l;
+            { we can put it into the left side entry }
+            ip^.left^.base := tp;
+            ip1 := ip; { save the add entry }
+            ip := ip^.left; { move new constant up }
+            putint(ip1) { free operator entry }
+
+         end else if ip^.i = tinotbol then
+            { check for 'not' optimize cases }
+            if (ip^.left^.i = tiequset) or (ip^.left^.i = tiequrel) or 
+               (ip^.left^.i = tiequstr) or (ip^.left^.i = tiequgst) or 
+               (ip^.left^.i = tiequint) or (ip^.left^.i = tiequtgp) or
+               (ip^.left^.i = tineqset) or (ip^.left^.i = tineqrel) or 
+               (ip^.left^.i = tineqstr) or (ip^.left^.i = tineqgst) or 
+               (ip^.left^.i = tineqint) or (ip^.left^.i = tineqtgp) or
+               (ip^.left^.i = tileqrel) or (ip^.left^.i = tileqstr) or
+               (ip^.left^.i = tileqgst) or (ip^.left^.i = tileqint) or  
+               (ip^.left^.i = tigeqrel) or (ip^.left^.i = tigeqstr) or 
+               (ip^.left^.i = tigeqgst) or (ip^.left^.i = tigeqint) or 
+               (ip^.left^.i = tiltnrel) or (ip^.left^.i = tiltnstr) or 
+               (ip^.left^.i = tiltngst) or (ip^.left^.i = tiltnint) or 
+               (ip^.left^.i = tigtnrel) or (ip^.left^.i = tigtnstr) or 
+               (ip^.left^.i = tigtngst) or (ip^.left^.i = tigtnint) then begin
+
+            { get opposite case entry }
+            case ip^.left^.i of { operator type }
+
+               tiequset: getint(ip1, tineqset);
+               tiequrel: getint(ip1, tineqrel);
+               tiequstr: getint(ip1, tineqstr);
+               tiequgst: getint(ip1, tineqgst);
+               tiequint: getint(ip1, tineqint);
+               tiequtgp: getint(ip1, tineqtgp);
+               tineqset: getint(ip1, tiequset);
+               tineqrel: getint(ip1, tiequrel);
+               tineqstr: getint(ip1, tiequstr);
+               tineqgst: getint(ip1, tiequgst);
+               tineqint: getint(ip1, tiequint);
+               tineqtgp: getint(ip1, tiequtgp);
+               tileqrel: getint(ip1, tigtnrel);
+               tileqstr: getint(ip1, tigtnstr);
+               tileqgst: getint(ip1, tigtngst);
+               tileqint: getint(ip1, tigtnint);
+               tigeqrel: getint(ip1, tiltnrel);
+               tigeqstr: getint(ip1, tiltnstr);
+               tigeqgst: getint(ip1, tiltngst);
+               tigeqint: getint(ip1, tiltnint);
+               tiltnrel: getint(ip1, tigeqrel);
+               tiltnstr: getint(ip1, tigeqstr);
+               tiltngst: getint(ip1, tigeqgst);
+               tiltnint: getint(ip1, tigeqint);
+               tigtnrel: getint(ip1, tileqrel);
+               tigtnstr: getint(ip1, tileqstr);
+               tigtngst: getint(ip1, tileqgst);
+               tigtnint: getint(ip1, tileqint);
+
+            end;
+            { copy operands up }
+            ip1^.left := ip^.left^.left;
+            ip1^.right := ip^.left^.right;
+            ip1^.base := ip^.left^.base;
+            putint(ip^.left); { release operators }
+            putint(ip);
+            ip := ip1 { set new operator }
+             
+         end
+ 
+      end;
+
+      tiaddint, tidivint, timodint, timltint, tisubint, tiandint, tiorint, tixorint, 
+      tiequint, tineqint, tileqint, tigeqint, tiltnint, tigtnint: begin
+
+         cstoprexp(ip^.left); { fold leaves first }
+         cstoprexp(ip^.right);
+         if (ip^.left^.i = tilimint) and (ip^.right^.i = tilimint) then begin
+
+            { its foldable }
+            l.v := consti(ip^.left^.base); { get operand values }
+            l.s := constis(ip^.left^.base); { get operand values }
+            r.v := consti(ip^.right^.base);
+            r.s := constis(ip^.right^.base);
+            case ip^.i of { operator }
+
+               tiaddint: begin
+
+                  if fchkcst then
+                     { perform overflow check. overflow will only occur if the
+                       operands are the same sign }
+                     if (l.s = r.s) and (maxint-l.v < r.v) then 
+                           error(enumovf); { overflows }
+                  t.v := ssadd(l, r); { find addition value }
+                  t.s := ssadds(l, r); { find addition sign }
+                  l := t
+
+               end;
+               tidivint: begin 
+
+                  if r.v = 0 then error(edivzer); 
+                  t.v := ssdiv(l, r); { find division value }
+                  t.s := ssdivs(l, r); { find division sign } 
+                  l := t
+
+               end;
+               timodint: begin 
+
+                  if r.s then error(einvopr); { invalid if < 0 }
+                  if r.v = 0 then error(edivzer); { zero divide }
+                  t.v := ssmod(l, r); { find modulo value }
+                  t.s := ssmods(l, r); { find modulo sign } 
+                  l := t
+
+               end;
+               timltint: begin
+
+                  if fchkcst then { check for overflow }
+                     if l.v > maxint div r.v then
+                        error(enumovf); { overflows }
+                  t.v := ssmult(l, r); { multiply value }
+                  t.s := ssmults(l, r); { find multiply sign }
+                  l := t
+
+               end;
+               tisubint: begin
+
+                  if fchkcst then
+                     { perform overflow check. overflow will only occur if the
+                       operands are the same sign }
+                     if (l.s = not r.s) and (maxint-l.v < r.v) then
+                           error(enumovf); { overflows }
+                  t.v := sssub(l, r); { find subtraction value }
+                  t.s := sssubs(l, r); { find subtraction sign }
+                  l := t
+
+               end;
+               tiandint: begin
+
+                  if fchkcst then { check negative operands }
+                     if l.s or r.s then error(ebolneg);
+                  l.v := l.v and r.v
+
+               end;
+               tiorint:  begin
+
+                  if fchkcst then { check negative operands }
+                     if l.s or r.s then error(ebolneg);
+                  l.v := l.v or r.v
+
+               end;
+               tixorint: begin
+
+                  if fchkcst then { check negative operands }
+                     if l.s or r.s then error(ebolneg);
+                  l.v := l.v xor r.v
+
+               end;
+               tiequint: begin l.v := ord(ssequ(l, r)); l.s := false end;
+               tineqint: begin l.v := ord(ssnequ(l,  r)); l.s := false end;
+               tileqint: begin l.v := ord(ssleq(l, r)); l.s := false end;
+               tigeqint: begin l.v := ord(ssgeq(l, r)); l.s := false end;
+               tiltnint: begin l.v := ord(ssltn(l, r)); l.s := false end;
+               tigtnint: begin l.v := ord(ssgtn(l, r)); l.s := false end
+
+            end;
+            gettypa(tp, ticst); { get type entry }
+            { set new result }
+            tp^.ival := l;
+            { we can put it into the left side entry }
+            ip^.left^.base := tp;
+            putint(ip^.right); { free right constant }
+            ip1 := ip; { save the add entry }
+            ip := ip^.left; { move new constant up }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tiequrel, tineqrel, tileqrel, tigeqrel, tiltnrel, tigtnrel, timltrel, tidivrel,
+      tiaddrel, tisubrel: begin
+
+         cstoprexp(ip^.left); { fold leaves first }
+         cstoprexp(ip^.right);
+         if (ip^.left^.i = tilimrel) and (ip^.right^.i = tilimrel) then begin
+
+            { its foldable }
+            lr := ip^.left^.base^.rval; { get operand values }
+            rr := ip^.right^.base^.rval;
+            case ip^.i of { operator }
+
+               tiaddrel: lr := lr+rr;
+               tidivrel: begin if rr = 0 then error(edivzer); lr := lr/rr end;
+               timltrel: lr := lr*rr;
+               tisubrel: lr := lr-rr;
+               tiequrel: l.v := ord(lr = rr);
+               tineqrel: l.v := ord(lr <> rr);
+               tileqrel: l.v := ord(lr <= rr);
+               tigeqrel: l.v := ord(lr >= rr);
+               tiltnrel: l.v := ord(lr < rr);
+               tigtnrel: l.v := ord(lr > rr)
+
+            end;
+            if (ip^.i = tiaddrel) or (ip^.i = tidivrel) or (ip^.i = timltrel) or
+               (ip^.i = tisubrel) then begin { real result }
+
+               gettypa(tp, trcst); { get type entry }
+               { set new result }
+               tp^.rval := lr;
+               { we can put it into the left side entry }
+               ip^.left^.base := tp;
+               putint(ip^.right); { free right constant }
+               ip1 := ip; { save the operator entry }
+               ip := ip^.left; { move new constant up }
+               putint(ip1)  { free operator entry }
+
+            end else begin { boolean result }
+
+               gettypa(tp, ticst); { get type entry }
+               { set new result }
+               tp^.ival.v := l.v;
+               tp^.ival.s := false;
+               putint(ip^.left); { free left constant }
+               putint(ip^.right); { free right constant }
+               getint(ip2, tilimint); { get intermediate entry }
+               ip2^.base := tp;
+               ip1 := ip; { save the operator entry }
+               ip := ip2; { place new constant }
+               putint(ip1) { free operator entry }
+
+            end
+
+         end
+
+      end;
+
+      tiequstr, tineqstr, tileqstr, tigeqstr, tiltnstr, tigtnstr: begin
+
+         cstoprexp(ip^.left); { fold leaves first }
+         cstoprexp(ip^.right);
+         if (ip^.left^.i = tilodadr) and (ip^.right^.i = tilodadr) then
+            if (ip^.left^.base^.t = tscst) and (ip^.right^.base^.t = tscst) then
+               begin
+
+            { its foldable }
+            ls := ip^.left^.base^.sval; { get operand values }
+            rs := ip^.right^.base^.sval;
+            case ip^.i of { operator }
+
+               tiequstr: l.v := ord(ls^ = rs^);
+               tineqstr: l.v := ord(ls^ <> rs^);
+               tileqstr: l.v := ord(ls^ <= rs^);
+               tigeqstr: l.v := ord(ls^ >= rs^);
+               tiltnstr: l.v := ord(ls^ < rs^);
+               tigtnstr: l.v := ord(ls^ > rs^)
+
+            end;
+            gettypa(tp, ticst); { get type entry }
+            { set new result }
+            tp^.ival.v := l.v;
+            tp^.ival.s := false;
+            putint(ip^.left); { free left constant }
+            putint(ip^.right); { free right constant }
+            getint(ip2, tilimint); { get intermediate entry }
+            ip2^.base := tp;
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tisinset: begin
+
+         cstoprexp(ip^.left); 
+         cstoprexp(ip^.right);
+         { check constant set, nil set type, and constant operand }
+         if (ip^.left^.i = tilimns) and (ip^.right^.i = tilimint) then begin
+
+            { its foldable }
+            l.v := consti(ip^.right^.base); { get value }
+            l.s := constis(ip^.right^.base); { get sign }
+            gettypa(tp, tstet); { set element entry }
+            { place single element }
+            tp^.stes := l;
+            tp^.stee := l;
+            tp^.sten := nil; { set no next }
+            gettypa(tp1, tstcst); { get set constant entry }
+            tp1^.stcc := tp; { link to list }
+            tp^.steh := tp1; { link list to head }
+            tp1^.stct := gblsbs; { set base type of constant }
+            putint(ip^.left); { free left }
+            putint(ip^.right); { free right }
+            getint(ip2, tilodset); { get intermediate entry }
+            ip2^.base := tp1;
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end else
+            { check constant set type with constant operand }
+            if (ip^.left^.i = tilodset) and (ip^.right^.i = tilimint) then
+               if ip^.left^.base^.t = tstcst then begin
+
+            { its foldable }
+            l.v := consti(ip^.right^.base); { get value }
+            l.s := constis(ip^.right^.base); { get sign }
+            copystcst(tp, ip^.left^.base); { copy constant set to new set }
+            gettypa(tp1, tstet); { set element entry }
+            { place single element }
+            tp1^.stes := l; { place element value }
+            tp1^.stee := l;
+            tp1^.steh := tp; { link to head }
+            tp1^.sten := tp^.stcc; { push onto new list }
+            tp^.stcc := tp1;
+            putint(ip^.left); { free left }
+            putint(ip^.right); { free right }
+            getint(ip2, tilodset); { get intermediate entry }
+            ip2^.base := tp; { place base }
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tirngset: begin
+
+         cstoprexp(ip^.left); 
+         cstoprexp(ip^.right);
+         cstoprexp(ip^.xtra);
+         { check constant set, nil set type, and constant operand }
+         if (ip^.left^.i = tilimns) and (ip^.right^.i = tilimint) and 
+            (ip^.xtra^.i = tilimint) then begin
+
+            { its foldable }
+            l.v := consti(ip^.right^.base); { get values }
+            l.s := constis(ip^.right^.base); { get sign }
+            r.v := consti(ip^.xtra^.base);
+            r.s := constis(ip^.xtra^.base);
+            gettypa(tp, tstet); { set element entry }
+            { place single element }
+            tp^.stes := l;
+            tp^.stee := r;
+            tp^.sten := nil; { set no next }
+            gettypa(tp1, tstcst); { get set constant entry }
+            tp1^.stcc := tp; { link to list }
+            tp^.steh := tp1; { link list to head }
+            tp1^.stct := gblsbs; { set base type of constant }
+            putint(ip^.left); { free left }
+            putint(ip^.right); { free right }
+            getint(ip2, tilodset); { get intermediate entry }
+            ip2^.base := tp1;
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end else
+            { check constant set type with constant operand }
+            if (ip^.left^.i = tilodset) and (ip^.right^.i = tilimint) and
+               (ip^.xtra^.i = tilimint) then
+               if ip^.left^.base^.t = tstcst then begin
+
+            { its foldable }
+            l.v := consti(ip^.right^.base); { get value }
+            l.s := constis(ip^.right^.base); { get sign }
+            r.v := consti(ip^.xtra^.base); { get value }
+            r.s := constis(ip^.xtra^.base); { get sign }
+            copystcst(tp, ip^.left^.base); { copy constant set to new set }
+            gettypa(tp1, tstet); { set element entry }
+            { place single element }
+            tp1^.stes.v := l.v; { place element value }
+            tp1^.stes.s := l.s; { place element sign }
+            tp1^.stee.v := r.v;
+            tp1^.stee.s := r.s;
+            tp1^.steh := tp; { link to head }
+            tp1^.sten := tp^.stcc; { push onto new list }
+            tp^.stcc := tp1;
+            putint(ip^.left); { free left }
+            putint(ip^.right); { free right }
+            getint(ip2, tilodset); { get intermediate entry }
+            ip2^.base := tp; { place base }
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tiuniset: begin
+
+         cstoprexp(ip^.left); 
+         cstoprexp(ip^.right);
+         if (ip^.left^.i = tilodset) and (ip^.right^.i = tilodset) then
+            if (ip^.left^.base^.t = tstcst) and 
+               (ip^.right^.base^.t = tstcst) then begin
+
+            { both sides are set constants }
+            copystcst(tp, ip^.left^.base); { copy constant sets to new sets }
+            copystcst(tp1, ip^.right^.base);
+            { find the end of the left set }
+            tp2 := tp^.stcc; { index top }
+            while tp2^.sten <> nil do tp2 := tp2^.sten; { find end entry }
+            tp2^.sten := tp1^.stcc; { join second list to first }
+            deltyp(tp1); { remove 2nd head }
+            puttyp(tp1); { free it }
+            { correct the head pointers }
+            tp1 := tp^.stcc; { index start of list }
+            while tp1 <> nil do begin
+
+               tp1^.steh := tp; { place new head pointer }
+               tp1 := tp1^.sten { next }
+
+            end;
+            { Normalizing a concatenated set of both will remove the
+              redundancies and create an effective union of sets }
+            normset(tp); { normalize set }
+            putint(ip^.left); { free left constant }
+            putint(ip^.right); { free right constant }
+            getint(ip2, tilodset); { get intermediate entry }
+            ip2^.base := tp;
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+            
+
+         end
+
+      end;
+
+      tiintset: begin
+
+         cstoprexp(ip^.left); 
+         cstoprexp(ip^.right);
+         if (ip^.left^.i = tilodset) and (ip^.right^.i = tilodset) then
+            if (ip^.left^.base^.t = tstcst) and 
+               (ip^.right^.base^.t = tstcst) then begin
+
+            { both sides are set constants }
+            copystcst(tp, ip^.left^.base); { copy constant sets to new sets }
+            copystcst(tp1, ip^.right^.base);
+            normset(tp); { normalize sets }
+            normset(tp1);
+            intset(tp2, tp, tp1); { find intersection of sets }
+            putset(tp); { release set copies }
+            putset(tp1);
+            putint(ip^.left); { free left constant }
+            putint(ip^.right); { free right constant }
+            if tp2^.stcc = nil then begin { create null constant }
+
+               getint(ip2, tilimns); { get intermediate entry }
+               putset(tp2) { remove null set }
+
+            end else begin
+
+               getint(ip2, tilodset); { get intermediate entry }
+               ip2^.base := tp2
+
+            end;
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tiequset, tineqset: begin
+
+         cstoprexp(ip^.left); 
+         cstoprexp(ip^.right);
+         if (ip^.left^.i = tilodset) and (ip^.right^.i = tilodset) then
+            if (ip^.left^.base^.t = tstcst) and 
+               (ip^.right^.base^.t = tstcst) then begin
+
+            { both sides are set constants }
+            copystcst(tp, ip^.left^.base); { copy constant sets to new sets }
+            copystcst(tp1, ip^.right^.base);
+            normset(tp); { normalize sets }
+            normset(tp1);
+            if ip^.i = tiequset then l.v := ord(equset(tp, tp1))
+            else l.v := ord(not equset(tp, tp1));
+            putset(tp); { release set copies }
+            putset(tp1);
+            putint(ip^.left); { free left constant }
+            putint(ip^.right); { free right constant }
+            gettypa(tp, ticst); { get type entry }
+            { set new result }
+            tp^.ival.v := l.v;
+            tp^.ival.s := false;
+            getint(ip2, tilimint); { get intermediate entry }
+            ip2^.base := tp;
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tiincset: begin
+
+         cstoprexp(ip^.left); 
+         cstoprexp(ip^.right);
+         if (ip^.left^.i = tilimint) and (ip^.right^.i = tilodset) then
+            if ip^.right^.base^.t = tstcst then begin
+
+            { both sides are constants, find in functions }
+            t.v := consti(ip^.left^.base);
+            t.s := constis(ip^.left^.base);
+            l.v := ord(inset(ip^.right^.base, t));
+            l.s := false; { set positive }
+            putint(ip^.left); { free left constant }
+            putint(ip^.right); { free right constant }
+            gettypa(tp, ticst); { get type entry }
+            { set new result }
+            tp^.ival := l;
+            getint(ip2, tilimint); { get intermediate entry }
+            ip2^.base := tp;
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tidifset: begin
+
+         cstoprexp(ip^.left); 
+         cstoprexp(ip^.right);
+         if (ip^.left^.i = tilodset) and (ip^.right^.i = tilodset) then
+            if (ip^.left^.base^.t = tstcst) and 
+               (ip^.right^.base^.t = tstcst) then begin
+
+            { both sides are set constants }
+            copystcst(tp, ip^.left^.base); { copy constant sets to new sets }
+            copystcst(tp1, ip^.right^.base);
+            normset(tp); { normalize sets }
+            normset(tp1);
+            difset(tp2, tp, tp1); { find intersection of sets }
+            putset(tp); { release set copies }
+            putset(tp1);
+            putint(ip^.left); { free left constant }
+            putint(ip^.right); { free right constant }
+            if tp2^.stcc = nil then begin { create null constant }
+
+               getint(ip2, tilimns); { get intermediate entry }
+               putset(tp2) { remove null set }
+
+            end else begin
+
+               getint(ip2, tilodset); { get intermediate entry }
+               ip2^.base := tp2
+
+            end;
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end;
+
+      tileqset, tigeqset: begin
+
+         cstoprexp(ip^.left); 
+         cstoprexp(ip^.right);
+         if (ip^.left^.i = tilodset) and (ip^.right^.i = tilodset) then
+            if (ip^.left^.base^.t = tstcst) and 
+               (ip^.right^.base^.t = tstcst) then begin
+
+            { both sides are set constants }
+            copystcst(tp, ip^.left^.base); { copy constant sets to new sets }
+            copystcst(tp1, ip^.right^.base);
+            normset(tp); { normalize sets }
+            normset(tp1);
+            if ip^.i = tileqset then l.v := ord(leqset(tp, tp1))
+            else l.v := ord(leqset(tp1, tp));
+            putset(tp); { release set copies }
+            putset(tp1);
+            putint(ip^.left); { free left constant }
+            putint(ip^.right); { free right constant }
+            gettypa(tp, ticst); { get type entry }
+            { set new result }
+            tp^.ival.v := l.v;
+            tp^.ival.s := false;
+            getint(ip2, tilimint); { get intermediate entry }
+            ip2^.base := tp;
+            ip1 := ip; { save the operator entry }
+            ip := ip2; { place new constant }
+            putint(ip1) { free operator entry }
+
+         end
+
+      end
+
+      else error(esysflt76) { should not occur }
+
+   end
+
+{ ;write('cstoprexp: intermediate: -'); prtic(ip^.i, 1); writeln; }
+
+end;
+
+{ constant operator }
+
+procedure cstoprop(ip: intptr);
+
+begin
+
+{ ;write('cstoprop: intermediate: '); prtic(ip^.i, 1); writeln; }
+
+   case ip^.i of { intermediate }
+
+      tigoto, tilabequ, tihalt: ; { no action }
+
+      tiprccal, tiprccalo: cstopr(ip^.flow2); { parameter list }
+
+      tiprccali: begin { procedure/function call }
+
+         cstoprexp(ip^.left); { address }
+         cstopr(ip^.flow2) { parameter list }
+
+      end;
+
+      { unary }
+      tigotot, tigotof, tiwrteolt, tiredeolt, tiget, tigett, tiput, tireset, tirewrite,
+      ticlose, tiupdate, tiappend, tipaget, tidel, tinew, tidisp, tistoint,
+      tistosrl, tistorel, tistochr, tistobol, tistoset, tistosrc, tistofint,
+      tistofsrl, tistofrel, tistofchr, tistofbol, tidspgar, tistogar, tistotgp,
+      tistoftgp, ticalpar, tisignal, tisignalone, tiwait: cstoprexp(ip^.left);
+
+      { binary }
+      tistiint, tistisrl, tistirel, tistichr, tistibol, tistiset, tistisrc, tistifint,
+      tistifsrl, tistifrel, tistifchr, tistifbol, tistigar, tistitgp, tistiftgp,
+      tiwrtsrc, tiwrtintt, tiwrtchrt, tiwrtbolt, tiwrtrelt, tiwrtstrt,
+      tiwrtsrl, tiwrtrel, tiwrtset, tiwrtbol, tiwrtchr, tiwrtint, tiredsrc, tiredintt,
+      tiredchrt, tiredrelt, tiredsrlt, tipos, tichg, tiwrtgstt, tiassign, 
+      tinewgar, tiassert: begin
+
+         cstoprexp(ip^.left);
+         cstoprexp(ip^.right);
+
+      end;
+   
+      { trinary }
+      tiwrtintft, tiwrtchrft, tiwrtbolft, tiwrtrelft, tiwrtstrft, tipack,
+      tiunpack, tiwrtgstft: begin
+
+         cstoprexp(ip^.left);
+         cstoprexp(ip^.right);
+         cstoprexp(ip^.xtra);
+
+      end;
+
+      { quad }
+      tiwrtrelfft: begin
+
+         cstoprexp(ip^.left); 
+         cstoprexp(ip^.right);
+         cstoprexp(ip^.xtra); 
+         cstoprexp(ip^.xtra2);
+
+      end;
+
+      { structured entries }
+
+      tiifbgn: begin { if statement }
+
+         cstoprexp(ip^.left);
+         cstopr(ip^.flow2); { process true flow }
+         cstopr(ip^.flow3) { process false flow }
+
+      end;
+
+      tiwhlbgn, tirptbgn, ticasbgn: begin
+
+         cstoprexp(ip^.left);
+         cstopr(ip^.flow2) { process enclosed flow }
+
+      end;
+
+      tiwthbgn: begin
+
+         cstoprexp(ip^.left); { record base address }
+         cstopr(ip^.flow2) { process enclosed flow }
+
+      end;
+
+      tifortint, tifortchr, tifortbol, tifordint, tifordchr,
+      tifordbol: begin
+
+         cstoprexp(ip^.left); { start }
+         cstoprexp(ip^.right); { end }
+         cstopr(ip^.flow2) { for loop }
+
+      end;
+
+      ticasstb, ticasels: cstopr(ip^.flow2) { case entry }
+
+      { trap other cases }
+      else error(esysflt66) { should not occur }
+
+   end
+
+{ ;write('cstoprop: intermediate: -'); prtic(ip^.i, 1); writeln; }
+
+end;
+
+begin
+
+   ip := mip; { index root }
+   while ip <> nil do begin { traverse this forward flow }
+
+      ip1 := ip^.flow; { save next in case this entry gets deleted }
+      cstoprop(ip); { follow secondary flows single node }
+      ip := ip1 { next in flow }
+
+   end
+
+end;
+
+{*******************************************************************************
+
+Eliminate dead code
+
+Removes intermediate tree sections that are enabled by constants. This 
+operation should be done after constant folding, so that only simple constants
+are present in the graph.
+
+*******************************************************************************}
+
+procedure remdead(var mip: intptr);
+
+var ip, ips: intptr;
+
+{ process terminal operators }
+
+procedure remdeadop(ip: intptr);
+
+var ip1, ip2, ip3: intptr;
+    tp:            typptr;
+    s, e, t:       integer;
+    f:             boolean;
+    v:             ssint;
+
+{ find end of list, or nil if given nil }
+
+function endlst(ip: intptr): intptr;
+
+begin
+
+   if ip <> nil then
+      while ip^.flow <> nil do ip := ip^.flow; { find end }
+
+   endlst := ip
+
+end;
+
+{ Find precedent for entry. If precedent is root, returns nil. Gives error
+  if not found, or entry was nil. }
+
+function preced(ip: intptr): intptr;
+
+var p, lp: intptr;
+
+begin
+
+   p := mip; { index top of list }
+   lp := nil; { set no last }
+   while (p <> ip) and (p <> nil) do begin { traverse }
+
+      lp := p; { set last }
+      p := p^.flow { next entry }
+
+   end;
+   if p = nil then error(esysflt61); { not found, thats bad }
+   
+   preced := lp { return last }
+
+end;
+
+{ Delete intermediate entry. Error if entry is nil. }
+
+procedure delint(ip: intptr);
+
+var lp: intptr;
+
+begin
+
+   lp := preced(ip); { find precedent of old entry }
+   if lp = nil then mip := ip^.flow { replace first entry }
+   else lp^.flow := ip^.flow { gap out entry }
+
+end;
+
+{ Replace list entry. Error if old entry is nil. Replace with nil
+  is effectively delete. }
+
+procedure replace(oip, nip: intptr);
+
+var p, lp: intptr;
+
+begin
+
+   if nip = nil then delint(oip) { reduce to delete }
+   else begin { replace }
+
+      lp := preced(oip); { find precedent of old entry }
+      if lp = nil then mip := nip { replace first entry }
+      else lp^.flow := nip; { gap out entry }
+      p := endlst(nip); { find end of new list }
+      p^.flow := oip^.flow { link to next }
+
+   end
+
+end;
+
+{ insert list entry }
+
+procedure insert(oip, nip: intptr);
+
+var p: intptr;
+
+begin
+
+   p := endlst(nip); { find end of new entry list }
+   if p <> nil then begin { not a null insert }
+
+      p^.flow := oip^.flow; { link to next }
+      oip^.flow := nip { link current to next }
+
+   end
+
+end;
+
+{ check flow contains a label equate }
+
+function labequ(ip: intptr): boolean;
+
+var f: boolean; { found flag }
+
+begin
+
+   f := false; { set not found }
+   while ip <> nil do begin { traverse }
+
+      if ip^.i = tilabequ then f := true; { found }
+      ip := ip^.flow { next }
+
+   end;
+
+   labequ := f { return result }
+
+end;
+
+begin
+
+   case ip^.i of { intermediate }
+
+      { skip non-structural entries }
+      tiwrtrelfft, tiwrtintft, tiwrtchrft, tiwrtbolft, tiwrtrelft, tiwrtstrft, tipack,
+      tiunpack, tiwrtgstft, tistiint, tistisrl, tistirel, tistichr, tistibol, tistiset,
+      tistisrc, tistifint, tistifsrl, tistifrel, tistifchr, tistifbol, tistigar,
+      tistitgp, tistiftgp, tiwrtsrc, tiwrtintt, tiwrtchrt, tiwrtbolt, tiwrtrelt,
+      tiwrtstrt, tiwrtsrl, tiwrtrel, tiwrtset, tiwrtbol, tiwrtchr, tiwrtint, tiredsrc,
+      tiredintt, tiredchrt, tiredrelt, tiredsrlt, tipos, tichg, tiwrtgstt, tiassign,
+      tinewgar, tiwrteolt, tiredeolt, tiget, tigett, tiput, tireset, tirewrite, ticlose,
+      tiupdate, tiappend, tipaget, tidel, tinew, tidisp, tistoint, tistosrl,
+      tistorel, tistochr, tistobol, tistoset, tistosrc, tistofint, tistofsrl,
+      tistofrel, tistofchr, tistofbol, tidspgar, tistogar, tistotgp, tistoftgp,
+      ticalpar, tiprccal, tiprccalo, tiprccali, tigoto, tigotot, tigotof,
+      tilabequ, tihalt, tiassert, tisignal, tisignalone, tiwait: ; { no action }
+
+      { structured entries }
+
+      tiifbgn: begin { if statement }
+
+         { An odd feature of Pascal is that one section of an 'if' can jump to
+           the other. If a side of the if is dead, but contains a label, we must
+           leave it alone, since it could be jumped to. }
+         if (ip^.left^.i = tilimint) and not labequ(ip^.flow2) and 
+            not labequ(ip^.flow3) then begin { condition is constant, no labels }
+
+            if consti(ip^.left^.base) <> 0 then begin { true }
+
+               delinttree(ip^.flow3); { remove false tree }
+               if ip^.flow2 = nil then 
+                  { if the true flow does not exist, just remove the entire if }
+                  delint(ip)
+               else { replace if operator with true flow }
+                  replace(ip, ip^.flow2) { replace top operator }
+
+            end else begin { false }
+
+               delinttree(ip^.flow2); { remove true tree }
+               if ip^.flow3 = nil then 
+                  { if the false flow does not exist, just remove the entire if }
+                  delint(ip)
+               else { replace if operator with false flow }
+                  replace(ip, ip^.flow3) { replace top operator }
+
+            end;
+            putint(ip^.left); { free constant entry }
+            putint(ip) { free 'if' entry }
+
+         end else if (ip^.flow2 = nil) and (ip^.flow3 = nil) and 
+                     not chkfncexp(ip^.left) then begin
+
+            { controlled statements are empty, and no included side effect in
+              expression, remove entire if }
+            delintexp(ip^.left); { free expression }
+            delint(ip); { remove if entry }
+            putint(ip) { free 'if' entry }
+
+         end else begin { process subtree }
+
+            remdead(ip^.flow2); { process true flow }
+            remdead(ip^.flow3) { process false flow }
+
+         end
+
+      end;
+
+      tiwhlbgn: begin
+
+         if ip^.left^.i = tilimint then begin
+
+            { condition is constant }
+            if consti(ip^.left^.base) <> 0 then begin { true }
+
+               { true loops forever, but could be exited by a goto }
+               gettypa(tp, tlab); { get a label entry }
+               tp^.lmrk := blkstk^.mark; { set mark to current }
+               getint(ip1, tilabequ); { get a label intermediate }
+               ip1^.base := tp; { set base }
+               ip1^.flow := nil; { set one entry only }
+               replace(ip, ip1); { replace while with that }
+               ip2 := endlst(ip^.flow2); { save end of this list }
+               insert(ip1, ip^.flow2); { insert enclosed flow }
+               getint(ip3, tigoto); { get a goto label }
+               ip3^.base := tp; { set base }
+               ip3^.flow := nil; { set one entry only }
+               if ip2 <> nil then { enclosed flow not empty }
+                  insert(ip2, ip3) { place goto }
+               else { empty, attach to label instead }
+                  insert(ip1, ip3) { place goto }
+
+            end else begin { false }
+
+               { false loop is a no-op, remove in entirety }
+               delinttree(ip^.flow2); { remove enclosed flow }
+               delint(ip) { remove while entry }
+
+            end;
+            putint(ip^.left); { free constant entry }
+            putint(ip) { free 'if' entry }
+
+         end else remdead(ip^.flow2) { process enclosed flow }
+
+      end;
+
+      tirptbgn: begin
+
+         if ip^.left^.i = tilimint then begin
+
+            { condition is constant }
+            if consti(ip^.left^.base) <> 0 then { true }
+               { true loop executes the body only once }
+               replace(ip, ip^.flow2) { replace top operator }
+            else begin { false }
+
+               { false loops forever, but could be exited by a goto }
+               gettypa(tp, tlab); { get a label entry }
+               tp^.lmrk := blkstk^.mark; { set mark to current }
+               getint(ip1, tilabequ); { get a label intermediate }
+               ip1^.base := tp; { set base }
+               ip1^.flow := nil; { set one entry only }
+               replace(ip, ip1); { replace repeat with that }
+               ip2 := endlst(ip^.flow2); { save end of this list }
+               insert(ip1, ip^.flow2); { insert enclosed flow }
+               getint(ip3, tigoto); { get a goto label }
+               ip3^.base := tp; { set base }
+               ip3^.flow := nil; { set one entry only }
+               if ip2 <> nil then { enclosed flow not empty }
+                  insert(ip2, ip3) { place goto }
+               else { empty, attach to label instead }
+                  insert(ip1, ip3) { place goto }
+
+            end;
+            putint(ip^.left); { free constant entry }
+            putint(ip) { free repeat entry }
+
+         end else remdead(ip^.flow2) { process enclosed flow }
+
+      end;
+
+      ticasbgn: begin
+
+         if ip^.left^.i = tilimint then begin { condition is constant }
+
+            v.v := consti(ip^.left^.base); { get case selector }
+            v.s := constis(ip^.left^.base);
+            { tour case statements looking for that selector }
+            ip1 := ip^.flow2; { index first statement block }
+            ip2 := nil; { clear found statement }
+            while ip1 <> nil do begin { traverse }
+
+               tp := ip1^.base; { index case list }
+               while tp <> nil do begin { traverse }
+
+                  if tp^.t <> tcassel then error(esysflt46); { bad }
+                  if (v.s = tp^.csv.s) and (v.v = tp^.csv.v) then
+                     ip2 := ip1; { found, save that }
+                  tp := tp^.csn { link next }
+
+               end;
+               ip1 := ip1^.flow { link next statement }
+
+            end;
+            if ip2 = nil then error(ecasvnf); { no case value found }
+            replace(ip, ip2^.flow2); { replace entire case with that statement }
+            { now delete all other statements }
+            ip1 := ip^.flow2; { index first statement block }
+            while ip1 <> nil do begin { traverse }
+
+               ip2 := ip1^.flow; { save next }
+               delinttree(ip1); { delete statement }
+               ip1 := ip2 { link next }
+
+            end;
+            putint(ip^.left); { free constant entry }
+            putint(ip) { free case entry }
+
+         end else begin
+
+            { Look for any active statements. If none exist, we can delete the
+              entire case. }
+            ip1 := ip^.flow2; { index first statement block }
+            f := false; { set no statement found }
+            while ip1 <> nil do begin { traverse }
+
+               if ip1^.flow2 <> nil then f := true; { found a statement }
+               ip1 := ip1^.flow { link next statement }
+
+            end;
+            if not f and not chkfncexp(ip^.left) then begin 
+
+               { no statement found, and no possible side effect, delete case }
+               delintexp(ip^.left); { free expression }
+               delint(ip); { remove case entry }
+               putint(ip) { and free it }
+
+            end else remdead(ip^.flow2) { process enclosed flow }
+
+         end
+
+      end;
+
+      tiwthbgn: remdead(ip^.flow2); { process enclosed flow }
+
+      tifortint, tifortchr, tifortbol, tifordint, tifordchr,
+      tifordbol: begin
+
+         if (ip^.left^.i = tilimint) and (ip^.right^.i = tilimint) and 
+            (ip^.flow2 <> nil) then begin
+
+            { loop controls are constant }
+            s := consti(ip^.left^.base); { get start and end }
+            e := consti(ip^.right^.base);
+            if (ip^.i = tifordint) or (ip^.i = tifordchr) or 
+               (ip^.i = tifordbol) then begin
+
+               { downto, swap start and end }
+               t := s;
+               s := e;
+               e := t
+
+            end;
+            if s > e then begin { loop will never execute, delete }
+
+               putint(ip^.left); { free constants }
+               putint(ip^.right);
+               delinttree(ip^.flow2); { remove enclosed flow }
+               delint(ip); { remove repeat entry }
+               putint(ip) { and free it }
+
+            end else remdead(ip^.flow2) { process enclosed flow }
+
+         end else if ip^.flow2 = nil then begin
+
+            { controlled loop is empty, remove entire loop }
+            delintexp(ip^.left); { free expressions }
+            delintexp(ip^.right);
+            delint(ip); { remove for entry }
+            putint(ip) { and free it }
+
+         end else remdead(ip^.flow2) { process enclosed flow }
+
+      end;
+
+      ticasstb, ticasels: remdead(ip^.flow2) { case entry }
+
+      { trap other cases }
+      else error(esysflt68) { should not occur }
+
+   end
+
+end;
+
+begin
+
+   ip := mip; { index root }
+   while ip <> nil do begin { traverse this forward flow }
+
+      ips := ip^.flow; { save next node incase of delete }
+      remdeadop(ip); { follow secondary flows single node }
+      ip := ips  { next in flow }
+
+   end
+
+end;
+
+{*******************************************************************************
+
+Perform boolean to jump optimization
+
+Changes boolean trees in expressions to jump trees. If an expression is a
+branch off a conditional statement, the statement is "ripped" to become its
+equivalent using jumps (gotos), then the boolean logic of the expression is
+converted to jumps. The statements this applies to are:
+
+if
+while
+repeat
+gotot
+gotof
+
+And the boolean operations that are converted to jumps are:
+
+Original    Becomes
+==================================================================
+a and b     if not a then jump falseloc else if b then jump trueloc else
+               jump falseloc
+a or b      if a then jump trueloc else if b then jump trueloc else 
+               jump falseloc
+not a       special case: remains jump with true and false statement lists
+               exchanged.
+
+Note that the encoder synthetic entrys gotot and gotof are here in case the
+upstream optimizers want to use these constructs.
+
+*******************************************************************************}
+
+procedure bol2jmp(var mip: intptr);
+
+var ip, ips: intptr;
+
+{ find end of list }
+
+function endlst(ip: intptr): intptr;
+
+begin
+
+   if ip <> nil then { not nil }
+      while ip^.flow <> nil do ip := ip^.flow; { find end }
+
+   endlst := ip
+
+end;
+
+{ find preceeding entry, or nil }
+
+function before(ip: intptr): intptr;
+
+var p: intptr;
+
+begin
+
+   if mip = ip then p := nil { set is root }
+   else begin { search }
+
+      if mip = nil then error(esysflt47); { list nil }
+      p := mip; { index top of list }
+      { find preceeding entry }
+      while (p^.flow <> ip) and (p <> nil) do p := p^.flow;
+      if p = nil then error(esysflt48) { not found }
+
+   end;
+
+   before := p { return result }
+
+end;
+
+{ delete intermediate entry }
+
+procedure delint(ip: intptr);
+
+var lp: intptr;
+
+begin
+
+   lp := before(ip); { find precedant entry }
+   if lp = nil then mip := ip^.flow { replace first entry }
+   else lp^.flow := ip^.flow { gap out entry }
+
+end;
+
+{ insert list entry after given entry }
+
+procedure insert(oip, nip: intptr);
+
+var p: intptr;
+
+begin
+
+   if nip <> nil then begin { inserted list is not nil }
+
+      { find end of new entry list }
+      p := nip; { index 1st }
+      while p^.flow <> nil do p := p^.flow; { find last }
+      if oip = nil then begin { its the list root }
+
+         p^.flow := mip; { link to root }
+         mip := nip
+
+      end else begin
+
+         p^.flow := oip^.flow; { link to next }
+         oip^.flow := nip { link current to next }
+
+      end
+
+   end
+
+end;
+
+{ replace single entry with list }
+
+procedure replace(oip, nip: intptr);
+
+begin
+
+   insert(oip, nip); { insert after entry }
+   delint(oip) { delete the old entry }
+
+end;
+
+{ check elegible boolean operator }
+
+function chkbolopr(ip: intptr): boolean;
+
+var f: boolean; { is boolean operator }
+
+begin
+
+   f := false; { set not }
+   { link over any leading 'not's }
+   while ip^.i = tinotbol do ip := ip^.left;
+   if (ip^.i = tiandint) or (ip^.i = tiorint) then f := true;
+
+   chkbolopr := f { return result }
+
+end;
+
+{ find net 'not', returns true if single 'not' is indicated }
+
+function netnot(ip: intptr): boolean;
+
+var f: boolean; { single not }
+
+begin
+
+   f := false; { set no not }
+   { link over any 'not's }
+   while ip^.i = tinotbol do begin
+
+      f := not f; { invert state of 'not' }
+      ip := ip^.left; { link next }
+
+   end;
+
+   netnot := f { return result }
+
+end;
+
+{ rip 'not' entries }
+
+function ripnot(ip: intptr): intptr;
+
+var ip1: intptr;
+
+begin
+
+   while ip^.i = tinotbol do begin { rip nots }
+
+      ip1 := ip; { save entry }
+      ip := ip^.left; { link next }
+      putint(ip1) { release unused not }
+
+   end;
+
+   ripnot := ip { return clean operator }
+
+end;
+   
+{ expression }
+
+procedure bol2jmpexp(    ip:         intptr;  { operator entry }
+                     var iip:        intptr;  { insertion point }
+                         flw:        boolean; { following condition is true/false }
+                         labf, labt: typptr); { false and true labels }
+
+var ip1: intptr;
+    rtj: typptr; { right jump label }
+
+{ insert new tolken in flow }
+
+procedure newint(var ip: intptr; i: tintcod);
+
+begin
+
+   getint(ip, i); { get a jump false entry }
+   ip^.flow := nil; { set one only }
+   insert(iip, ip); { insert to list }
+   iip := ip { set new list end }
+
+end;
+
+begin
+
+{ ;write('bol2jmpexp: intermediate: '); prtic(ip^.i, 1); writeln; }
+
+   case ip^.i of { intermediate }
+
+      { no action required entries }
+      tilodset, tilimns, tilodint, tilimint, tilodrel, tilimrel, tilodsrl, tilodchr, 
+      tilodbol, tilodsrc, tilodptr, tilodtgp, tilodadr, tilodfadr, tildiint, tildibol,
+      tildirel, tildiset, tildichr, tildisrl, tildisrc, tildiptr, tilditgp, tieolt, tieof,
+      tiodd, tiexist, tiloc, tilen, tinotint, tilodlen, tinegint, tiabsint, tisqrint,
+      tirnd, titrc, ticvtitr, tinegrel, tiabsrel, tisqrrel, tiatnrel, ticosrel, tiexprel,
+      tilgnrel, tisinrel, tisqtrel, tirngchk, tilodafbuft, tilodafbuf, tirecoff,
+      tisucint, tiprdint, ticvtgtf, ticvtftg, ticvtntg, ticvtrtsr, tidivint, timodint,
+      timltint, tiaddint, tisubint, tixorint, tiintset, tiuniset, tidifset, tiequset,
+      tineqset, tileqset, tigeqset, tiequrel, tineqrel, tileqrel, tigeqrel, tiltnrel,
+      tigtnrel, tiequgst, tineqgst, tigeqgst, tiltngst, tigtngst, tiequtgp, tineqtgp,
+      tiequint, tineqint, tileqint, tigeqint, tiltnint, tigtnint, tiequstr, tineqstr,
+      tileqstr, tigeqstr, tiltnstr, tigtnstr, tiincset, timltrel, tidivrel, tiaddrel,
+      tisubrel, tisinset, tiarrref, tiarfgar, tirngset, tifnccal, tifnccalo,
+      tifnccali, tileqgst, tiaddintimm, timltintimm, tiandintimm, tiequintimm,
+      tiequtgpimm, tineqintimm, tineqtgpimm, tiorintimm, tixorintimm,
+      tileqintimm, tigeqintimm, tiltnintimm, tigtnintimm, tisubintimm,
+      tiaddintlod, timltintlod, tiandintlod, tiequintlod,
+      tiequtgplod, tineqintlod, tineqtgplod, tiorintlod, tixorintlod,
+      tileqintlod, tigeqintlod, tiltnintlod, tigtnintlod, tisubintlod,
+      tiaddintldi, timltintldi, tiandintldi, tiequintldi, tiequtgpldi,
+      tineqintldi, tineqtgpldi, tiorintldi, tixorintldi, tileqintldi,
+      tigeqintldi, tiltnintldi, tigtnintldi, tisubintldi: ;
+
+      { For boolean not, reverse the sense of jumps and send it down }
+      tinotbol: bol2jmpexp(ip^.left, iip, not flw, labt, labf);
+
+      tiandint: begin
+
+         gettypa(rtj, tlab); { get a label enry for right eval skip }
+         rtj^.lmrk := blkstk^.mark; { set mark to current }
+       
+         if chkbolopr(ip^.left) then
+            { convert another level with true fallthrough }
+            bol2jmpexp(ip^.left, iip, true, labf, rtj)
+         else begin { jump out on false }
+
+            if netnot(ip^.left) then newint(ip1, tigotot) { get a jump true entry }
+            else newint(ip1, tigotof); { get a jump false entry }
+            ip1^.left := ripnot(ip^.left); { place condition }
+            ip1^.base := labf { branch to false label }
+
+         end;
+
+         { set right skip label }
+         newint(ip1, tilabequ); { get a label intermediate for true }
+         ip1^.base := rtj; { set base }
+
+         if chkbolopr(ip^.right) then
+            { convert another level }
+            bol2jmpexp(ip^.right, iip, flw, labf, labt)
+         else if flw then begin { true fallthrough }
+
+            if netnot(ip^.right) then newint(ip1, tigotot) { get a jump true entry }
+            else newint(ip1, tigotof); { get a jump false entry }
+            ip1^.left := ripnot(ip^.right); { place condition }
+            ip1^.base := labf { branch to false label }
+
+         end else begin { false fallthrough }
+
+            if netnot(ip^.right) then newint(ip1, tigotof) { get a jump false entry }
+            else newint(ip1, tigotot); { get a jump true entry }
+            ip1^.left := ripnot(ip^.right); { place condition }
+            ip1^.base := labt { branch to false label }
+
+         end;
+
+         putint(ip) { release 'and' operator }
+
+      end;
+
+      tiorint: begin
+
+         gettypa(rtj, tlab); { get a label enry for right eval skip }
+         rtj^.lmrk := blkstk^.mark; { set mark to current }
+
+         if chkbolopr(ip^.left) then
+            { convert another level with false fallthrough }
+            bol2jmpexp(ip^.left, iip, false, rtj, labt)
+         else begin
+
+            if netnot(ip^.left) then newint(ip1, tigotof) { get a jump false entry }
+            else newint(ip1, tigotot); { get a jump true entry }
+            ip1^.left := ripnot(ip^.left); { place condition }
+            ip1^.base := labt { branch to true label }
+
+         end;
+
+         { set right skip label }
+         newint(ip1, tilabequ); { get a label intermediate for true }
+         ip1^.base := rtj; { set base }
+
+         if chkbolopr(ip^.right) then
+            { convert another level }
+            bol2jmpexp(ip^.right, iip, flw, labf, labt)
+         else if flw then begin { true fallthrough }
+
+            if netnot(ip^.right) then newint(ip1, tigotot) { get a jump true entry }
+            else newint(ip1, tigotof); { get a jump false entry }
+            ip1^.left := ripnot(ip^.right); { place condition }
+            ip1^.base := labf { branch to true label }
+
+         end else begin { false fallthrough }
+
+            if netnot(ip^.right) then newint(ip1, tigotof) { get a jump false entry }
+            else newint(ip1, tigotot); { get a jump true entry }
+            ip1^.left := ripnot(ip^.right); { place condition }
+            ip1^.base := labt { branch to true label }
+
+         end;
+
+         putint(ip) { release 'or' operator }
+
+      end
+
+      { trap other cases }
+      else error(esysflt78) { should not occur }
+
+   end
+{ ;write('bol2jmpexp: intermediate: -'); prtic(ip^.i, 1); writeln; }
+
+end;
+
+{ operator }
+
+procedure bol2jmpop(ip: intptr);
+
+var ip1, ip2, ip3: intptr;
+    labf, labt:    typptr; { true and false jump labels }
+    labc:          typptr; { continue label }
+
+begin
+
+{ ;write('bol2jmpop: intermediate: '); prtic(ip^.i, 1); writeln; }
+   case ip^.i of { intermediate }
+
+      tiwrtrelfft, tiwrtintft, tiwrtchrft, tiwrtbolft, tiwrtrelft, tiwrtstrft, tipack,
+      tiunpack, tiwrtgstft, tistiint, tistisrl, tistirel, tistichr, tistibol, tistiset,
+      tistisrc, tistifint, tistifsrl, tistifrel, tistifchr, tistifbol, tistigar,
+      tistitgp, tistiftgp, tiwrtsrc, tiwrtintt, tiwrtchrt, tiwrtbolt, tiwrtrelt,
+      tiwrtstrt, tiwrtsrl, tiwrtrel, tiwrtset, tiwrtbol, tiwrtchr, tiwrtint, tiredsrc,
+      tiredintt, tiredchrt, tiredrelt, tiredsrlt, tipos, tichg, tiwrtgstt, tiassign,
+      tinewgar, tiwrteolt, tiredeolt, tiget, tigett, tiput, tireset, tirewrite, ticlose,
+      tiupdate, tiappend, tipaget, tidel, tinew, tidisp, tistoint, tistosrl,
+      tistorel, tistochr, tistobol, tistoset, tistosrc, tistofint, tistofsrl,
+      tistofrel, tistofchr, tistofbol, tidspgar, tistogar, tistotgp, tistoftgp,
+      ticalpar, tiprccal, tiprccalo, tiprccali, tigoto, tilabequ, tihalt, 
+      tiassert, tisignal, tisignalone, tiwait: ; { no action }
+
+      { structured entries }
+
+      tifortint, tifortchr, tifortbol, tifordint, tifordchr, tifordbol, ticasbgn, 
+      ticasstb, ticasels, tiwthbgn: bol2jmp(ip^.flow2); { process enclosed flow }
+
+      tiifbgn: begin { if statement }
+
+         bol2jmp(ip^.flow2); { process true flow }
+         bol2jmp(ip^.flow3); { process false flow }
+         { look for a candidate expression }
+         if chkbolopr(ip^.left) then begin
+
+            { perform boolean to jump eval }
+            gettypa(labf, tlab); { get a label entry for false }
+            labf^.lmrk := blkstk^.mark; { set mark to current }
+            gettypa(labt, tlab); { get a label entry for true }
+            labt^.lmrk := blkstk^.mark; { set mark to current }
+            gettypa(labc, tlab); { get a label entry for continue }
+            labc^.lmrk := blkstk^.mark; { set mark to current }
+            { generate expression with jumps }
+            ip1 := before(ip); { find precedent }
+            bol2jmpexp(ip^.left, ip1, true, labf, labt);
+
+            { generate true flow block }
+            
+            getint(ip1, tilabequ); { get a label intermediate for true }
+            ip1^.base := labt; { set base }
+            ip1^.flow := nil; { set one entry only }
+            replace(ip, ip1); { replace if with that }
+            ip2 := endlst(ip^.flow2); { save end of this list }
+            insert(ip1, ip^.flow2); { insert enclosed flow }
+            ip3 := ip2; { set default next }
+            if ip^.flow3 <> nil then begin { there is a false flow }
+            
+               getint(ip3, tigoto); { get a goto label }
+               ip3^.base := labc; { set base }
+               ip3^.flow := nil; { set one entry only }
+               insert(ip2, ip3); { place goto }
+            
+            end;
+            
+            { generate false flow block }
+            
+            getint(ip1, tilabequ); { get a label intermediate for false }
+            ip1^.base := labf; { set base }
+            ip1^.flow := nil; { set one entry only }
+            insert(ip3, ip1); { place that }
+            ip2 := ip1; { set default next is false label }
+            if ip^.flow3 <> nil then begin { there is a false flow }
+            
+               ip2 := endlst(ip^.flow3); { save end of this list }
+               insert(ip1, ip^.flow3) { insert enclosed flow }
+            
+            end;
+            getint(ip1, tilabequ); { get a label for continue }
+            ip1^.base := labc; { set base }
+            ip1^.flow := nil; { set one entry only }
+            insert(ip2, ip1); { place continue label }
+
+            putint(ip) { release old entry }
+
+         end
+
+      end;
+
+      tiwhlbgn: begin
+
+         bol2jmp(ip^.flow2); { process enclosed flow }
+         if chkbolopr(ip^.left) then begin
+
+            { perform boolean to jump eval }
+            gettypa(labf, tlab); { get a label entry for false (skip) }
+            labf^.lmrk := blkstk^.mark; { set mark to current }
+            gettypa(labt, tlab); { get a label entry for true (enter loop) }
+            labt^.lmrk := blkstk^.mark; { set mark to current }
+            gettypa(labc, tlab); { get a label entry for continue }
+            labc^.lmrk := blkstk^.mark; { set mark to current }
+
+            ip1 := before(ip); { find precedent }
+            getint(ip2, tilabequ); { get a label intermediate for loop start }
+            ip2^.base := labc; { set base }
+            ip2^.flow := nil; { set one entry only }
+            insert(ip1, ip2); { put that in front }
+            { generate boolean jumps for expression }
+            bol2jmpexp(ip^.left, ip2, true, labf, labt);
+            getint(ip1, tilabequ); { get a label intermediate for true (enter) }
+            ip1^.base := labt; { set base }
+            ip1^.flow := nil; { set one entry only }
+            replace(ip, ip1); { replace while with that }
+            ip2 := endlst(ip^.flow2); { save end of flow }
+            insert(ip1, ip^.flow2); { insert enclosed flow }
+            getint(ip1, tigoto); { place loop jump }
+            ip1^.base := labc; { set base }
+            ip1^.flow := nil; { set one entry only }
+            insert(ip2, ip1); { place that }
+            getint(ip2, tilabequ); { get a label intermediate for false (skip) }
+            ip2^.base := labf; { set base }
+            ip2^.flow := nil; { set one entry only }
+            insert(ip1, ip2); { place }
+         
+            putint(ip) { release old entry }
+
+         end
+
+      end;
+
+      tirptbgn: begin
+
+         { bol2jmpexp(ip^.left); }
+         bol2jmp(ip^.flow2); { process enclosed flow }
+         if chkbolopr(ip^.left) then begin
+
+            { perform boolean to jump eval }
+            gettypa(labf, tlab); { get a label entry for false (skip) }
+            labf^.lmrk := blkstk^.mark; { set mark to current }
+            gettypa(labt, tlab); { get a label entry for true (enter loop) }
+            labt^.lmrk := blkstk^.mark; { set mark to current }
+            gettypa(labc, tlab); { get a label entry for continue }
+            labc^.lmrk := blkstk^.mark; { set mark to current }
+
+            ip1 := before(ip); { find precedent }
+            getint(ip2, tilabequ); { get a label intermediate for loop start }
+            ip2^.base := labf; { set base }
+            ip2^.flow := nil; { set one entry only }
+            insert(ip1, ip2); { put that in front }
+
+            ip1 := endlst(ip^.flow2); { save end of flow }
+            insert(ip2, ip^.flow2); { insert enclosed flow }
+            { generate boolean jumps for expression }
+            bol2jmpexp(ip^.left, ip1, true, labf, labt);
+
+            getint(ip1, tilabequ); { get a label intermediate for true (exit) }
+            ip1^.base := labt; { set base }
+            ip1^.flow := nil; { set one entry only }
+            replace(ip, ip1); { replace repeat entry with that }
+
+            putint(ip) { release old entry }
+
+         end
+
+      end;
+
+      tigotot: begin
+
+         if chkbolopr(ip^.left) then begin
+         
+            gettypa(labf, tlab); { get a label entry for false }
+            labf^.lmrk := blkstk^.mark; { set mark to current }
+
+            getint(ip1, tilabequ); { get a label intermediate for false }
+            ip1^.base := labf; { set base }
+            ip1^.flow := nil; { set one entry only }
+            replace(ip, ip1); { replace goto entry with that }
+
+            { generate boolean jumps for expression }
+            bol2jmpexp(ip^.left, ip1, true, labf, ip^.base);
+
+            putint(ip) { release old entry }
+
+         end
+
+      end;
+
+      tigotof: begin
+
+         if chkbolopr(ip^.left) then begin
+         
+            gettypa(labf, tlab); { get a label entry for true }
+            labf^.lmrk := blkstk^.mark; { set mark to current }
+
+            getint(ip1, tilabequ); { get a label intermediate for true }
+            ip1^.base := labt; { set base }
+            ip1^.flow := nil; { set one entry only }
+            replace(ip, ip1); { replace goto entry with that }
+
+            { generate boolean jumps for expression }
+            bol2jmpexp(ip^.left, ip1, true, ip^.base, labt);
+
+            putint(ip) { release old entry }
+
+         end
+
+      end
+
+      { trap other cases }
+      else error(esysflt69) { should not occur }
+
+   end
+{ ;write('bol2jmpop: intermediate: -'); prtic(ip^.i, 1); writeln; }
+
+end;
+
+begin
+
+   ip := mip; { index root }
+   while ip <> nil do begin { traverse this forward flow }
+
+      ips := ip^.flow; { save next node incase of delete }
+      bol2jmpop(ip); { follow secondary flows single node }
+      ip := ips  { next in flow }
+
+   end
+
+end;
+
+begin
+end.

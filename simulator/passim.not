@@ -1,0 +1,13 @@
+                               WORKING NOTES FOR PASSIM
+
+1. When files appear as locals, the containing procedure/function should have
+it's locals initalized to 0, or just the file variables initalized (difficult),
+or just allways initalize locals.
+
+2. All files should be closed on exit, and all temp files should be deleted
+on close.
+
+3. Implement the ability to read more than one intermediate file, and implement
+modularity. This will require the ability to merge global references.
+
+4. Cannot take header files from command line.

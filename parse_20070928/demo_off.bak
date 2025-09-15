@@ -1,0 +1,4 @@
+@echo off
+@echo Setting Demo Mode ON
+
+copy demo_disable.pas demo.pas

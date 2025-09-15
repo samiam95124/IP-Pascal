@@ -1,0 +1,3 @@
+copy *.pas a:
+copy *.txt a:
+copy *.lab a:

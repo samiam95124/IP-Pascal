@@ -1,0 +1,417 @@
+lmt rgt  11111111112222222222333333333344444444445555555555666666666677777777778
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+THE PASCALINE DESIGN RATIONALE
+
+S. A. Moore
+
+05/2007
+
+Introduction
+------------
+
+One of the better documents to come from the Ada project was the the 
+"rationale", which introduced the designers and the reason for the decisions
+for the language. A rationale both gives a place for the designer to state the
+reasons for the language features, and also serves to keep such opinonated 
+verbage out of the language standard itself.
+
+The Pascaline rationale follows in those footsteps. The format of the rationale
+for the most part follows the Pascaline standard itself, and can be read to
+follow along with this document.
+
+Why extend Pascal?
+------------------
+
+This is really the hardest question of all. I have been both a Pascal user and
+Pascal compiler designer for nearly 30 years now. When I first implemented 
+Pascal in 1979 (the compiler first operated in January, 1980), I had both the
+original Pascal documents as well as the draft standard for what would become
+ISO 7185 (note that this was four years before the introduction of 
+"Turbo Pascal"). The language design was mature at that time, and I implemented
+a compiler that was strict to the standard.
+
+My first implementation of the language added several features I felt necessary
+at that time to make the language usable on a microprocessor, including separate
+compilation, ability to include other source files inside the current source
+file, the ability to declare external assembly language procedures and functions
+(as was allowed for, but not fully specified by the standard), ability to
+functions, procedures and even variables at fixed addresses, ability to specify
+alternate radixes, character escapes, etc.
+
+In fact, the 1980 implementation of Pascal looked very much like a cross between
+Pascal and C. This was not a coincidence, as these were the two main programming
+languages I used throughout the 1980's, and on through today.
+
+I felt in 1980 that all of the extra features I needed to make Pascal practical
+for everyday use then could be covered by the label of "implementation specific
+features".
+
+However, as my day to day use of the language went on, I felt the distinct need
+the support of features above and beyond Pascal that were formal parts of the
+language. The need to always use fixed length arrays topped the list of 
+problems. The next was a desire to have a formal solution to modularity. Then
+there was the need to exactly specify the precision of operations (although 
+Pascal specifies the exact value variables can hold, it specifies that all 
+subranges of integer are promoted to full integer during expressions).
+
+Why not use another language?
+-----------------------------
+
+This question is much easier. Despite the introduction of several newer 
+languages that did cover my needs with Pascal, many of those candidates do not
+share the essential features of Pascal, such as type safety, simplicity, 
+clarity, and others. Ada is certainly type safe, but nobody would claim that it
+is simple. C and C++ discard type safety entirely, and also a good deal of
+clarity. Java and C# reintroduce type safety, but not completely, and feature
+(quite unfortunately in my opinion) the obscurity of odd characters instead of
+easy to read keywords, endless and unecessary operators, arcane syntax, etc.
+
+In fact, the closest languages that are candiates for safety, simplicity and
+clarity are Nicklaus Wirths' other languages such as Modula and Oberon. This
+leads to my next point.
+
+I don't really see the point of discarding your language each time you see the
+idea of something better on the horizon. Computer language research is 
+important, and new languages should be introduced to cover new concepts. In the
+idea laboratories of the colleges and research laboratories of the world. In the
+world of day to day work, we in the trenches have the right to ask:
+
+"that is a great new language feature. Can you add that to my current language?"
+
+And indeed, no matter what language you prefer, this has indeed been the rule.
+Thus we have C going to C++, continuing new versions of Ada, Java, and even
+Fortran and Cobol. In these languages, the answer has been to incorporate the
+new with the old, and even to make the new and the old work together and 
+interlock seamlessly, which may indeed be a more difficult task that simply
+writing a new language from scratch.
+
+Why not use one of the existing extentions for Pascal?
+------------------------------------------------------
+
+This is perhaps back to being a more difficult question. The short answer is
+there is really only one such candidate, the ISO 10206 specification from 1990.
+There are others, such as the UCSD dielect and the Borland Dielect. However,
+both of these were never compliant with the original Pascal language. Certainly
+it is possible to add back the missing constructs from ISO 7185 Pascal to such
+a language, but often the two languages are in conflict, such that an "option"
+is required to switch between interpretations of the language.
+
+I feel strongly that such an amalgamated language inherently disappoints its
+potiential users. The existing users of the dielect will think of such a new
+langugage as an odd implementation of their language and avoid its use. The
+standard language users will find that they need to break the standard to use
+the dielect extentions.
+
+Further, it is difficult to organically extend a language that hasn't needed to
+comply with the original language. Extending ISO 7185 Pascal involves a lot of
+work and compromise to make the new features work with the old. The designers of
+the dielect never felt that need because they never implemented the original
+language. To enter into this domain is to shackle oneself with chains others
+cannot see or appreciate.
+
+This leaves to basic extentions to Pascal that have appeared, that are compliant
+in full with original Pascal. These are the ISO 10206 standard and Pascal-XSC.
+
+The first issue with ISO 10206 Pascal is that it does not implement many of the
+extention goals I had for the language. This is not a problem in and of itself,
+for the standard can be a starting point for such further extentions.
+
+The second issue is that the standard starts to distinctly erode the ideals of
+simplicity and clarity of original Pascal. There are no less than four (!)
+different methods available to operate on arrays of characters, the original
+Pascal method using fixed arrays of characters, conformat array parameters,
+a new string type, and finally schemas.
+
+Finally, there are distinct areas where the ISO 10206 standard requires less
+efficient implementation. A prime example is the requirement to pass both the
+high and the low limit of variable length arrays.
+
+For Pascal-XSC, a standard I admire and refer to, there is simply not a great
+deal of commonality in the goals of it (primarily extended mathematic operators)
+and mine. Add to this the fact that Pascal-XSC exists in one implementation
+only, and has a limited interest group.
+
+The language Pascaline
+----------------------
+
+If, as Nicklaus Wirth describes, Pascal is a "medium" complexity language, then
+Pascaline certainly qualifies as a "high" complexity language. However, the bar
+has moved with the specifications of such languages as Ada and C++.
+
+Pascaline is a relatively simple improvement over Pascal. The text of the main
+extentions is about 10-14 pages, verses the 54 pages of the original "Pascal
+Report" by Nicklaus Wirth in 1973. This is not counting the suggested standard
+libraries and methods added as appendicies to the Pascaline standard.
+
+Keywords
+--------
+
+The first extention Pascaline (or any other Pascal extention) is going to 
+feature is a set of added keywords, 24 to be exact.
+
+It has been an opinion that no extention to Pascal should be presented with a
+new keyword at all. This would mean that instead of defining a new keyword, you
+would define it as an identifier with a "special meaning". The ISO 7185 standard
+strongly hints at this with the classification of "forward" and "external" as
+"directives" and not keywords.
+
+While noting that the ISO 10206 standard apparently has no issue with 
+introducing new keywords to the language (leading perhaps to the idea that
+addition of keywords is a special priveledge for standards comitees only), it
+seems to me that this goes back to the basic issue of "what is a keyword".
+
+There have, in fact, been several languages that haven't defined keywords at
+all (or more properly "reserved words"), leading to the ability of the user to
+use what would appear to be keywords as identifiers. This leads to fun looking
+constructs such as:
+
+for for := to to do do <statement>;
+
+which would be perfectly valid if "for", "to" and "do" could be identifiers. We
+don't do this in modern languages because, besides being confusing for the
+programmer/program reader, it also increases the difficulty for the compiler to
+recover from errors, since it has no distinct tolkens to look to in order to
+resyncronise the parse after such an error.
+
+Based on this, Pascaline marches forward not only with new, distinct keywords
+where necessary, but also changes the definition of "forward" and "external" to
+official keywords. In ISO 1785 mode, a Pascaline compiler does not define them
+as keywords, but in Pascaline mode it certainly does.
+
+With the definition of new keywords, there is a price. There is always a 
+possibility that an existing program will use such a keyword as an identifier in
+an ISO 7185 program. This is the first and only modal dependency of Pascaline.
+That is to say, taking an existing ISO 1785 program and compiling it as a 
+Pascaline program, this is the only thing that would cause it to not compile.
+
+Identifiers
+-----------
+
+With identifiers, we enter into a long list of common extentions that everyone
+implements in one form or another. The standard "break" or "separator" method
+used in the literature for Pascal was something like:
+
+MyNewVariable
+
+or capitalization of each word in a composite identifier. Pascaline adds the "_"
+character as an official label character for use as a break. It is 
+"significant". This means that:
+
+my_new_variable
+
+and
+
+mynewvariable
+
+are NOT the same identifier.
+
+The only remaining issue of interest here is that there is a convention, 
+apparently starting with C, that identifiers starting with "_", like:
+
+_dangerous_system_symbol
+
+Have special meanings. This is apparently for the idea that when writing 
+assembly language support functions, it is best to choose a name that won't
+conflict with an identifer in the compiled program.
+
+Now I personally have never felt the urge to use "_" prefixed system identifers.
+The Pascaline implementation uses a "coining" method to translate program 
+identifers to identifiers acceptable to the assembly/link layer such that for
+the program "test", you would have identifiers like:
+
+test_a
+test_mynewvariable
+
+etc. This system inherently avoids name collisions with common assembly support
+code, while still allowing the creation of assembly code to access program
+identifiers.
+
+Never the less, Pascaline recommends that "_" prefixed identifiers be avoided,
+and recommends an option to reject them.
+
+Numeric constants
+-----------------
+
+Pascaline features single character prefixes for alternate radixes, with "$"
+for hexadecimal, "&" for octal, and "%" for binary.
+
+Despite resemblances to other Pascals, the convention (which by the way predates
+may other Pascals including Turbo Pascal) was stolen blatantly from the 
+conventions used in Motorolas' assemblers. The "@" used by motorola for octal
+was changed to "&" in Pascaline because the ISO 7185 standard appropriated it
+for use with systems that (apparently) didn't have a "^" character. So here we
+have a perfectly good convention that was ruined by machines and terminals that
+most certainly no longer exist.
+
+There are several basic ways to implement alternate radixes, and I'll list some
+of them here:
+
+$1234   - Single character prefix
+16#1234 - Radix prefix
+0x1234  - C and many other languages
+1234h   - Postfix, copied from assembler notation
+
+There are two reasons I prefer the single character prefix. First, it is simple,
+both to parse, and to write. Second, it tells the compiler what radix is being
+used when the number starts. The use of "1234h" postfix formats requires that
+the number have its characters stored and reread when the actual radix is found
+at the end. I don't find this format amusing even for assemblers, and I have
+never written an assembler that way.
+
+The C standard "0x1234" format is borrowed from many compilers and assemblers
+that existed before C did (I have seen the convention used back into the 1960s).
+The idea is that it will be recognised as a simple decimal, and will have led
+the compiler completely into parsing a decimal "0" when the parser can notice
+that it is followed by a postfix "x", and then switch to parsing hex. The
+convention is fairly inexplicable and uses two characters to do what a single
+character can, but perhaps having the advantage of not using up a precious
+special character that the language might use. Important to C, but not to 
+Pascal.
+
+The prefix convention "16#1234", used in many languages, including ISO 10206
+Pascal, is a good one for being able to represent all radixes. It is, of course,
+verbose. My chief issue with it is that, in my entire carreer, I have never been
+asked to use base 32 in a program. Certainly at some point, base 32 (or 
+greater!) will in fact come into use, but I will certainly be breath and warmth
+challenged by that point in time.
+
+A final mention is about the binary ("%") convention in Pascaline. This is not
+often useful, but when it is, such as the creation of a bit mask in an embedded
+product, it is greatly appreciated.
+
+Constant expressions
+--------------------
+
+The disadvantage of original Pascals' scheme of introducing the declarations in
+sucessive levels, i.e., constants to types to variables and procedure/functions,
+is that it discards the menmonic power of expressions. I suppose the point was
+that such calculations were more clearly left to the code blocks, but the effect
+was to cause programmers to perform such setup calculations with a pocket
+calculator, then place them in the program, perhaps placing the founding
+calculation in a comment to preserve the original idea.
+
+For such constants, there is almost universal agreement amongst Pascal 
+implementors that such constant expressions should not simply be standard
+expressions from the language, but rather a special set of rules applying to
+constants only. This avoids the idea of what to do if the programmer places a
+variable, function or worse in such an expression.
+
+Boolean integer operations
+--------------------------
+
+I wonder if anyone noticed in original Pascal that the language was not 
+dependent on if it was implemented on a binary or a decimal machine. D. E. Knuth
+would have been proud of such a development, as in his famous series "the art of
+programming" he described the use of assembly language that would not care what
+the base of numbers in the machine were.
+
+To appreciate why this is interesting, you have to appreciate that as late as
+the 1960's, there were still two kinds of computers in use, the decimal based
+ones and the binary based ones. Even if you considered binary to be the 
+"winner", there were machines that supported both types of math, including the
+famous IBM 360.
+
+So in Pascaline, there is support for direct binary math on integers. The
+standard does not get into the issue of what that means on a signed integer. 
+I think this is just, for the reason that Pascaline also supports the idea of
+unsigned types, and therefore removes any great need to perform binary math with
+signed integers. If you want to perform binary operations on integers, then it
+is only fair to use only unsigned types to do it.
+
+The standard specifies that these operations probally won't work on a decimal
+machine. Don't laugh, there is still a good possibility that the language may be
+used on computer history simulators.
+
+Protected parameters
+--------------------
+
+There isn't much controversy here. Everyone implements such parameters. In fact,
+an early version of Wirths' Pascal report had them. The import of a protected
+parameter is that any expression that can be allowed with a value parameter can
+be used, but the compiler is able to eliminate the copy operation involved with
+passing structured types into a value parameter.
+
+The only issue is the choice of keyword, "view", vs. "protected" or anything 
+else. My only excuse is that "view" seemed to me to be more in keeping with the
+series of a value, variable or ... parameter. In other words, "I pass by value",
+"I pass by variable", then "I pass by view" made more sense to me than "I pass
+by protected". It just rhymed better. I have the value for the parameter, I have
+the variable, I have a view on the parameter. Plus "view" is a nice short
+keyword.
+
+Case statement extentions
+-------------------------
+
+Of all of the extentions in Pascaline, I find the case statement extentions most
+distasteful. The problem with "else" (or "otherwise") and case ranges is that
+they really remove the best property of case statements, that of being a clear
+simple to understand construct that compiles efficiently to an underlying
+machine level construct, namely a table lookup jump.
+
+The extentions encourage, and I have often seen in code examples, the idea of a
+case statement as a "general purpose" filter for values. It certainly isn't. If
+there are a lot of gaps between the sequences of case labels, the compiler isn't
+going to give you a neat jump table in the output code, but is going to be
+forced to recode the problem in another way. And that "way" may not have the
+performance you expect from a case statement. In fact, the compiler can just
+degenerate the case statement to a series of if-then-else comparison statements
+internally.
+
+Of course, this can happen with ISO 7185 Pascal as well:
+
+case x of
+
+   1: ...;
+   1000000: ...;
+
+end;
+
+Is a fairly ridiculous case statement, but perfectly valid under the rules of
+ISO 7185 Pascal. The result is sure to be something you won't like, such as a
+case jump table of massive length, but only two entries occupied, degeneration
+to if-then-else, etc.
+
+The issue people seem to have with ISO 7185 Pascals standard case statement is
+that it "takes too much code" to get around the fact that the default for a case
+statement is an error:
+
+if (x < 1) or (x > 3) then ....
+else case x of
+
+   1: ...;
+   2: ...;
+   3: ...;
+
+end;
+
+I must admit that I don't share the idea of single if statement to guard a case
+statement as a hardship. A bit more difficult is collecting all of the gaps in a
+series into an if conditional on a large but slightly sparse case table.
+
+In any case, the "straw that broke the camels' back" was using Pascaline to 
+interface to C code, which is pretty much a requirement these days. Trying to
+efficiently dispatch a deliberately sparse enum statement from a C code module
+using a Pascal case statement is an excersize in frustration, so I gave up and
+gave in to the "dark side".
+
+The use of the "else" keyword (vs. "otherwise") was based on else being a short
+keyword that already existed in the language and already had the intended 
+meaning ("else do this"). It didn't hurt that Turbo Pascal also had this 
+convention.
+
+The idea of ranges was introduced in the CDC 6000 series Pascal compiler, and
+used by Nicklaus Wirth himself in Oberon. It seems reasonable, and solves the
+issue where you are having to count off enumerations redundantly.
+
+
+
+
+
+
+
+
+
+
+
+

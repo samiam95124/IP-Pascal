@@ -1,0 +1,16 @@
+                              Notes on extlib
+
+1. Getting the current path overflows on large paths, this should be
+able to get any size path. The key is to call getenvironment twice,
+once to get the length of string, and the second time to actually
+get the data.
+
+2. Getenv should return a nil pointer for dynamic results if the
+environment string is not defined. The code looks like it returns
+an empty string instead. Check.
+
+3. The times and dates functions, and everything that calls them,
+should use the system time and date format specifications to format
+the time as per the users settings.
+
+4. Change chkfil to use windows style characters.

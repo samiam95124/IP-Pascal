@@ -1,0 +1,90 @@
+********************************************************************************
+
+                     AN ANALYSIS OF MONITOR MULTITASK BEHAVIOR
+
+********************************************************************************
+
+The existence of monitors in IP Pascal not only gives the language a construct
+for parallel tasking, but also gives it the ability to control the interactive
+consequences of tasking. For example, the existance of lock and signal calls
+as compiler constructs give the compiler the ability to clear register
+caches of variables before such a construct.
+
+THE LOCKING METHOD
+
+Each monitor is is own "domain" for a lock. The rules are:
+
+1. Only one lock can be held at a time.
+
+2. At all times when executing monitor code, the lock for that monitor is held.
+
+3. When leaving a monitor for any reason, the monitor lock is held, and 
+reaquired after the call.
+
+This set of perhaps draconian rules effectively prevents deadlock, since there
+is no way for a monitor to "travel" while holding a lock. The deadlock case 
+really becomes a infinite loop case, since the only way to deadlock becomes:
+
+monitor deadlock;
+
+procedure stop; forward;
+
+private
+
+procedure stop;
+
+begin
+
+   while true do
+
+end;
+
+begin
+end.
+
+An important corolary to the single lock rule is that any var reference data
+exported from a monitor is at risk, since the monitor that owns the data will
+have to drop its lock to call another monitor. This would also create a risk
+for var references imported from tasks, then exported again by that monitor.
+
+So the rule becomes:
+
+No monitor can call another monitor using a var reference parameter
+
+This rule is enforceable by the parser.
+
+Calling the monitor with a var reference is ok. This effectively allows a 
+process to place its data on trust with a monitor routine, provided that the
+monitor promises not to give the data out to other monitors.
+
+IMPLEMENTATION
+
+Since all locks, signals and tasks are tracked in syslib, it can coordinate
+the interactions between modules. Syslib can keep track of what lock a monitor
+holds, and when a monitor requests a lock, meaning it may be traversing to a new
+monitor, the previous lock is dropped, and the new lock is aquired. syslib does
+not have to keep track of what monitor is being executed, because it keeps a
+pushdown list of the locks held.
+
+This would tend to argue that a module should unlock before performing external
+calls, and relock after. However, there is already a reason why locks need be
+"overlapped", the signal case, discussed later. Also you can't know what might
+be needed to solve special problems. So even though it would help speed, we let
+the lock and unlock calls perform their own crossover management.
+
+In effect, this is what it means:
+
+When a call is made from a monitor to an external routine, it is either to
+a monitor or a share. If it is a share, the lock is held, since the share is
+acting completely as the monitors agent.
+
+If it is a monitor, it is either the same monitor or a different one. For a new
+monitor, the monitor lock held is dropped, and the new one obtained. On return,
+the new lock is dropped, and the old one renewed. Since we don't directly know
+where we are monitor wise, this means we maintain the monitor lock stack to
+track this.
+
+If the monitor happens to be the same, either it can drop and renew the same 
+lock, or detect that the same lock is being crossed, and simply track it without
+any action.
+

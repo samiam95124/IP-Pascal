@@ -1,0 +1,455 @@
+         11111111112222222222333333333344444444445555555555666666666677777777778
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+                            REGISTER ALLOCATION
+
+OVERVIEW
+
+The first register allocation algorithim in the encoder is tree based. That is,
+it walks the tree in left to right order to perform allocations. It is two pass,
+in that the register allocation is done first, then the code generation pass is
+done separately using the registers allocated in the first pass. This is in
+contrast with the old 1982 algorithim that performs register allocation while
+the code is being generated.
+
+Register allocation assigns specific register to each operators result
+and operands. Each operand is considered a package, that is, all of the
+input and output registers are presented in the operator entry for the
+final encode routine to use. The encode routine may still access the
+leaves and even the root of the operand (full tree explore), but normally
+it does not need to. This capability mainly applies to the case where
+constant loads or addressing can be incorporated as part of the instruction.
+
+Each operand has one result register and up to four input registers. The four
+input registers correspond to the four operator branches of each operator.
+The registers are further divided into initial and final registers. On the
+input side, the inital registers are what each suboperand gave us, and
+the final registers are the registers the operand needs to have those
+results in. In most cases these registers are the same, but an operand may
+deliver a result in a register that is not what is requested. In this case,
+there is an implied move from the inital to the final register before
+the operand is encoded.
+
+REGISTER ENTRIES
+
+Each intermediate has a series of registers that can be assigned to it:
+
+lreg      Contains the left operand register
+lregx
+
+rreg      Contains the right operand register
+rregx
+
+xreg      Contains the extra operand register
+xregx
+
+x2reg     Contains the second extra operand register
+x3regx
+
+rsreg     Contains the result register
+rsregx
+
+freg      Contains the "final" register
+fregx
+
+t1reg     Contain temp registers
+t2reg
+t3reg
+
+Each intermediate entry has 0 to 4 parameters, which was dictated by the
+maximum number of parameters in an intermediate. Each operand of the 
+intermediate has its own branch in the intermediate tree, and each one has an
+associated operand register above. It is also possible for each operand to 
+occupy two registers, the normal and an "extended" register marked with a an "x"
+postfix.
+
+The register that an operand occupies is copied to its register entry during
+allocation. The result register, which can also be one to two registers, is 
+assigned to be the output register from the operation to be carried out.
+
+The "final" register is the register that actually carries the result back to
+its parent operator in the intermediate tree. In most cases, it is the same as
+the result register. However, if there are difficulties allocating that register
+in the "context" of the calling operator, the two registers can be different.
+When the intermediate is run through the coding phase, register copy operations
+are generated as needed to move the register from the result to the final (or
+"transfer") register.
+
+The temp registers are simply used to signal to the coding pass where to place
+temp registers that are needed.
+
+All of these registers can have the rgnull value, meaning that there is no 
+register needed or allocated there.
+
+It is also possible to have a special register value rgflg. This indicates that
+the value lies not in a register, but in a flag. To determine which flag, you
+must look at a separate flag value:
+
+lflg      Contains the left operand flag value.
+
+rflg      Contains the right operand flag value.
+
+xflg      Contains the extra operand flag value.
+
+x2flg     Contains the second extra operand flag value.
+
+The flag values are only relivant if the assocated register has the rgflg value.
+The reason that flags are not directly represented as registers comes from the
+way we treat them. Flags are not considered individual values, but as a "state"
+of the flags. For instance, less than or equal is commonly represented by the
+carry and the zero flags both being set. This model assumes that only one 
+operand can or will be carried in the flags, so they are mutually exclusive. In
+addition, values are typically carried in flags for a short time. The flag
+system is really a simple way of letting the operator signal the true state
+of a boolean return value, and let the parent operator decide what to do with
+the information.
+
+The register for a given operand in the intermediate is usually copied from the
+final or transfer register of the subordinate entry (in fact, there are 
+occasionally places in the code where the final register of the operand is
+used directly). However, there are cases where the operand register does not
+exactly match its transfer register. If the operand needs to be expanded, or
+changed from a single to a double register, then the operand register will
+be a double register, whereas the transfer register won't. In any case, it is
+bad form to examine the operand intermediate entry directly. Rather the self
+contained information in the intermediate entry itself should be used.
+
+The converse situation is also possible. If the transfer register is double,
+but what is needed is only a single, the double will be allocated in the
+calling intermediate, whether it can use it or not. All results must go 
+somewhere, even if they are then ignored.
+
+REGISTER TRACKING
+
+Besides the entries used to track individual registers, each intermediate also
+keeps sets of all registers. These are used to track which registers are in use
+at any given time.
+
+push      Gives the set of registers that need to be pushed and poped.
+
+alc       Gives the registers allocated at this node.
+
+The alc set is used to perform basic register allocation, and tells the 
+allocator exactly which registers are in use at any particular node. The push
+set has each register set if the register is to be saved during the operation.
+For each register set in the push mask, the register is saved before the 
+intermediate operator is coded, and restored after. The push/pop scheme is used
+to resolve register overflow issues.
+
+The use of the alc and push sets to control allocation must be understood in
+of the tree structure:
+
+              + (add) 
+              | Alc:  eax, ebx, ecx
+              | Push: eax
+              +
+(load) L-------------R (load)
+Alc:  eax            Alc: ebx
+Push:                Push
+
+Each intermediate has its own register allocation. It must apportion the operand
+registers and temp registers from its own set of free registers. If a specific
+register is not available, it must be pushed to make it available. Each operator
+"knows what it is doing", and creates an allocation, or arrangement, of 
+registers that makes sense, and does not overlap. When the intermediate entry
+starts allocation, it inherits a copy of the current allocation from its parent.
+If it needs a register that is in use by the parent, then it will put it in the
+push mask. This means that it is saved and restored to and from the parent, and
+is then effectively out of the register allocation. However, the allocation
+within the intermediate itself must be consistent. If a register is requested,
+but already allocated in this same allocation, then it is a double allocation
+and a fault.
+
+REGISTER ALLOCATION
+
+Register allocation occurs by traversing the entire intermediate tree for a
+procedure or function, and filling out the register fields in each intermediate.
+
+While doing that, a set of register management calls are made to perform the
+register allocation.
+
+The routine:
+
+procedure regblk(ip: intptr; var tr: regset);
+
+Takes a full block tree, allocates all of its registers, and leaves the 
+registers in the register fields of each operator entry. It takes a set of 
+registers, which on return will be the total set of registers that were used
+during the routine. This information is used to determine if the registers 
+should be saved when a routine is entered.
+
+regblk tours the graph by recursively calling itself, and performs allocation
+on each terminal operator entry. These are entries such as tistiint, that hold
+expression trees to be processed. Each expression tree is processed by:
+
+procedure regexp(rr, rrx: regt; ip: intptr; var tr: regset);
+
+Which assigns registers for the tree. Regexp recursively calls itself to
+process each leaf in the tree. regexp takes as a parameter the two registers
+that the operator being processed needs. These can be rgnull if there is no
+specific register requirement. regexp also takes the set of allocated registers.
+
+Regexp can, in cases, specify a register even if the final result may or may not
+use it. For example, the rrx parameter can contain a register even if we don't
+know if the operand to be processed has an extended register. The appearance of
+a register in either rr or rrx means that if the result exists, then it will be
+placed in that register.
+
+The important thing to understand about regexp is that if a rr or rrx register
+is specified, then the result will allways be placed there. It is not a
+preference, it is a demand.
+
+To perform the actual register allocations, a few routines do the bulk of the
+work:
+
+procedure getreg(var r: regt; ip: intptr; var tr: regset);
+procedure getregbs(var r: regt; ip: intptr; var tr: regset);
+procedure plcreg(r: regt; ip: intptr; var tr: regset);
+procedure prfreg(var r: regt; pr: regt; ip: intptr; var tr: regset);
+
+Each of the allocation routines takes a reference to the total allocation.
+This is just an 'or' of all the registers that were used, so that genblk can
+determine which registers to protect for the caller of a routine.
+
+Each of the routines will be discussed in turn.
+
+getreg
+
+Takes the intermediate tree entry to allocate a register for, along
+with a reference to the total allocation. It will find either a completely
+free register, or not finding that, it will flag one of the registers in the
+push mask, then use that. The register allocated is returned in the given
+register variable.
+
+getregbs
+
+Performs the same task, but only allocates registers from the set that
+are byte or word storable, that is, eax, ebx, ecx, or edx. It will not allocate
+esi and esi. This routine is required for operands that must be stored to byte
+or word values. The register allocated is returned in the given register
+variable.
+
+plcreg
+
+allocates a specific register, which is passed. If the register is not
+free, it is pushed.
+
+prfreg 
+
+is halfway between getreg and plcreg. It takes a "preference" register,
+but if the register is not free, it will allocate another one. The reason for
+this routine is that some register combinations save code, but not enough to
+justify an extra push/pop to do it. An example of this is "add eax,n". The
+target eax has a special more compact code format, but there is also a general
+purpose "add r,n" that takes any register. The register allocated is returned in
+the given register variable.
+
+PERFORMING ALLOCATION
+
+The register allocation is as simple as possible for a tree. Given only the alc
+and push sets, the allocator can control the allocated registers with overflow
+capability. The way to think of the allocator is to think of of each 
+intermediate node as a box:
+
++--------------+
+|    addint    |
+|              |
+|    alc       |
+|    push      |
++--------------+
+
+When the intermediate allocation starts, the parent allocation is copied into
+the box, and the push set is cleared. The intermediate has complete control of
+all the registers. If it needs a register that the parent flagged in use, then
+it only needs to flag that as pushed, then it has the register to itself. When
+processing is finished, it registers a result register, and at the same time
+that the parent context is restored by poping any registers, the result register
+is placed into the final or transfer register. The parent treats the box as a
+function that places the result in the register it wants, and does not distroy
+any other register.
+
+MIXING FIXED AND VARIABLE REGISTER ALLOCATIONS
+
+There is a non-obvious methodology for allocating a series of mixed fixed 
+register allocations, or allocations to specific registers, and variable 
+allocations that can go to any register. If a variable allocation is done, say
+with a regexp() call without preference, and it allocates a specific register,
+then that register is specified as fixed, then a "register already in use" error
+may result.
+
+The obvious solution would seem to be to process all individual fixed 
+allocations first, such as plcreg(), then other calculations. But fixing a 
+register takes it out of service, and doing that at the start may not be wise if
+it might then be needed for suboperator calculations. So we need to think
+carefully about allocations.
+
+regexp() can be used either as a variable or fixed register complex calculator.
+By contrast, getreg, plcreg, prfreg and the like are non-complex. Since a 
+complex calculation can use any number of registers at any level, we need to
+place operands in the following order:
+
+1. Complex allocations with fixed registers.
+
+2. Simple fixed allocations.
+
+3. Complex allocations with variable registers.
+
+4. Simple variable allocations.
+
+REGISTER CONTEXT
+
+The register context system is really separate from the register allocation. The
+intermediate operators that care about context use it, mainly the loads and 
+stores. Other operators simply use it to clear context entries out when they
+are distroyed, corresponding to changes made to the containing register.
+
+The context system creates context entries when simple values are loaded, and
+flags them usable when a store takes place. Simple values are values
+corresponding to a variable.
+
+Context entries are kept in table indexed by register, and each entry contains
+a type and an age in steps. The "steps" are simply a number that is incremented
+each time the context is modified, namly the entry and exit of a context entry.
+
+The main context management routines are:
+
+function fndcxt(t: typptr): regt;
+procedure setcxt(r: regt; t: typptr);
+procedure remcxt(r: regt);
+procedure cpycxt(dr, sr: regt);
+procedure cpycxtp(dr1, dr2, sr1, sr2: regt);
+procedure mrgcxt(view rc: regcxt);
+procedure clrcxt;
+procedure rescxt(var rc: regcxt);
+procedure matcxt(t: typptr);
+
+fndcxt
+
+This routine finds if a register has the given context by type. If found, it 
+returns that, else it returns rgnull.
+
+setcxt
+
+This routine sets up a context entry for the indicated register. The context
+entry gets the type indicated, and has its age reset.
+
+remcxt
+
+This routine removes the context from the indicated register.
+
+cpycxt
+
+Copies a context from one register to another. This is used to update after a
+copy from one register to another.
+
+cpycxtp
+
+This is the same as cpycxt, except performs copy on a register pair.
+
+mrgcxt
+
+Merges a saved context with the current context. Used to establish the net
+context after a concentration point for two code flows.
+
+clrcxt
+
+Clears out all current context.
+
+rescxt
+
+Clears a stored context.
+
+matcxt
+
+Matches a context by type, and if found, clears it. This routine is used to
+remove a context after it is updated, say by storing to the underlying variable.
+
+The context system is simple in operation. A load of a simple variable checks
+for a previous matching context entry, and if found, that is used instead of 
+going through the actual load. If not found, then the newly loaded value is 
+placed into the context system.
+
+Contexts are saved at distribution points, or points where the code takes a 
+branch, such as an 'if'. At a concentration point, such as where an 'if' comes
+back together, the contexts are merged by comparing each register context 
+between the saved and current context, and clearing out any context that is
+different between the two. This can be extended to any number of merging entries
+by simply merging all of the flows one at a time. This is how the case statement
+works.
+
+The entire context must be cleared at certain times. For example, we clear 
+context both before and after while and for loops, and before a repeat loop,
+although further research may discover a way to mitigate this.
+
+In addition, we clear context after each call of an external or even built in
+routine because the variables in the context might have changed. This is an
+unfortunate side effect, and further research can be done to find ways to
+more intellegently determine if the cached registers are really affected. For
+example, a call to a global routine is never going to change locals.
+
+FURTHER ISSUES
+
+REGISTER "DRIBBLING"
+
+It is possible that the algoritim can generate multiple pushes and pops of the
+same register. Since each intermediate is responsible for preserving the 
+registers of its parent intermediate, if a register is in use in the parent,
+more than one use of the same register in multiple child nodes will cause the
+same register to be pushed and poped multiple times.
+
+One way to deal with this is as follows. Instead of having one "push" mask on
+each intermediate, there would be a "push" and "pop" mask, each of which would
+signify a push or pop of the register. The current method of marking a register
+as saved by marking just the push mask would be to mark both the push and pop
+masks, which would do the same thing.
+
+Then, a post register allocation pass is done that would tour each node and look
+for multiple push and pop operations on a single node. It would simply count the
+number of suboperands with push and pop operations. Then, all pushes and pops of
+the same register except for the first push and the last pop can be removed.
+This means that the only push and pop that counts is the first one needed to
+preserve the register, and the last pop that occurs before the operation is
+processed.
+
+LONG DISTANCE CACHING
+
+We can increase the range of the caching algoritim by recognizing that 
+registered contents can be reused much later by caching over longer distances
+than the current algorithim.
+
+We establish a "long distance" cache. This is a separate cache that does not
+track register contents, but is a list of "available content". It is kept by
+type, just as current caching is done. The cache is flushed at any change of
+flow point such as a jump or label, or if the registers ever fill. The dx
+cache also keeps a pointer to the intermediate that loaded that content.
+
+In addition, each intermediate gets two "copy" entries that show if a copy from
+register to register needs to be performed after the load for that intermediate
+is performed.
+
+On a load, not only the short distance cache (the current cache) is matched for
+content, but then the dx cache is also searched. If the short cache fails to 
+find content, but the dx cache has it, then the indicated intermediate is marked
+to show a copy to an availble register, then that register load is skipped.
+
+The result is that old contents will be reused, with just the cost of a register
+to register copy instruction.
+
+ALGORITHIM STRENGTHS AND WEAKNESSES
+
+Although some aspects of the algorithim can be complex to understand, the basic
+notion is simple, that each node of the intermediate controls its own 
+allocation, and thus is self determining.
+
+The disadvantage is that each node cannot know that it is pushing and poping the
+same parent register, so "dribbling" a parent value is possible. Another 
+disadvantage is that little is done about bringing important values forward in
+registers. A register content either survives or it does not, and whether it
+does or not is happenstance, or even stacked against the algorithim, since it 
+tends to reuse the same registers over and over again due to demand allocations.
+
+One of the big advantages of the method is that it "packages" the registers to
+be used in each intermediate, and theoretically intermediates are individual
+processing units. In reality, this symmetry is frequently broken, and
+intermediate operator processing routines have to reach down into subtrees,
+which means the register pass must as well.

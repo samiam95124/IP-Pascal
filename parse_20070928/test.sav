@@ -1,0 +1,98 @@
+module parlib(output);
+
+uses syslib,
+     strlib,
+     extlib;
+
+const maxpar = 100; { number of logical parse handles }
+
+type 
+
+   parhan = 1..maxpar; { logical parse handle }
+      
+{ functions }
+
+procedure prterr(var f: text; ph: parhan; view es: string; pl: boolean);
+   forward;
+
+private
+
+type 
+
+   posptr = ^posrec; { position save pointer }
+   posrec = record { position save record }
+
+      inx: integer; { saved position }
+      next: posptr { next entry }
+
+   end;
+   iflptr = ^iflrec; { pointer to file record }
+   iflrec = record
+
+      buf:  pstring; { buffer for lines }
+      inx:  integer; { index for buffer }
+      len:  integer; { length of line }
+      name: pstring; { name of file }
+      line: integer; { line counter }
+      endf: boolean; { end of file encountered }
+      flin: boolean; { file entry is for line buffer only }
+      f:    text;    { file to read }
+      sav:  posptr;  { position save stack }
+      next: iflptr   { next entry in files stack }
+
+   end;
+   parptr = ^parrec; { pointer to parse record }
+   parrec = record
+
+      fil: iflptr;  { files stack }
+      err: integer; { number of errors }
+      fch: chrset   { set of valid file characters }
+
+   end;
+
+var partab: array [parhan] of parptr; { logical parse blocks }
+    parinx: parhan; { index for table }
+    valfch: chrset; { valid file characters }
+
+procedure prterr(var f: text; ph: parhan; view es: string; pl: boolean);
+
+begin
+
+   partab[ph]^.err := partab[ph]^.err+1; { count errors }
+   with partab[ph]^.fil^ do begin { create save entry }
+
+      if pl then begin { print source line display }
+
+         writesp(f, buf^); { print source line }
+         writeln(f, '^': inx) { print indicator }
+
+      end;
+      { print error line }
+      write(f, '[');
+      if not flin then begin { print filename and line }
+
+         writesp(f, name^); { print filename }
+         write(f, ':', line:1, '.');
+
+      end;
+      writeln(inx:1, partab[ph]^.err:1, ']', es)
+
+   end
+
+end;
+
+{ start block }
+
+begin
+
+   filchr(valfch); { get the filename valid characters }
+   for parinx := 1 to maxpar do partab[parinx] := nil { clear parse block list }
+
+end;
+
+{ end block }
+
+begin
+
+
+end.

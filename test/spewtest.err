@@ -1,0 +1,13 @@
+en!.
+  ^
+*** C:\PASCOMP\TEST\spewtest.pas [456:3] 'end' or ';' expected *** 
+en!.
+  ^
+*** C:\PASCOMP\TEST\spewtest.pas [456:3] 'en' assumed to be misspelled 'end' *** 
+en!.
+   ^
+*** C:\PASCOMP\TEST\spewtest.pas [456:4] Invalid symbol/character '!' (skipped) *** 
+*** C:\PASCOMP\TEST\spewtest.pas [456:4] Symbol 'brdinx' defined but never referenced *** 
+en!.
+   ^
+*** C:\PASCOMP\TEST\spewtest.pas [456:4] '.' expected *** 

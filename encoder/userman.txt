@@ -1,0 +1,375 @@
+                             ALPHA USERS MANUAL FOR 80786 ENCODER
+
+OVERVIEW
+
+This document discusses how to use the 80786 series encoder.
+
+COMMAND FORM
+
+encode file/opt [/opt]...
+
+A single file parameter exists, which is the .int file for the program to be
+encoded. The program is encoded into the files file.obj and file.sym, which
+contain the final code for the module.
+
+A typical alternate form for the command is:
+
+ec80686 file/opt [/opt]...
+
+Which identifies which encoder for what processor series is being used.
+
+FUNCTION
+
+The encoder generates a module in standard Harvard archetecture form. The code,
+constants such as "fixed" objects and strings, and other fixed data is output
+into the program section. The variable section contains global variables. The
+stack and heap is implemented by the libary in use.
+
+The calling convention for ec80686 is found in call386.dwp. The calling 
+convention is based on the 80386 processor, and is used unchanged for the 
+80386, 80486, 80586, 80686 and 80786 processors.
+
+OPTIONS
+
+The following options are implemented:
+
+Long              Short   Meaning
+================================================================================
+verbose           v       Print all status messages (default)
+noverbose         nv      Do not print status messages
+arraycheck        ac      Check index for array accesses at runtime (default)
+noarraycheck      nac     Do not check index for array access
+trap              t       Generate trap instructions
+notrap            nt      Do not generate trap instructions (default)
+packvariables     pv      Pack global/local variables (default)
+nopackvariables   npv     Do not pack global/local variables
+i80386                    Use 80386 level instructions (default)
+i80486                    Use 80486 level instructions
+i80586                    Use 80586 level instructions
+i80686                    Use 80686 level instructions
+softwarefloat     sf      Use software floating point handling
+hardwarefloat     hf      Use hardware floating point handling (FPU) (default)
+speed             sp      Optimize for highest speed (default)
+size              sz      Optimize for smallest size
+rangecheck        rc      Perform range checking (default)
+norangecheck      nrc     Do not perform range checking
+convertcheck      cvc     Perform narrowing convertion value checks
+noconvertcheck    ncvc    Do not perform narrowing conversion value checks
+overflowcheck     oc      Perform arthimetic overflow checking (default)
+nooverflowcheck   noc     Do not perform arthimetic overflow checking
+dividezero        dz      Capture divide by zero errors to library
+nodividezero      ndz     Let CPU handle divide by zero errors (default)
+casecheck         cc      Validate case selectors (default)
+nocasecheck       ncc     Do not validate case selectors
+clearlocals       clcl    Clear local variables to zero automatically (default)
+noclearlocals     nclcl   Do not clear local variables
+caseoccupancy     co      Set case occupancy
+nilpointercheck   npc     Check for dereference of nil pointers (default)
+nonilpointercheck nnpc    Do not check for dereference of nil pointers
+variantcheck      vrc     Check for current variant active before access
+novariantcheck    nvrc    Do not check for current variant active before access
+boundins          bi      Use bounds check instruction (default)
+noboundins        nbi     Do not use bounds check instruction
+mmx                       Use mmx extended instructions
+sse                       Use SSE extended instructions
+sse2                      Use SSE2 extended instructions and XMM calling
+
+verbose
+
+The file being processed, and the layout and addresses of the generated object
+are printed in verbose mode.
+
+arraycheck
+
+Checks the index for array accesses at runtime, to make sure that an array
+access does not access an element of an array outside of the valid range
+of array elements. If rangecheck or convertcheck is on, array checking may
+not be required, and it will only be used if needed.
+
+Turning array checking off is not recommended. Without array checking, the
+program can access outside valid data space and cause program corruption
+and possibly a crash. It is recommended that users turn off range and
+convertion checks, if needed for program speed/size concerns, and leave
+array checking ON if at all possible.
+
+trap
+
+On 80x86 series processors, a short form exists for arithemetic overflow 
+trapping, the into instruction, which takes a CPU trap on overflow. If
+overflowcheck is on, the trap option causes the into instruction to be
+used. This will result in smaller code sizes, but may produce less debug
+information, and may disallow any ability for the program to self-handle
+such faults.
+
+packvariables
+
+If this flag is on, global and local variables are "packed" or located in
+the address space at byte boundaries. If the flag is off, global and local
+variables are located at dword (32 bit) boundaries. Locating variables on even
+dword boundaries can speed up accesses to variables on some processors due to
+the elimination of multiword reads and writes, at the cost of increasing
+the amount of space required for global and local variables, possibly
+a dramatic increase. ec80686 will sort variables by length to attempt to
+mitigate the storage requirement impact of leaving this switch off.
+
+i80386
+i80486
+i80586
+i80686
+
+Each of these flags select a different processor as the active processor for
+code generation. The incremental instructions added after the 32 bit mode
+addition in the 80386 were minor, and it is suggested that the 80386 be left
+as the default generation mode. This will ensure that the widest range of target
+machines can use your program. Note also that use of any advanced processor
+mode should be accompanied by a interlock module in the final program. Interlock
+modules check for the required processor type and halt with error if it is
+not found. This will prevent the program failing with an "invalid opcode"
+instruction trap.
+
+softwarefloat/hardwarefloat
+
+On 80486 (all but the 80486sx) and later processors, the CPU has built in
+hardware to process floating point numbers. On the 80386 processor, the
+coprocessor may or may not exist, and unfortunately, most operating systems do
+not implement the option of emulating it in software. The softwarefloat flag
+generates routine calls for all floating point operations normally processed
+in hardware (the FPU). If this switch is enabled, the floating point library
+must be linked into the program to support these operations. Note that the
+code may be significantly larger and slower as a result.
+Programs using the hardware floating point unit should have an interlock
+module for that.
+
+speed/size
+
+Typically the 80786 encoder generates code that is best for both the highest
+speed and smallest code size. However, there are times when these two goals
+are in conflict. An example is processing set instructions inline vs. calling
+a library. If the speed option is selected, the fastest program run will be
+selected. If the size option is selection, a limited set of adjustments will be
+made to generate a smaller program. Note that in any case, the difference will
+rarely be dramatic.
+
+rangecheck
+
+Enables critical range checking on values. If this flag is enabled, the runtime
+values of variables will be verified to lie within their declared values.
+For example, the declaration:
+
+type s = (1..3);
+
+Would cause all type s variables to be checked for a value within the range
+1 to 3, and produce an error if not. This option is highly recommended for
+development of programs to verify that only the declared range of values is
+used. It may be left off on mature programs to enhance size and speed,
+if that is required.
+
+convertcheck
+
+Causes arithmetic conversions that could potentially lose precision to be
+checked and an error generated on precision loss. For example, since all
+integer values are specified as promoted to a full integer during expression
+evaluations, storing such a value to a byte variable would cause a potential
+loss of precision. This type of check is less expensive than rangecheck, and
+is recommended to be left on even if rangecheck is off. Note that if
+rangecheck is enabled, ec80686 may automatically leave convertion checks out
+if it determines that range checking has made that redundant.
+
+overflowcheck
+
+Causes arithmetic operations that overflow to generate errors. This option
+is highly recommended to be left enabled unless program space or speed
+is absolutely critical.
+
+dividezero
+
+Normally, the operating system in use handles the divde by zero exception.
+However, this may limit the amount of debug information available, as well as
+making it impossible for the program to self-handle such exceptions. Enabling
+this option will cause divide by zero errors to be sent to the support library
+as a formal error instead of being left to the CPU.
+
+casecheck
+
+If a case statement results in a direct array lookup, this option will check
+for an out of range selector. See also the caseoccupancy option.
+
+Turning case checking off is not recommended. An invalid case selector can
+cause an invalid location to be executed, and cause a program crash. Turning
+the option OFF will result in only minor code size and/or speed savings.
+
+clearlocals
+
+This option will cause each procedure or function to clear its locals to zero
+on entry. It is possible to save both size and especially code speed by
+turning this option OFF. It is recommended that this be done ONLY on a mature
+program, since it invalidates other consistency checks, such as
+nilpointercheck. Note that any files which are local MUST be cleared, and so
+ec80686 will either substitute a clear for any local file, or even override
+and clear the locals for a procedure or function that contains local files.
+It will do whichever is most efficient. For example, if the locals contain
+complex records or arrays containing files, it may be more efficient to
+simply clear all locals than attempt to initalize each file.
+
+caseoccupancy=0..100
+
+ec80686 generates two types of structures to handle case statements. If the
+case meets the "occupancy" requirement, which is a measure of the number of
+sequential case numbers vs. the number of gaps in the sequence, it will be
+generated as a straight table lookup and jump. If not, the case will be
+handled by a hash lookup table. The normal occupancy required to generate
+a jump table is %75, that is, %75 of the resulting jump table would be occupied
+by valid entries. Using this metric:
+
+case x of
+
+   1: ... ;
+   2: ... ;
+   3: ... ;
+   4: ... ;
+   6: ... ;
+   7: ... ;
+
+end;
+
+Ie., two missing case labels, would qualify as a jump table, whereas:
+
+case x of
+
+   1: ... ;
+   3: ... ;
+   4: ... ;
+   6: ... ;
+   7: ... ;
+
+end;
+
+Ie., three missing case labels, would result in a hash table lookup.
+
+The hash verision is both slower and bigger than a jump table. However, the
+generation of very large jump tables is possible if a very sparse (many missing
+case labels in sequence) case appears. Hash lookup is the fastest and most
+efficient method for handling sparse case tables.
+
+Using the caseoccupancy option, the exact case occupancy threshold can be
+selected. A %0 case occupancy would result in all case tables being encoded
+as jump tables. A %100 case occupancy would result in any table that is not
+completely full becoming a hash table. Any percentage of occupancy between
+%0 and %100 can be selected.
+
+nilpointercheck
+
+Causes all pointer dereferences to be checked for nil (0). This option is 
+highly recommended, and can catch serious program errors. Many operating
+provide checking for nil pointers as part of the memory management and
+control function. However, leaving nil pointer checking to the operating
+system may result in less debugging information, and may make it impossible
+for the program to self-recover from the error. Note that locals, globals
+and even dynamically allocated data must be cleared to zero for this
+check to work, even if the operating system performs it. See the clearlocals
+flag.
+
+variantcheck
+
+If a tagged variant appears, this option will cause all access to the variant
+to be validated for the active variant. This option is recommended. Note that
+this option is most valuable if locals, globals and even dynamic varaibles are
+cleared before use, and further that 0 is NOT one of the valid tag values.
+Note also that this check cannot catch an error of an uninitalized variant 
+being read. Finally, note that a variant without a tag will be unchecked
+regardless of the state of this option.
+
+boundins
+
+Uses the "bound" instruction of the x86 instruction set. During range checking
+(enabled by rangecheck option), the bound instruction can be used to give a
+slightly smaller object file. The disadvatages of using the bound instruction
+are possibly worse diagnostic messages, and the inability of the program
+to self-handle the error.
+
+mmx
+
+Enables use of the MMX registers and extended instructions. MMX is a vector
+processing unit that exists in exclusion to the FPU. It is capable of 
+performing vector math on up to 8 integer values at the same time.
+The mmx unit is mutually exclusive with the FPU (Floating Point Unit). If a
+procedure or function has floating point operations, this may make it impossible
+to use mmx instructions for some or all of that routine.
+mmx must be specified with I80586 or later processors. Programs should use
+an interlock module to stop faults on processors not having this feature.
+
+sse
+
+Enables use of the XMM registers and extended instructions. SSE is a 128 bit
+vector processing unit that exists separately from the FPU. It is capable
+of performing vector math on up to 16 integer values, or 4 32-bit floating
+point values at the same time.
+sse must be specified with I80686 or later processors. Programs should use
+an interlock module to stop faults on processors not having this feature.
+
+sse2
+
+Enables use of the XMM registers and extended instructions. SSE is a 128 bit
+vector processing unit that exists separately from the FPU. It is capable
+of performing vector math on up to 16 integer values, 4 32-bit floating
+point values, or 2 64-bit floating point values at the same time.
+sse2 also enables the use of the XMM floating point calling convention.
+This convention modifies the I80386 calling convention so that floating point
+values are passed via the XMM registers. This is a dramatically more effcient
+means of calling floating point routines.
+sse2 must be specified with I80686 or later processors. Programs should use
+an interlock module to stop faults on processors not having this feature.
+
+PROCESSOR INSTRUCTION MAPPING
+
+Each processor in the I80x86 series is defined for the purposes of the ec80686
+as an incremental step in instructions available to user programs. ec80686
+encompasses the I80386 processor to the I80786 processor. The I80386 and
+I80486 processor numbers were defined by Intel. After the I80486, Intel dropped
+the 80x86 numbering system, and changed to a naming system for their 
+processors. However, the convention used in IP in general is to continue to
+use the 80x86 series numbering convention for these processors.
+
+What follows is a list of exactly what number equals which name in the Intel
+naming/numbering scheme.
+
+Number      Intel name/number
+================================================================================
+I80386      80386DX, 80386SX 
+I80486      80486DX, 80486DX2
+I80586      Pentium
+I80686      Pentium Pro
+
+The differences between the base instruction sets of the processors are minor.
+Although there may be several new instructions, many of them only apply to
+system management. The net changes in the series that are relivant to encoding
+are as follows:
+
+I80386
+
+Start of the 32 bit instruction series.
+
+I80486
+
+New instructions
+================
+bswap
+xadd
+cmpxchg
+
+I80586
+
+New instructions
+================
+cmpxchg8b
+
+I80686
+
+New instructions
+================
+cmovcc
+fcmovcc
+fcomi
+
+The mmx, sse, and sse2 instruction sets are treated as optional units by Intel.
+These features are enabled by individual options.

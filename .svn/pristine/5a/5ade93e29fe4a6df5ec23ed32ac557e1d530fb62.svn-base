@@ -1,0 +1,4 @@
+cp ce80386.exe /mnt/windrv/ip/windows/i80386/bin
+cp ce80386.exe /mnt/windrv/ip/windows/i80386/bin/ce.exe
+cp ce80386 /mnt/windrv/ip/linux/i80386/bin
+cp ce80386 /mnt/windrv/ip/linux/i80386/bin/ce

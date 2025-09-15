@@ -1,0 +1,840 @@
+
+                          INTERMEDIATE CATALOG FOR ENCODER
+
+DESCRIPTION
+
+The encoder takes the external standard intermediate and re-encodes it to an
+internal four operand intermediate entry format. In addition, there are several
+custom intermediate entries that are created within the encoder. These entries
+contain simplified sequences such as load address and fetch concatenated,
+conditional jumps, and other special operators. These operators will only be
+found in the encoder, and are not standard intermediates. There are also several
+external standard intermediates that are not used internally in the encoder.
+These are noted in the catalog.
+
+APPLICABILITY
+
+This information is needed by anyone modifying or creating a backend for the
+encoder. This file essentially describes the intermediate graph operator entries
+for the intermediate graph that is passed to the backend on the block stack
+by a genblk call.
+
+PROCESSING
+
+An encoder backend can be implemented by either stack based or register based
+archtecture, or even some other method. The type system gives the list of
+types and variables for each block that is accessable in the scope of the
+intermediate being processed.
+
+If the intermediate graph passed is to be understood in stack based form, then
+the graph should be traversed in standard left or right ordering, then the
+loads, stores and operators work in terms of the stack.
+
+If the intermediate graph is to be understood in register based form, the
+registers are assigned using the standard intermediate fields provided for that.
+Then the graph can be traversed in any order. In this mode, the loads and
+stores are understood in terms of to or from a register. Items that cannot
+fit in registers are typically allocated as temps, then the register becomes
+the address of that. In this way, any size operand can be handled.
+
+There are several fields in the intermediate that are used by the standard
+register allocator, which is contained in the machine dependent section of
+encode. Sourcewise, the machine indepenent section of encode does not
+know about or use these fields, and they may, in fact, be unused if the
+machine dependent section is generating a stack based model, for example.
+
+GRAPH FORM
+
+The intermediate is in a form termed "acyclic graph", which is a tree with a
+single root with N-single branches. It is acyclic because all program 
+structures, including loops such as for or repeat, are represented by single
+branches. This is possible because the final code generation treats the single
+branch as a list that is to be repeated. Gotos do form cycles, but with side
+links that are not part of the intermediate graph form.
+
+The graph is separated into terminal and expression operators, and this is
+very important to the understanding of the intermediate graph. The terminal
+operators form the backbone of the program structure, and represent operators
+that deliver no result value, such as assignment, read and write, etc. The
+expression operators form expression trees that are rooted into the terminal
+structure.
+
+CATALOG
+
+************************* Expression Operators *********************************
+
+tilodadr     load address operator 
+================================================================================
+Rbase: Type of the resulting object.
+Base:  Type of object to be loaded.
+
+The address of the object described by the type is loaded.
+
+tilodfadr    load address function result operator 
+================================================================================
+Rbase: Type of the resulting object.
+Base:  Type of object to be loaded.
+
+The address of the object described by the type is loaded. The type will be the
+type of the function result for the current function.
+
+tiarrref     array reference operator 
+================================================================================
+Rbase: Type of the resulting object.
+Base:  Array type
+Left:  Array base address
+Right: Index
+
+The index for the array is scaled by the size of the array element size, then
+used to offset into the array. The result is the address of the object in the
+array.
+
+tiarfgar     general array reference operator 
+================================================================================
+Rbase: Type of the resulting object.
+Base:  Array type
+Left:  Array base address
+Right: Index
+
+The index for the array is scaled by the size of the array element size, then
+used to offset into the array. The result is the address of the object in the
+array. The address of the array is a tagged pointer, allowing the reference
+to be checked against the number of elements in the array.
+
+tirecoff     record offset operator 
+================================================================================
+Rbase: Type of the resulting object.
+Base:  Record field entry
+Left:  Record base address
+
+The offset for the record field is added to the base address. The result is an
+address of the field.
+
+tildiint     load indirect integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+Base:  Type of integer to load (subrange)
+Left:  Address of integer to load
+
+The size of integer indicated by the type is loaded from the address. If the
+register or stack has a standard size requirement, sign or zero extention is
+done as appropriate to the type of integer subrange.
+
+tildirel     load indirect real operator 
+================================================================================
+Rbase: Type of the resulting object.
+Left:  Address of real to load
+
+The standard length real is loaded from its address.
+
+tildisrl     load indirect short real operator 
+================================================================================
+Rbase: Type of the resulting object.
+Left:  Address of short real to load
+
+The short length real is loaded from its address. If the register or stack has
+a standard length requirement, short real is converted to standard real at this
+step.
+
+tildiset     load indirect set operator 
+================================================================================
+Rbase: Type of the resulting object.
+Left:   Address of set to load
+
+The set at the address is loaded. The set is loaded to 256 element standard
+form.
+
+tildichr     load indirect character operator 
+================================================================================
+Rbase: Type of the resulting object.
+Left:  Address of character to load
+
+The character at the address is loaded, and zero extended as required.
+
+tildibol     load indirect boolean operator 
+================================================================================
+Rbase: Type of the resulting object.
+Left:  Address of boolean to load
+
+The boolean at the address is loaded, and zero extended as required.
+
+tildisrc     load indirect structure operator 
+================================================================================
+Rbase: Type of the resulting object.
+Base:  Type of structure to load
+Left:  Address of structure to load
+
+The structure at the address is loaded, with the size of the structure type.
+
+tildiptr     load indirect pointer 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilditgp     load indirect tagged pointer 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilimint     load immediate integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilimrel     load immediate real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilimns      load immediate empty set operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodlen     load general array tag length 
+================================================================================
+Rbase: Type of the resulting object.
+
+tinotint     integer 'not' operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tinotbol     boolean 'not' operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tisinset     set single element operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tirngset     set range of elements operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+ticvtitr     convert integer to real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+ticvtgtf     convert general to fixed array 
+================================================================================
+Rbase: Type of the resulting object.
+
+ticvtftg     convert fixed array to general 
+================================================================================
+Rbase: Type of the resulting object.
+
+ticvtntg     convert nil to tagged format 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiswptop     swap top and second stack operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiintset     set intersection operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+timltrel     multiply real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+timltint     multiply integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tidivrel     divide real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tidivint     divide integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+timodint     modulo integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiandint     integer 'and' operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tinegint     negate integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tinegrel     negate real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiuniset     set union operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiaddrel     add real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiaddint     add integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tidifset     set difference operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tisubrel     subtract real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tisubint     subtract integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiorint      'or' integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tixorint     'xor' integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiincset     set inclusion operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiequset     set equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiequrel     real equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiequstr     string equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiequgst     general string equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiequint     integer equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiequtgp     tagged pointer equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tineqset     set not equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tineqrel     real not equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tineqstr     string not equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tineqgst     general string not equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tineqint     integer not equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tineqtgp     tagged pointer not equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tileqset     set less than or equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tileqrel     real less than or equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tileqstr     string less than or equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tileqgst     general string less than or equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tileqint     integer less than or equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tigeqset     set greater than or equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tigeqrel     real greater than or equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tigeqstr     string greater than or equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tigeqgst     general string greater than or equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tigeqint     integer greater than or equal operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiltnrel     real less than operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiltnstr     string less than operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiltngst     general string less than operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiltnint     integer less than operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tigtnrel     real greater than operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tigtnstr     string greater than operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tigtngst     general string greater than operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tigtnint     integer greater than operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+ticvtrtsr    convert real to short real 
+================================================================================
+Rbase: Type of the resulting object.
+
+ticalpar     procedure/function call parameter 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodint     load direct integer 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodrel     load direct real 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodsrl     load direct short real 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodset     load direct set 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodchr     load direct character 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodbol     load direct boolean 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodsrc     load direct structure 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodptr     load direct pointer 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodtgp     load direct tagged pointer 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodafbuf   load address of file buffer 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilodafbuft  load address of text file buffer 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiabsrel     abs of real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiabsint     abs of integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tisqrrel     sqr of real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tisqrint     sqr of integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiatnrel     arctan of real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+ticosrel     cos of real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiexprel     exp of real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilgnrel     ln of real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tisinrel     sin of real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tisqtrel     sqrt of real operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tieolt       eoln of file operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tieof        eof of file operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiodd        odd of integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tisucint     succ of integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiprdint     pred of integer operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tirnd        round operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+titrc        trunc operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiexist      file exists operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tilen        file length operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+tiloc        file location operator 
+================================================================================
+Rbase: Type of the resulting object.
+
+************************* Terminal Operators ***********************************
+
+tiifbgn      if begin operator 
+================================================================================
+
+ticasbgn     case begin operator 
+================================================================================
+
+tiwhlbgn     while begin operator 
+================================================================================
+
+tirptbgn     repeat begin operator 
+================================================================================
+
+tifortint    for 'to' integer operator 
+================================================================================
+
+tifortchr    for 'to' character operator 
+================================================================================
+
+tifortbol    for 'to' boolean operator 
+================================================================================
+
+tifordint    for 'downto' integer operator 
+================================================================================
+
+tifordchr    for 'downto' character operator 
+================================================================================
+
+tifordbol    for 'downto' boolean operator 
+================================================================================
+
+tiwthbgn     with begin operator 
+================================================================================
+
+tigoto       goto operator 
+================================================================================
+
+tiprccal     procedure call operator 
+================================================================================
+
+tiprccali    procedure call indirect operator 
+================================================================================
+
+tifnccal     function call operator 
+================================================================================
+
+tifnccali    function call indirect operator 
+================================================================================
+
+tiwrtsrc     write file operator 
+================================================================================
+
+tiwrtintt    write integer operator 
+================================================================================
+
+tiwrtchrt    write character operator 
+================================================================================
+
+tiwrtbolt    write boolean operator 
+================================================================================
+
+tiwrtrelt    write real operator 
+================================================================================
+
+tiwrtstrt    write string operator 
+================================================================================
+
+tiwrtgstt    write general string operator 
+================================================================================
+
+tiwrtintft   write integer fielded operator 
+================================================================================
+
+tiwrtchrft   write character fielded operator 
+================================================================================
+
+tiwrtbolft   write boolean fielded operator 
+================================================================================
+
+tiwrtrelft   write real fielded operator 
+================================================================================
+
+tiwrtstrft   write string fielded operator 
+================================================================================
+
+tiwrtgstft   write general string fielded operator 
+================================================================================
+
+tiwrtrelfft  write real fielded and fractioned operator 
+================================================================================
+
+tiwrtsrl     write file short real 
+================================================================================
+
+tiwrtrel     write file real 
+================================================================================
+
+tiwrtset     write file set 
+================================================================================
+
+tiwrtbol     write file boolean 
+================================================================================
+
+tiwrtchr     write file character 
+================================================================================
+
+tiwrtint     write file integer 
+================================================================================
+
+tiwrteolt    write file end of line 
+================================================================================
+
+tiredsrc     read file operator 
+================================================================================
+
+tiredintt    read integer operator 
+================================================================================
+
+tiredchrt    read character operator 
+================================================================================
+
+tiredrelt    read real operator 
+================================================================================
+
+tiredsrlt    read short real operator 
+================================================================================
+
+tiredeolt    read file end of line 
+================================================================================
+
+tiget        file get operator 
+================================================================================
+
+tigett       text file get operator 
+================================================================================
+
+tiput        file put operator 
+================================================================================
+
+tireset      file reset operator 
+================================================================================
+
+tirewrite    file rewrite operator 
+================================================================================
+
+ticlose      file close operator 
+================================================================================
+
+tipack       pack operator 
+================================================================================
+
+tiunpack     unpack operator 
+================================================================================
+
+tipaget      page operator 
+================================================================================
+
+tiassign     assign file operator 
+================================================================================
+
+tipos        position file operator 
+================================================================================
+
+tidel        delete file operator 
+================================================================================
+
+tichg        change file operator 
+================================================================================
+
+tistiint     store integer operator 
+================================================================================
+
+tistisrl     store short real operator 
+================================================================================
+
+tistirel     store real operator 
+================================================================================
+
+tistichr     store character operator 
+================================================================================
+
+tistibol     store boolean operator 
+================================================================================
+
+tistiset     store set operator 
+================================================================================
+
+tistisrc     store structured operator 
+================================================================================
+
+tistigar     store general array 
+================================================================================
+
+tistitgp     store tagged pointer 
+================================================================================
+
+tistifint    store function result integer operator 
+================================================================================
+
+tistiftgp    store function result tagged pointer operator 
+================================================================================
+
+tistifsrl    store function result short real operator 
+================================================================================
+
+tistifrel    store function result real operator 
+================================================================================
+
+tistifchr    store function result character operator 
+================================================================================
+
+tistifbol    store function result boolean operator 
+================================================================================
+
+tinew        new operator 
+================================================================================
+
+tidisp       dispose operator 
+================================================================================
+
+tilabequ     'goto' label equation 
+================================================================================
+
+tirngchk     range check 
+================================================================================
+
+tinewgar     allocate tagged array 
+================================================================================
+
+tidspgar     deallocate tagged array 
+================================================================================
+
+tihalt       halt program 
+================================================================================
+
+tigotot      goto on true 
+================================================================================
+
+tigotof      goto on false 
+================================================================================
+
+tistoint     store direct integer 
+================================================================================
+
+tistosrl     store direct short real 
+================================================================================
+
+tistorel     store direct real 
+================================================================================
+
+tistochr     store direct character 
+================================================================================
+
+tistobol     store direct boolean 
+================================================================================
+
+tistoset     store direct set 
+================================================================================
+
+tistosrc     store direct structure 
+================================================================================
+
+tistogar     store direct general array 
+================================================================================
+
+tistotgp     store direct tagged pointer 
+================================================================================
+
+tistofint    store direct function result integer 
+================================================================================
+
+tistoftgp    store direct function result tagged pointer 
+================================================================================
+
+tistofsrl    store direct function result short real 
+================================================================================
+
+tistofrel    store direct function result real 
+================================================================================
+
+tistofchr    store direct function result character 
+================================================================================
+
+tistofbol    store driect function result boolean 
+================================================================================
+
+

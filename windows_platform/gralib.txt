@@ -1,0 +1,138 @@
+Notes for gralib on Windows NT/Windows XP.
+
+Gralib is implemented directly in GDI32 and allows access
+to those features. The default fonts for gralib logical fonts
+are:
+
+Logical font      Actual font
+================================
+terminal          System fixed
+sign              Microsoft Sans Serif
+book              Times New Roman
+
+Note that these defaults can be changed by command line option.
+
+The technical font is an internally generated vector font. On
+Windows, this is done with circular vectors and the result is
+quite good.
+
+TERMINAL MODE
+
+The terminal font is the Microsoft System Fixed font, and terminal
+fonts cannot be sized, nor are any modes available, including bold,
+italic, etc. The Sytem fixed font is sized by the system appearance
+settings, which are global for all windows.
+
+The system fixed type is a bitmapped font created specially for
+windows, and has the best appearance for small fixed fonts. Although
+the font "Tahoma" is the same style font in TrueType, that font
+just does not have the same appearance in the pixel resolutions used
+at this writing.
+
+TrueType fixed (or "monospace") fonts are usable in higher resolutions,
+and as they become the norm the terminal default may be rethought.
+
+In the meantime, you can use any font as a terminal font just by
+selecting it.
+
+TRUE TYPE/OPEN TYPE FONTS
+
+Open fonts are a superset of true type fonts, they are
+essentially true type fonts with Adobe Type Manager fonts
+added in.
+
+With the exception of the terminal font, Gralib only uses and selects
+True Type and Open fonts, and these are all that appear in the fonts
+list. The reason for this is that they scale to any size, and typically
+have all modes available.
+
+The "sign" logical font is designed to be as close as possible to
+the Windows "system" (proportional) font, which is styled like Tohoma
+or Microsoft Sans Serif. The default size for TrueType fonts is set
+to also match the system font.
+
+TYPE MODES
+
+In windows, virtually all modes are usable including bold, italic,
+underline, strikeout, subscript and superscript. Blink is, of
+course, excluded.
+
+Although Windows can synthiese underline and strikeout modes,
+it does not synthesise italic and bold modes on most fonts,
+Microsoft documentation to the contrary. Also, most fonts don't
+have the full list of extra bold, condensed, narrow and similar
+types. The best way to get increased type and mode choices from
+Windows is to install large numbers of fonts with extensive
+moding.
+
+Gralib synthesizes superscript and subscript by selecting a
+font size that is 1/2 the normal size and moving it up or down
+in the character cell. If you want full size super/subscripts,
+use normal mode type and reposition it.
+
+ANTIALIASING
+
+Gralib turns on antialiasing for fonts by default. Other possible
+settings are off, and ClearType. ClearType tends to produce "thin"
+looking fonts on standard terminals, but is said to enhance the
+appearance of LCD screens. Some users may like the clean look
+of fonts without antialiasing.
+
+INCLUSION MODE
+
+Gralib uses "inclusion mode" for lines and figures, meaning that
+if you specify a line from (1,1) to (10,10) you get a line
+including the ends (1,1) and (10,10). Windows uses an excluded
+mode that does not draw the last point. This is fully compensated
+by gralib,  but the algoritim in use produces slight errors in
+non-orthogonal lines of greater than one pixel in width. These
+lines are approximations anyways, and this effect is not noticable.
+Gralib will get improved handling of these cases at a later time.
+
+FRAME TIMING
+
+Windows does not allow access to frame timing in GDI32 mode. The
+frame timer is set for the default of 60fps. Other modes such as
+directX will allow this.
+
+STARTUP MODES AND DEBUGGING
+
+The normal use of gralib is with the genpe flag /wg (Windows
+Graphical) which flags special handling for the program However,
+on Windows NT and XP, the program will run without the flag. With
+/wg, the program will start as a separate process, but without it,
+and if the program is executed from a command line, then the
+shell will await the completion of it. This mode is similar to
+Unix/Xwindows, and can be usefull, especially if you use an advanced
+shell that can select background processing for such a program,
+either by flagging the command as background on the command line,
+or with a "place in background" control key.
+
+In this "non-graphical" mode, it is also possible to output and
+input serially to the command window. This either appears in the
+command window where originally executed, or in a special command
+window if the program is executed directly from another grapical
+program. This makes it possbile to send normal writeln statements
+to the Window for debugging.
+
+Normally, gralib reassigns the input ("_input") and output ("_output")
+files to the main window. However, you may specify the following
+files under gralib:
+
+_debug_in   - Receives input from the command window.
+_debug_out  - Sends output to the command window.
+
+These are "bypass" files, and gralib actually reassigns these files
+to "_input" and "_output" and sends them down to the next I/O layer.
+
+CONTROL CHARACTERS
+
+All control characters, which are defined as any character with a value
+less than space (32 or $20 hex) are suppressed. The control characters
+that do not have a direct function are no-ops, and neither print nor
+move the cursor to the right. Note that on virtually all fonts under
+windows, the control character locations do not contain printing
+characters, but instead contain a "box" character to indicate a
+non-printing character.
+
+

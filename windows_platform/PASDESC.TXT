@@ -1,0 +1,248 @@
+                       PASCAL SUPPORT LIBRARY
+
+OVERVIEW
+
+This document describes the support routines implemented in the Pascal support
+library.
+
+IMPLEMENTATION
+
+The Pascal support library is a linkable module that exists second under the
+system interface library:
+
+    |=============|
+    | SYSTEM      |
+    | SUPPORT     |
+    | MODULE      |
+    |=============|
+    | PASCAL      |
+    | SUPPORT     |
+    | MODULE      |
+    |=============|
+    | PASCAL      |
+    | PROGRAM     |
+    | MODULE      |
+    |=============|
+    | PASCAL      | 
+    | PROGRAM     |
+    | MODULE      |
+    |=============|
+    ~             ~
+
+The Pascal support module takes various Pascal support functions and translates
+them to general system calls. It is a standard Pascal module itself, and both
+accepts and generates calls using standard calling conventions.
+Support calls are allways prepended with "PS_" in order to prevent name
+collisions.
+
+GENERAL DESIGN
+
+The Pascal module mostly deals with files, and only the specific aspects of
+files that need special processing specific to Pascal. Other calls, such as
+memory management, general named file handling, etc., bypass this module and
+are handled by the system module.
+The ability to adapt the routines contained here to ANY file type is a trick
+the compiler performs. It handles checking the definition of the file calls,
+and decomposes them into the individual calls both in this and the system
+module. Because the calls are passed to us via typeless linktime references,
+we are free to describe the calls implemented here at will. This will amount
+to a defacto type convertion at each call boundary.
+This also differs from our use of the system module. We call the system module
+using type secure calls.
+The library is very system independent. The only reliance is on the system
+module interface and Pascal itself. Therefore this module should never have
+to be changed for each implementation, even when moving to a different CPU
+(just recompilation required).
+
+FILES
+
+File references are allways passed as pointers, which makes them implementation
+independent. In the library, files are represented as 0-255 numbers, which
+allows a single byte to represent a file. This "file id number" is then used to
+reference the actual file data in a table. The number 0 means "never opened",
+and all files should be initalized to such a value.
+
+ERRORS
+
+Any errors found during library execution terminate the program with the
+message:
+
+    *** Pascal error: xxxxx...x
+
+Where xxxxx...x is the text for the error. In addition, the program may trip
+these errors by calling the library error routine with the error number. This
+is used to trap range errors, etc.
+Errors incurred in the system module are not checked for, as that module has
+it's own error trap methodology, etc.
+
+ERROR CODES
+
+The following error codes are defined for runtime:
+
+    0  = ps_ecnull   = No error. This code will never be used in practice, and
+                       will in fact generate a library fault if used.
+    1  = ps_ecrngchk = Range check. An operand value lies outside the allowed
+                       range of use.
+    2  = ps_eclenmat = Length match. The general array size does not match
+                       another general array or fixed array length.
+    3  = ps_ecftbful = File table full. Too many files are open at once.
+    4  = ps_ecfilopn = File is open. The file is already open.
+    5  = ps_ecfilass = File is assigned. The file already has a name.
+    6  = ps_ecfnmovf = Filename too long. The filename passed is too long to
+                       process.
+    7  = ps_ecfilnop = File not open. The file is not open for processing.
+    8  = ps_ecfilmod = File not in correct mode. The file is not in the correct
+                       read or write mode for the operation.
+    9  = ps_ecinvfld = Invalid field. The field specified is invalid.
+    10 = ps_ecinvrl  = Invalid real number. The real parameter given is invalid
+                       (such as ANSI undefined or ANSI infinity).
+    11 = ps_ecinvfrc = Invalid fraction. The fraction parameter is invalid.
+    12 = ps_ecintfmt = Integer format. The character format of the integer has
+                       the wrong syntax.
+    13 = ps_ecinttl  = Integer overflow. The integer is too large to read in.
+    14 = ps_ecrlfmt  = Real format. The character format of the real has the
+                       wrong syntax.
+    15 = ps_eceof    = EOF. An attempt was made to read past the EOF.
+    16 = ps_ecfault  = Library fault. A Pascal library fault has been detected.
+
+ROUTINES
+
+procedure PS_Abort;
+
+    Aborts the current run, closing all open files, etc, and exits to the
+    system module.
+
+procedure PS_Error(e: rerrcod);
+
+    Prints the error message corresponding to the given error code, and then
+    aborts the program.
+
+procedure PS_WrtInt(var fn: filnum; f: integer; i: integer);
+
+    The integer is written to the text file using the given field.
+
+procedure PS_WrtChr(var fn: filnum; f: integer; c: char);
+
+    The character is written to the text file using the given field.
+
+procedure PS_WrtBol(var fn: filnum; b: boolean);
+
+    The boolean is written to the text file.
+
+procedure PS_WrtBlf(var fn: filnum; f: integer; b: boolean);
+
+    The boolean is written to the text file using the given field.
+
+procedure PS_WrtReal(var fn: filnum; f: integer; r: real);
+
+    The real is written to the text file using the given field,
+    in floating point notation.
+
+procedure PS_WrtRlf(var fn: filnum; fl, fr: integer; r: real);
+
+    The real is written to the text file using the given field
+    and fraction, in fixed point notation.
+
+procedure PS_WrtStr(var fn: filnum; f: integer; view s: string);
+
+    The general string is written to the text file using the given field.
+
+procedure PS_WrtEol(var fn: filnum);
+
+    Writes an eoln to the text file.
+
+procedure PS_RdInt(var fn: filnum; var i: integer);
+
+    Reads an integer from the text file.
+
+procedure PS_RdChr(var fn: filnum; var c: char);
+
+    Reads a character from the text file.
+
+procedure PS_RdReal(var fn: filnum; var r: real);
+
+    Reads a real from the text file.
+
+procedure PS_RdEol(var fn: filnum);
+
+    Reads to the next eoln in the text file.
+
+function PS_ChkEol(var fn: filnum);
+
+    Returns the status of eoln for the text file.
+
+function PS_ChkEof(var fn: filnum);
+
+    Returns the status of eof for the text file.
+
+procedure PS_GetTxt(var fn: filnum);
+
+    Loads the next buffer character from the given text file.
+
+function PS_LbaTxt(var fn: filnum): gbtptr;
+
+    Returns the buffer variable for the text file.
+
+procedure PS_PagTxt(var fn: filnum);
+
+    Outputs a next page sequence to the text file.
+
+procedure PS_WrtFil(var fn: filnum; ba: bytarr);
+
+    General file write. The given byte array is written to the file. It is an
+    error if the length of the array does not match the buffer length of the
+    file.
+
+procedure PS_RdFil(var fn: filnum; bp: bytptr);
+
+    General file read. The given byte array is read from the file. It is an
+    error if the length of the array does not match the buffer length of the
+    file.
+
+procedure PS_GetFil(var fn: filnum);
+
+    General file get buffer. Loads the buffer from the file.
+
+procedure PS_PutFil(var fn: filnum);
+
+    General file put buffer. Writes the buffer to the file.
+
+function PS_LbaFil(var fn: filnum): gbtptr;
+
+    Returns the buffer variable for the file.
+
+procedure PS_Assign(var fn: filnum; nam: string);
+
+    Assigns a filename to the file.
+
+procedure PS_ResFil(var fn: filnum; bs: integer);
+
+    Resets a general file, with the given buffer length.
+
+procedure PS_ResTxt(var fn: filnum; bs: integer);
+
+    Resets a text file, with the given buffer length.
+
+procedure PS_RwtFil(var fn: filnum; bs: integer);
+
+    Rewrites a general file, with the given buffer length.
+
+procedure PS_RwtTxt(var fn: filnum; bs: integer);
+
+    Rewrites a text file, with the given buffer length.
+
+procedure PS_Close(var fn: filnum);
+
+    Closes the file.
+
+function PS_FilLen(var fn: filnum): integer;
+
+    Returns the length of the file.
+
+function PS_FilLoc(var fn: filnum): integer;
+
+    Returns the current location in the file.
+
+procedure PS_PosFil(var fn: filnum; p: integer);
+
+    Positions the file to the given location.

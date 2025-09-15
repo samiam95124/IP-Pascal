@@ -1,0 +1,25 @@
+program test(output);
+
+var fault: exception;
+
+procedure fail;
+
+begin
+
+   throw
+
+end;
+
+begin
+
+   try 
+
+      writeln('lets see if this works');
+      fail;
+      writeln('Guess it worked')
+
+   on fault except writeln('it was my fault!')
+   except writeln('crap, it didn''t work');
+   writeln('now we end')
+
+end.

@@ -1,0 +1,255 @@
+{*******************************************************************************
+*                                                                              *
+*                               Hash table generator                           *
+*                                                                              *
+* Generates tight chained tables for use with as. The output table is in the   *
+* form of assignment to an 'ressym' array, suitable for direct insertion.      *
+*                                                                              *
+*******************************************************************************}
+
+program hashtabs(output);
+
+uses strlib; { strings }
+
+label 99;
+
+const tabmax = 200; { maximum table length }
+      labmax = 100;   { maximum label length }
+
+type name = packed array[1..labmax] of char;
+     labinx = 1..labmax; { index for label }
+
+var loadarr, loadarrid, loadarrs: array [1..tabmax] of name; { holding tables }
+    ressym: array [1..tabmax] of { label table }
+               record
+
+                  reslab: name;
+                  resid:  name;
+                  reschn: 0..tabmax { chain }
+
+               end;
+    max, maxt, mmax: 0..65535; { maximum number of entries }
+    s : name;
+    i, x, h: 0..tabmax; { indexes }
+    lc: byte; { character on line count }
+    infile, outfile: text; { input and output files }
+    prime, mprime: integer; { number of prime entries }
+    add, madd: integer;
+    chncnt: array [1..10] of integer; { chain counts }
+    ci: 1..10; { chain index }
+    mccnt: integer; { minimum chain count }
+    err: boolean; { read error variable }
+
+function hash(s: name; add: integer; max: integer): byte;
+
+var i, r : integer;
+
+begin
+
+   r := 0;
+   for i := 1 to labmax do
+      if s[i] <> ' ' then r := r + ord(s[i]) + add;
+   hash := r mod max + 1
+
+end;
+
+{ process laying of entries to table }
+
+procedure laydown(add: integer; max: integer);
+
+var i, x, h: 0..tabmax; { indexes }
+
+begin
+
+   for i := 1 to tabmax do begin { clear result table }
+
+      clears(ressym[i].reslab);
+      ressym[i].reschn := 0
+
+   end;
+   prime := 0; { clear primes counter }
+   for i := 1 to max do begin { find primes }
+
+     if loadarr[i][1] <> ' ' then begin { occupied }
+
+         h := hash(loadarr[i], add, max); { find the entry hash }
+         if ressym[h].reslab[1] = ' ' then begin { prime }
+
+            ressym[h].reslab := loadarr[i]; { place }
+            ressym[h].resid := loadarrid[i];
+            clears(loadarr[i]); { clear old entry }
+            prime := prime + 1
+
+         end
+
+      end
+
+   end;
+   for i := 1 to max do begin { find slots for non-prime }
+
+      if loadarr[i][1] <> ' ' then begin { lefttover }
+
+         h := hash(loadarr[i], add, max); { find the entry hash }
+         { find terminal entry }
+         while ressym[h].reschn <> 0 do h := ressym[h].reschn;
+         x := 1; { find free slot }
+         while ressym[x].reslab[1] <> ' ' do x := x + 1;
+         ressym[h].reschn := x; { chain to this entry }
+         ressym[x].reslab := loadarr[i]; { place entry }
+         ressym[x].resid := loadarrid[i]; { place entry }
+         clears(loadarr[i]) { clear that }
+
+      end
+
+   end
+
+end;
+
+procedure count(max: integer);
+
+var ci:   1..10; { chain counters index }
+    cc:   integer; { chain counter }
+    i, x: 0..tabmax; { indexes }
+
+begin
+
+   for ci := 1 to 10 do chncnt[ci] := 0; { clear chain counters }
+   for i := 1 to max do begin
+
+      cc := 0; { zero counter }
+      x := i; { save index }
+      while ressym[x].reschn <> 0 do begin { traverse }
+      
+         x := ressym[x].reschn; { chain }
+         cc := cc + 1 { count }
+
+      end;
+      if cc <> 0 then begin { count chains }
+
+         if cc >= 10 then chncnt[10] := chncnt[10] + 1
+         else chncnt[cc] := chncnt[cc]+1
+
+      end
+   
+   end
+
+end;   
+
+begin { hash }
+
+   assign(infile, 'spctbl.lab');
+   reset(infile);
+   assign(outfile, 'spctbl.inc');
+   rewrite(outfile);
+   for i := 1 to tabmax do clears(loadarr[i]); { clear save table }
+   i := 1; { index table start }
+   while not eof(infile) do begin { read labels }
+
+      readsp(infile, s, err);
+      if err then begin
+
+         writeln('*** Read error');
+         goto 99
+
+      end;
+      readln(infile);
+      if lenp(s) > 0 then begin { string not empty }
+
+         if words(s) < 2 then begin
+
+            writeln('*** Bad data format');
+            goto 99
+
+         end;
+         extwordsp(loadarr[i], s, 1, 1); { get character sequence }
+         extwordsp(loadarrid[i], s, 2, 2); { get character id }
+         i := i + 1 { next entry }
+
+      end
+
+   end;
+   max := i-1; { set maximum number of entries }
+   mprime := 0; { set minimum prime }
+   mccnt := maxint; { set minimum chain count }
+   for add := 0 to 100 do begin { hash offset tries }
+
+      for maxt := max to max+10 do begin { max entry tries }
+
+         loadarrs := loadarr; { save array }
+         laydown(add, maxt); { laydown a set }
+         count(maxt); { tally that }
+         loadarr := loadarrs; { restore array }
+{
+         writeln('add: ', add:1, ' max = ', maxt: 1, ' prime = ', prime:1);
+}
+         if prime > mprime then 
+	    begin madd := add; mprime := prime; mmax := maxt end
+{         if chncnt[2] < mccnt then 
+	    begin madd := add; mprime := prime; mmax := maxt; mccnt := chncnt[2] end
+}
+
+      end
+
+   end;
+   if mprime = 0 then begin 
+
+      writeln('*** Error: no table solution found');
+      goto 99
+
+   end;
+   laydown(madd, mmax); { process with minimum }
+   count(mmax); { count the chains }
+   { output entry count }
+   writeln(outfile, 'const chrmax = ', mmax:1, ';');
+   writeln(outfile); { skip space }
+   writeln(outfile, 'const chroff = ', madd:1, ';');
+   writeln(outfile); { skip space }
+   for i := 1 to mmax do begin { output result table }
+
+      if lenp(ressym[i].reslab) > 0 then begin { not empty }
+
+         write(outfile, '   spctbl[', i:3, '].lab  := ''');
+         write(outfile, ressym[i].reslab:3);
+         write(outfile, ''';');
+         if ressym[i].reschn <> 0 then { output chaining spec }
+            write(outfile, ' spctbl[', i:3, '].chn := ',
+                          ressym[i].reschn:3, ';');
+         writeln(outfile); { terminate line }
+         write(outfile, '   spctbl[', i:3, '].tolk := c');
+         writesp(outfile, ressym[i].resid);
+         write(outfile, ';');
+         writeln(outfile) { terminate line }
+
+      end
+
+   end;
+   writeln(outfile); { skip space }
+   for i := 1 to mmax do begin { output definition table }
+
+      if lenp(ressym[i].reslab) > 0 then begin { not empty }
+
+         write(outfile, '   copysp(deftbl[c');
+         writesp(outfile, ressym[i].resid);
+         write(outfile, '], ''');
+         writesp(outfile, ressym[i].reslab);
+         writeln(outfile, ''');')
+
+      end
+
+   end;
+   writeln(outfile); { skip space }
+   writeln('Number of entries processed: ', max:1);
+   writeln('Number of prime entries: ', prime:1);
+   writeln('Number of non-prime entries: ', max-prime:1);
+   writeln('Add function: ', madd);
+   writeln('Table pad: ', mmax-max);
+   writeln('Chain counters:');
+   writeln;
+   for ci := 1 to 10 do { output chain counter table }
+      writeln(ci:2, ': ', chncnt[ci]:2);
+   writeln;
+   writeln('Function complete');
+
+   99:;
+
+end.

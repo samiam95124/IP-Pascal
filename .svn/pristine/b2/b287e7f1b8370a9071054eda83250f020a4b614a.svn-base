@@ -1,0 +1,118 @@
+********************************************************************************
+
+                                  PASCAL COMPILER
+
+********************************************************************************
+
+18/04/2010  12:50 p.m.             5.618 readme.txt
+18/04/2010  11:39 a.m.    <DIR>          ch2ph
+18/04/2010  10:37 a.m.    <DIR>          check_encoder
+18/04/2010  10:41 a.m.    <DIR>          common_headers
+18/04/2010  10:41 a.m.    <DIR>          common_libraries
+18/04/2010  11:37 a.m.    <DIR>          c_parser
+18/04/2010  10:42 a.m.    <DIR>          document
+18/04/2010  10:42 a.m.    <DIR>          dump_intermediate
+18/04/2010  10:43 a.m.    <DIR>          encoder
+18/04/2010  10:43 a.m.    <DIR>          freedos32_platform
+18/04/2010  10:43 a.m.    <DIR>          ibmpc_platform
+18/04/2010  10:43 a.m.    <DIR>          ide
+18/04/2010  10:44 a.m.    <DIR>          installer
+18/04/2010  11:44 a.m.    <DIR>          parser
+18/04/2010  10:44 a.m.    <DIR>          pc
+18/04/2010  10:45 a.m.    <DIR>          pretty_printer
+18/04/2010  10:45 a.m.    <DIR>          simulator
+18/04/2010  10:46 a.m.    <DIR>          test
+18/04/2010  10:46 a.m.    <DIR>          unix_platform
+18/04/2010  10:46 a.m.    <DIR>          windows_platform
+
+Last updated 2010/04/18
+
+The Pascal compiler is the successor to the Z80 compiler created in 1980. The 
+compiler and its support tooling, which is extensive, lies here. However it also
+relies heavily on the assembly language toolset, which is located elsewhere.
+
+At this writing, the compiler supports 80386 and up processors, Windows, linux
+and standalone environments.
+
+================================================================================
+
+                         CONTENTS OF PASCAL COMPILER AREA
+
+================================================================================
+
+readme.txt         - This file.
+
+ch2ph              - Contains a converter for C header files to Pascal header 
+                     files.
+          
+check_encoder      - Contains the check encoder. This is an obsolete program
+                     that was used to bring up the first I80386 compiler.
+          
+common_libraries   - Contains several support libraries for pascal that are not
+                     machine dependent, such as paslib, strlib and several 
+                     others.
+          
+c_parser           - Contains a front end only for the C language. This was used
+                     as the basis of the ch2ph tool. A dead project now, since
+                     there is no intention of integrating C into the IP 
+                     platform.
+          
+document           - Contains the compiler manual, various documents.
+          
+dump_intermediate  - Intermediate dump program. This is a utility to produce a
+                     formatted of Pascal intermediate files.
+          
+encoder            - Contains the production encoder. The encoder is presently
+                     targeted at I80386 and up CPUs. However, it is general
+                     purpose and will be extended.
+          
+ibmpc              - Contains facillities to run Pascal directly on the IBM-PC
+                     as an embedded program.
+          
+ide                - Contains the integrated development environment for Pascal.
+          
+installer          - Contains the graphical installer for Pascal.
+          
+common_headers     - Contains a series of header files for common library 
+                     components. No actual code is contained, just header files.
+                     The names will be the same as various modules around the
+                     system.
+          
+parser             - Contains the front end for the compiler.
+          
+simulator          - Contains the CPU independent intermediate code simulator.
+          
+test               - Contains various testing files, including the test suite.
+                     Note however, that several programs use their own testing 
+                     programs in the same directory as the program.
+          
+pretty_printer     - The start of a prettyprinter program for pascal. 
+          
+pc                 - Contains pc, which is the command line tools integrator for
+                     Pascal. It calculates a dependency tree for a program, and 
+                     runs all of Pascal utilities.
+          
+unix_platform      - Contains the support library implementation for Unix/Linux.
+          
+windows_platform   - Contains the support library implementation for Windows.
+
+freedos32_platform - Contains the support library implementation for freedos32.
+
+================================================================================
+
+Common methods and procedures used here:
+
+================================================================================
+
+build.bat  - Build program(s) in the given directory
+
+update.bat - Copy binaries and any other data to the run tree and release tree
+
+clean.bat  - Remove transient (automatically built) files
+
+Each directory has a "build.bat" file that will cause the main program in the
+directory to be built. Each directory also has an "update.bat" file that copies
+the binaries and any assocated files to the IP run area, usually c:/ip/...
+
+Most directories have a readme.txt file that explains more about the specific
+program the directory contains.

@@ -1,0 +1,3 @@
+ln runfile=conlib common basicio parserot scanner symbol parser parse cap
+genpe parse=runfile kernel32 /v
+del runfile.*

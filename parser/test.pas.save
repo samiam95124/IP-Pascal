@@ -1,0 +1,9 @@
+module test;
+
+type
+
+sc_evsptr = ^sc_evsrec;
+sc_evsrec = integer;
+
+begin
+end.

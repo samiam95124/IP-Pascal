@@ -1,0 +1,93 @@
+!
+! Module that implements semaphores using polling
+!
+! Demonstration program of semaphore signaling using a monitor, and
+! implemented using unfair queuing.
+!
+
+module signal;
+
+private
+
+type semaphore = record
+
+        f: boolean; ! signal true
+        o: boolean; ! signal one only
+        c: integer  ! current active waiters
+
+     end;
+     
+var s: semaphore;
+
+procedure wait(var s: semaphore);
+
+begin
+
+   ! Add us to the waiter count
+   
+   s.c := s.c+1;
+   
+   ! Wait for signal to become true. If not, call another monitor/share.
+   ! this breaks the lock, and allows another task to signal
+   
+   while not s.f and not s.o do escape;
+   
+   ! Flag signal accepted by removing our count
+   
+   s.c := s.c-1;
+   
+   ! Always turn single signal off, this means we are the only responder.
+   
+   s.o := false;
+   
+   ! If we are the last one out of the signal wait list, turn it back off.
+   
+   if s.c = 0 then s.f := false
+   
+end;
+
+procedure signal(var s: semaphore);
+
+begin
+
+   s.f := true
+   
+end;
+
+procedure signalone(var s: semaphore);
+
+begin
+
+   s.o := true
+   
+end;
+
+begin
+
+   ! set no signal active
+   
+   s.f := false;
+   s.o := false;
+   s.c := 0
+   
+end.
+
+!
+! The Escape call is any other module that is monitor callable, including
+! monitors and shares.
+!
+
+share other;
+
+procedure escape;
+
+begin
+
+   !
+   ! All the escape need do is break the lock of the monitor, which occurs
+   ! anytime the control flow leaves the monitor. However, this routine could
+   ! also perform a call to wave the rest of it's task time.
+
+end;
+
+.

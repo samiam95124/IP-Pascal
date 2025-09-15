@@ -1,0 +1,9 @@
+                           STRING LIBRARY NOTES
+
+1. Word functions are words and extwords. There is no insert, because a standard
+insert can do that, but there are two issues with that. First, there is no
+index function that can find the character position of a given word, so there is
+no easy way to find the insert position. Second, use of a character insert would
+not word normalize the string.
+
+2. reads() needs a version that defaults to standard input.

@@ -1,0 +1,1047 @@
+{******************************************************************************
+*                                                                             *
+*                 PASCAL COMPILER PARSER                                      *
+*                                                                             *
+*                 9/89 S. A. Moore                                            *
+*                                                                             *
+* General description: We implement a ANSI - Standard pascal compiler in      *
+* Pascal. The compiler is designed to break down into at least three modules: *
+*                                                                             *
+*     Parser - Accepts source code modules and generates intermediate code    *
+*     output. This module is entirely processor independent.                  *
+*                                                                             *
+*     Optimizer - Performs various optimization on the intermediate code.     *
+*     Optional module.                                                        *
+*                                                                             *
+*     Code generator - Generates a ln compatible code module. This is the     *
+*     processor specific module.                                              *
+*                                                                             *
+* This is the only module that need be complete for any given system. For a   *
+* minimum system, a rudamentary code generator for a given processor may be   *
+* constructed, and the system bootstrapped.                                   *
+*                                                                             *
+* Data typing: This processor implements the same data types for all          *
+* processors:                                                                 *
+*                                                                             *
+*     integer - a 64 bit signed integer format. Type may contain all of a     *
+*     real mantissa.                                                          *
+*                                                                             *
+*     real - a 64 bit ANSI real.                                              *
+*                                                                             *
+*     char - ASCII 8 bits (8th bit parity is preserved).                      *
+*                                                                             *
+*     set  - N elements.                                                      *
+*                                                                             *
+* Any subseting of the data types is left entirely to the code module. This   *
+* would be typicaly integers and sets. The code module must prove that a      *
+* given operation may be performed with less than whole precision by          *
+* examination of use. The net result is emulation of the above types.         *
+* The output of the processor is intermediate code, consisting of procedure   *
+* start/stops, jumps, special and general procedure calls, and expression     *
+* trees. Each procedure contains real storage references that are referenced  *
+* to the procedure itself.                                                    *
+*                                                                             *
+* Structure                                                                   *
+*                                                                             *
+* The modular structure is fairly straightforward:                            *
+*                                                                             *
+*   parse.pas                                                                 *
+*                                                                             *
+*   Contains the top level of the program only.                               *
+*                                                                             *
+*   parser.pas                                                                *
+*                                                                             *
+*   Contains the complete syntax analisis.                                    *
+*                                                                             *
+*   symbol.pas                                                                *
+*                                                                             *
+*   Contains symbol and type processing.                                      *
+*                                                                             *
+*   scanner.pas                                                               *
+*                                                                             *
+*   Contains the full lexical analisis.                                       *
+*                                                                             *
+*   parserot.pas                                                              *
+*                                                                             *
+*   Contains the basic file open/close stacker, command line parsing, the     *
+*   options parsing, and the error printout.                                  *
+*                                                                             *            
+*   basicio.pas                                                               *
+*                                                                             *
+*   Contains all open, close, delete and existence checks on files. Generally *
+*   contains all I/O dependencies.                                            *
+*                                                                             *
+******************************************************************************}
+
+module parsedef;
+
+uses stddef; { standard pascal defines }
+
+const
+
+   maxexp  = 308;   { maximum exponent of real }
+   labmax  = 250;   { maximum characters in label }
+   resmax  = 61;    { number of reserved words (plus padding) }
+   chrmax  = 37;    { number of special character sequences
+                      (plus padding) }
+   filmax  = 100;   { number of characters in filename }
+   linmax  = 250;   { number of characters in command line }
+   symmax  = 1000;  { symbol chain head maximum }
+   hashoff = 40;    { hash function offset }
+   chroff  = 20;    { special character hash offset }
+   spcmax  = 2;     { special character string length }
+   lsmmax  = 10;    { maximum number of characters in label to output in
+                      symbols listing (should not be greater than labmax) }
+   prtmax  = 80;    { maximum number of characters in an output line }
+   digmax  = 10000; { maximum number of digit places in integer }
+   usemax  = 200;   { maximum length of uses path }
+   { characters allowable in filename. this is DOS dependent }
+   filchrs  = ['0'..'9', 'a'..'z', 'A'..'Z', '_', '\\', ':', '.'];
+   usestr  = 'usespath'; { name of 'uses' path }
+   { demo limiter block. Demo mode should be enabled by a compile time option }
+   demo_mode = true; { demo enable/disable }
+   demo_chars = 4000; { number of total characters allowed }
+   demo_lines = 200;  { number of total lines allowed }
+  
+type
+
+   { scanner input tolkens }
+   tolken = (cundefined,  { undefined (must be first tolken) }
+             cplus,       { + }
+             cminus,      { - }
+             ctimes,      { * }
+             crdiv,       { / }
+             cequ,        { = }
+             cnequ,       { <> }
+             cnequa,      { >< }
+             cltn,        { < }
+             cgtn,        { > }
+             clequ,       { <= }
+             clequa,      { =< }
+             cgequ,       { >= }
+             cgequa,      { => }
+             clparen,     { ( }
+             crparen,     { ) }
+             clbrkt,      { [ }
+             crbrkt,      { ] }
+             clct,        { left comment }
+             crct,        { right comment }
+             cbcms,       { := }
+             cperiod,     { . }
+             ccma,        { , }
+             cscn,        { ; }
+             ccln,        { : }
+             ccmf,        { ^ }
+             crange,      { .. }
+             cdiv,        { div }
+             cmod,        { mod }
+             cnil,        { nil }
+             cin,         { in }
+             cor,         { or }
+             cand,        { and }
+             cxor,        { xor }
+             cnot,        { not }
+             cif,         { if }
+             cthen,       { then }
+             celse,       { else }
+             ccase,       { case }
+             cof,         { of }
+             crepeat,     { repeat }
+             cuntil,      { until }
+             cwhile,      { while }
+             cdo,         { do }
+             cfor,        { for }
+             cto,         { to }
+             cdownto,     { downto }
+             cbegin,      { begin }
+             cend,        { end }
+             cwith,       { with }
+             cgoto,       { goto }
+             cconst,      { const }
+             cvar,        { var }
+             ctype,       { type }
+             carray,      { array }
+             crecord,     { record }
+             cset,        { set }
+             cfile,       { file }
+             cfunction,   { function }
+             cprocedure,  { procedure }
+             clabel,      { label }
+             cpacked,     { packed }
+             cprogram,    { program }
+             cforward,    { forward }
+             cmodule,     { module }
+             cuses,       { uses }
+             cprivate,    { private }
+             cexternal,   { external }
+             cview,       { view }
+             cfixed,      { fixed }
+             cprocess,    { process }
+             cmonitor,    { monitor }
+             cshare,      { share }
+             cclass,      { class }
+             cconstruct,  { construct }
+             cdestruct,   { destruct }
+             cis,         { is }
+             catom,       { atom }
+             coverload,   { overload }
+             coverride,   { override }
+             cinteger,    { unsigned integer constant }
+             cidentifier, { identifier }
+             cstring,     { string constant }
+             creal,       { real constant }
+             ceof);       { end of file (must be last tolken) }
+   tolkset = set of tolken; { set of tolkens }
+   labinx = 1..labmax; { index for label }
+   labl   = packed array [labinx] of char; { label }
+   chrinx = 1..chrmax; { special character index }
+   chrstr = packed array [1..spcmax] of char; { special character string }
+   chrequ = record { special character table entry }
+
+               lab:  chrstr;   { characters }
+               tolk: tolken;   { equivalent tolken }
+               chn:  0..chrmax { next entry chain }
+
+            end;
+   resinx = 1..resmax; { index for reserved table }
+   resequ = record { reserved word table entry }
+
+               lab:  pstring;     { reserved word }
+               tolk: tolken;   { equivalent tolken }
+               chn:  0..resmax { chain to next entry }
+
+            end;
+   filinx = 1..filmax; { index for filename }
+   filnam = packed array [filinx] of char;
+   cmdinx = 1..linmax; { command line index }
+   cmdbuf = packed array [cmdinx] of char; { command line buffer }
+   srcptr = ^srcrec; { source file entry pointer }
+   srcrec = record
+
+               fil:    text;    { file }
+               nam:    filnam;  { filename }
+               lincnt: integer; { line count within file }
+               chrcnt: integer; { character count within file }
+               linmax: integer; { demo line limit }
+               chrmax: integer; { demo character limit }
+               line:   cmdbuf;  { buffered line }
+               lptr:   cmdinx;  { pointer for buffered line }
+               next:   srcptr   { next entry linkage }
+
+            end;
+   filept = ^filety; { file name entry pointer }
+   filety = record
+
+               nam:    filnam;  { filename }
+               next:   filept   { next entry linkage }
+
+            end;
+   fllptr = ^fllrec; { file list entry pointer }
+   fllrec = record
+
+               fst:  filept; { source file linear list }
+               lst:  filept; { last file in list }
+               cur:  filept; { current file processing }
+               stk:  srcptr; { open files stack }
+               next: fllptr  { next entry linkage }
+
+            end;
+   ext    = packed array [1..3] of char; { file extention }
+   typptr = ^typ; { type pointer }
+   symptr = ^sym; { symbol pointer }
+   sym    = record { symbol entry }
+     
+               next: symptr;  { next list entry }
+               rnxt: symptr;  { next field label entry (for records),
+                                also used for general listing }
+               lvl:  integer; { block level }
+               dup:  boolean; { symbol is duplicated (2-N times) }
+               mis:  boolean; { symbol is the target of a mispell }
+               udf:  boolean; { symbol is missing definition }
+               ddf:  boolean; { symbol undergoing delayed definition }
+               hld:  boolean; { symbol is being 'held' pending definition }
+               exp:  boolean; { symbol is exportable }
+               out:  boolean; { symbol has been output to intermediate }
+               ref:  integer; { reference count }
+               typ:  typptr;  { pointer to symbol type }
+               lab:  pstring; { symbol label }
+               use:  boolean  { symbol is part of "uses" file }
+
+            end;
+   syminx = 1..symmax; { index for symbol head table }
+   { built in procedure/function dispatch codes }
+   prcfnc = (pfnil,      { none, general procedure/function }
+             pfabs,      { f: abs }
+             pfarctan,   { f: arctan }  
+             pfchr,      { f: chr }    
+             pfcos,      { f: cos }    
+             pfeof,      { f: eof }   
+             pfeoln,     { f: eoln }    
+             pfexp,      { f: exp }     
+             pfln,       { f: ln }    
+             pfodd,      { f: odd }    
+             pford,      { f: ord }   
+             pfpred,     { f: pred }  
+             pfround,    { f: round }   
+             pfsin,      { f: sin }    
+             pfsqr,      { f: sqr }   
+             pfsqrt,     { f: sqrt }   
+             pfsucc,     { f: succ }  
+             pftrunc,    { f: trunc } 
+             pfexists,   { f: exists }
+             pflocation, { f: location }
+             pflength,   { f: length }
+             pfmax,      { f: max }
+             pfdispose,  { p: dispose }
+             pfget,      { p: get }    
+             pfnew,      { p: new }   
+             pfpack,     { p: pack }   
+             pfpage,     { p: page }    
+             pfput,      { p: put }   
+             pfread,     { p: read } 
+             pfreadln,   { p: readln }  
+             pfreset,    { p: reset }
+             pfrewrite,  { p: rewrite } 
+             pfunpack,   { p: unpack } 
+             pfwrite,    { p: write } 
+             pfwriteln,  { p: writeln } 
+             pfassign,   { p: assign }  
+             pfclose,    { p: close }  
+             pfposition, { p: position }
+             pfdelete,   { p: delete }  
+             pfchange,   { p: change }  
+             pfhalt);    { p: halt }
+   { file variable special handling codes }
+   fshan = (fsnone,     { no special handling }
+            fsreset,    { apply reset }
+            fsrewrite,  { apply rewrite }
+            fshparm,    { is unresolved header parameter }
+            fsherr);    { is errored header parameter }
+   { module marker codes }
+   modmrk = (mmsystem,  { system }
+             mmprogram, { program }
+             mmmodule,  { module }
+             mmprocess, { process }
+             mmmonitor, { monitor }
+             mmshare);  { share }
+   { type codes 
+     In our system, types are a loose word standing for anything that is 
+     predeclared and therefore requires a data structure to represent
+     it. Type entries may be indexed by symbols, or may be "anonymous" }
+   types  = (tudf,     { no type, used to mark errors }
+             tnil,     { 'nil' universal pointer }
+             tlab,     { goto label }
+             ticst,    { integer constant }
+             tscst,    { string constant }
+             tccst,    { character constant }
+             trcst,    { real constant }
+             tstcst,   { set constant }
+             tstet,    { set constant entry }
+             tarrcst,  { array constant entry }
+             tarrcel,  { array constant element }
+             treccst,  { record constant entry }
+             treccel,  { record constant element }
+             tenum,    { enumerated }
+             tenme,    { enumerated constant }
+             tsub,     { subrange }
+             tptr,     { pointer }
+             tarray,   { array }
+             tgarry,   { general array }
+             tfile,    { file }
+             tset,     { set }
+             trecord,  { record }
+             tfield,   { record field }
+             tftag,    { record tag field }
+             tfcas,    { record variant case }
+             tvar,     { variable }
+             tfix,     { fixed }
+             tproc,    { procedure }
+             tfunc,    { function }
+             tpar,     { parameter }
+             tvpar,    { variable parameter }
+             twpar,    { view parameter }
+             tpproc,   { procedure parameter }
+             tpfunc,   { function parameter }
+             tinteger, { integer }
+             tchar,    { character }
+             tboolean, { boolean }
+             treal,    { real }
+             tsreal,   { short real }
+             ttext,    { text }
+             teset,    { empty set }
+             tddf,     { delayed definition }
+             tglbl);   { global block }
+   typ    = record { type entry }
+            
+               next: typptr; { next list entry }
+               list: typptr; { general list maker link }
+               pack: boolean; { packed type flag }
+               lvl:  integer; { level number of type entry }
+               num:  integer; { sequence number of type entry }
+               case t: types of { types }
+
+                  tudf:     ();              { dummy entry to mark errors }
+                  tnil:     ();              { 'nil' universal pointer }
+                  tlab:     (ldef: boolean;  { label has been defined }
+                             lref: integer;  { number of 'goto' references }
+                             slvl: integer;  { statement level at definition }
+                             mlvl: integer;  { mimumum reference level }
+                             extr: boolean); { block external references 
+                                               exist }
+                  ticst:    (ival: integer); { the value of the integer }
+                  tscst:    (sval: pstring); { the value of the string }
+                  tccst:    (cval: char);    { character constant }
+                  trcst:    (rval: real);    { the value of the real }
+                  tstcst:   (stct: typptr;   { base type of set }
+                             stcc: typptr);  { set constant list }
+                  tstet:    (sten: typptr;   { next set element }
+                             stes: integer;  { starting value }
+                             stee: integer;  { ending value }
+                             steh: typptr);  { head entry }
+                  tarrcst:  (arcn: typptr);  { first list entry }
+                  tarrcel:  (aren: typptr;   { next list entry }
+                             arec: typptr);  { constant link }
+                  treccst:  (recn: typptr);  { first list entry }
+                  treccel:  (reen: typptr;   { next list entry }
+                             reec: typptr);  { constant link }
+                  tenum:    (enc:  typptr);  { list of enumerated constants }
+                  tenme:    (enx:  typptr;   { next enumeration entry }
+                             enh:  typptr;   { head entry pointer }
+                             env:  integer); { enumerated constant }
+                  tsub:     (subt: typptr;   { base type }
+                             subl: integer;  { lower bound }
+                             subu: integer); { upper bound }
+                  tptr:     (ptrt: typptr);  { base type }
+                  tarray:   (arrt: typptr;   { base type }
+                             arri: typptr);  { index type }
+                  tgarry:   (gart: typptr);  { base type }
+                  tfile:    (filt: typptr);  { base type }
+                  tset:     (sett: typptr;   { base type }
+                             setc: boolean); { set is 'in context' }
+                  trecord:  (recf: typptr;   { field list }
+                             recl: symptr);  { list of field labels }
+                  tfield:   (fldn: typptr;   { next field pointer }
+                             fldh: typptr;   { head entry pointer }
+                             fldt: typptr);  { base type }
+                  tftag:    (ftgc: typptr;   { case list }
+                             ftgh: typptr;   { head entry pointer }
+                             ftgt: typptr;   { base type }
+                             ftge: boolean); { exists flag }
+                  tfcas:    (fcsn: typptr;   { next case entry pointer }
+                             fcsf: typptr;   { field list }
+                             fcsc: integer); { case constant }
+                  tvar:     (vart: typptr;   { base type }
+                             varr: integer;  { threat count }
+                             varf: integer;  { 'for' use count }
+                             vars: fshan;    { file special handling }
+                             vare: boolean;  { variable is external }
+                             varh: typptr);  { used to form header file lists }
+                  tfix:     (fixt: typptr;   { base type }
+                             fixc: typptr;   { constant fill }
+                             fixe: boolean); { fixed is external }
+                  tproc:    (prcp: typptr;   { parameter list }
+                             prcd: prcfnc;   { dispatch code }
+                             prcf: boolean;  { procedure is forwarded }
+                             prcs: symptr;   { parameter symbols save for fwd }
+                             prct: typptr;   { parameter types save for fwd }
+                             prce: boolean;  { procedure is external }
+                             prco: typptr;   { overload list link }
+                             prch: typptr;   { overload list head }
+                             prcx: boolean;  { overload collide flag }
+                             prcq: boolean); { procedure is a deleted forward
+                                               overload }
+                  tfunc:    (fncp: typptr;   { parameter list }
+                             fncr: typptr;   { function result }
+                             fncd: prcfnc;   { dispatch code }
+                             fncc: integer;  { reference counter }
+                             fncf: boolean;  { function is forwarded }
+                             fncs: symptr;   { parameter symbols save for fwd }
+                             fnct: typptr;   { parameter types save for fwd }
+                             fnce: boolean;  { function is external }
+                             fnco: typptr;   { overload list link }
+                             fnch: typptr;   { overload list head }
+                             fncx: boolean;  { overload collide flag }
+                             fncq: boolean); { function is a deleted forward
+                                               overload }
+                  tpar:     (parn: typptr;   { next parameter }
+                             part: typptr;   { base type }
+                             parh: typptr;   { head entry pointer }
+                             parr: integer); { threat count }
+                  tvpar:    (vprn: typptr;   { next parameter }
+                             vprt: typptr;   { base type }
+                             vprh: typptr;   { head entry pointer }
+                             vprr: integer); { threat count }
+                  twpar:    (wprn: typptr;   { next parameter }
+                             wprt: typptr;   { base type }
+                             wprh: typptr);  { head entry pointer }
+                  tpproc:   (pprp: typptr;   { parameter list }
+                             pprn: typptr);  { next parameter }
+                  tpfunc:   (pfnp: typptr;   { parameter list }
+                             pfnr: typptr;   { function result }           
+                             pfnn: typptr);  { next parameter }
+                  tinteger: ();              { integer }
+                  tchar:    ();              { character }
+                  tboolean: (bnc:  typptr);  { list of enumerated constants }
+                  treal:    ();              { real }
+                  tsreal:   ();              { short real }
+                  ttext:    ();              { text file }
+                  teset:    ();              { empty set }
+                  tddf:     (ddfs: symptr;   { undefined symbol }
+                             ddft: typptr;   { base type }
+                             ddfd: boolean;  { type has been defined }
+                             ddfe: boolean); { error has been processed }
+                  tglbl:    (mm: modmrk)     { module type }
+
+               { end }
+
+            end;
+   typset = set of types; { set of types }
+   tpsptr = ^tps; { pointer to type stack entry }
+   tps    = record { type stack entry }
+
+               next: tpsptr;  { next entry }
+               typ:  typptr;  { type list for block }
+               lst:  typptr;  { last entry in type list }
+               upd:  typptr;  { sequential update pointer, indexes the first
+                                entry not yet output }
+               blk:  pstring; { block id }
+               seq:  integer  { sequence number }
+
+            end;
+   { Case value chain entry. Keeps track of case select values so that 
+     duplicates can be checked. }
+   csvptr = ^casval; { pointer to }
+   casval = record { entry }
+
+      val:  integer; { value of selector }
+      def:  boolean; { value is defined }
+      next: csvptr { next entry }
+
+   end;
+   { procedure/function "winnow" list, gives enties for a list of candidate
+     procedures or functions that are removed from the list as parameters are
+     parsed. }
+   winptr = ^winety; { pointer to entry }
+   winety = record { entry }
+
+      prcfnc: typptr; { procedure or function candidate }
+      next:   winptr { next entry }
+
+   end; 
+   { intermediate operator codes. Contains all the codes for markers, types, 
+     symbols, operations and other intermediate codes }
+   intcod = (ibgnlvl,    { begin new block level }
+             iendlvl,    { end current block level }
+             iusefil,    { 'uses' file string }
+             inil,       { 'nil' universal pointer }
+             ilab,       { 'goto' label }
+             iicst,      { integer constant }
+             iscst,      { string constant }
+             iccst,      { character constant }
+             ircst,      { real constant }
+             istcst,     { set constant }
+             istet,      { set constant entry }
+             iarrcst,    { array constant entry }
+             iarrcel,    { array constant element }
+             ireccst,    { record constant entry }
+             ireccel,    { record constant element }
+             ienum,      { enumerated type }
+             ienme,      { enumerated constant }
+             isub,       { subrange type }
+             iptr,       { pointer type }
+             iarray,     { array type }
+             igarry,     { general array type }
+             ifile,      { file type }
+             iset,       { set type }
+             irecord,    { record type }
+             ifield,     { record field }
+             iftag,      { record tag field }
+             ifcas,      { record case constant }
+             ivar,       { variable }
+             ifix,       { fixed }
+             iproc,      { procedure }
+             ifunc,      { function }
+             ipar,       { parameter }
+             ivpar,      { variable parameter }
+             iwpar,      { view parameter }
+             ipproc,     { procedure parameter }
+             ipfunc,     { fuction parameter }
+             iint,       { integer type }
+             ichar,      { character type }
+             iboolean,   { output marker }
+             ireal,      { real type }
+             isreal,     { short real type }
+             itext,      { text file type }
+             ieset,      { empty set type }
+             iglbl,      { global mark type }
+             inull,      { placeholder type entry }
+             isym,       { symbol entry }
+             issym,      { simple symbol entry }
+             ibgnpgm,    { program/procedure/function section entry }
+             iendpgm,    { program/procedure/function section end }
+             ibgnext,    { program exit section entry }
+             iendext,    { program exit section end }
+             ilodadr,     { load address operator }
+             ilodfadr,    { load address function result operator }
+             iarrref,    { array reference operator }
+             iarfgar,    { general array reference operator }
+             irecoff,    { record offset operator }
+             ildiint,    { load indirect integer operator }
+             ildirel,    { load indirect real operator }
+             ildisrl,    { load indirect short real operator }
+             ildiset,    { load indirect set operator }
+             ildichr,    { load indirect character operator }
+             ildibol,    { load indirect boolean operator }
+             ildisrc,    { load indirect structure operator }
+             ildiptr,    { load indirect pointer }
+             ilditgp,    { load indirect tagged pointer }
+             ilimint,    { load immediate integer operator }
+             ilimrel,    { load immediate real operator }
+             ilimns,     { load immediate empty set operator }
+             ilodlen,    { load general array length }
+             inotint,    { integer 'not' operator }
+             inotbol,    { boolean 'not' operator }
+             isinset,    { set single element operator }
+             irngset,    { set range of elements operator }
+             icvtitr,    { convert integer to real operator }
+             icvtgtf,    { convert general to fixed array }
+             icvtftg,    { convert fixed array to general }
+             icvtntg,    { convert nil to nil tagged }
+             iswptop,    { swap top and second stack operator }
+             iintset,    { set intersection operator }
+             imltrel,    { multiply real operator }
+             imltint,    { multiply integer operator }
+             idivrel,    { divide real operator }
+             idivint,    { divide integer operator }
+             imodint,    { modulo integer operator }
+             iandint,    { integer 'and' operator }
+             inegint,    { negate integer operator }
+             inegrel,    { negate real operator }
+             iuniset,    { set union operator }
+             iaddrel,    { add real operator }
+             iaddint,    { add integer operator }
+             idifset,    { set difference operator }
+             isubrel,    { subtract real operator }
+             isubint,    { subtract integer operator }
+             iorint,     { 'or' integer operator }
+             ixorint,    { 'xor' integer operator }
+             iincset,    { set inclusion operator }
+             iequset,    { set equal operator }
+             iequrel,    { real equal operator }
+             iequstr,    { string equal operator }
+             iequgst,    { general string equal operator }
+             iequint,    { integer equal operator }
+             iequtgp,    { tagged pointer equal operator }
+             ineqset,    { set not equal operator }
+             ineqrel,    { real not equal operator }
+             ineqstr,    { string not equal operator }
+             ineqgst,    { general string not equal operator }
+             ineqint,    { integer not equal operator }
+             ineqtgp,    { tagged pointer not equal operator }
+             ileqset,    { set less than or equal operator }
+             ileqrel,    { real less than or equal operator }
+             ileqstr,    { string less than or equal operator }
+             ileqgst,    { general string less than or equal operator }
+             ileqint,    { integer less than or equal operator }
+             igeqset,    { set greater than or equal operator }
+             igeqrel,    { real greater than or equal operator }
+             igeqstr,    { string greater than or equal operator }
+             igeqgst,    { general string greater than or equal operator }
+             igeqint,    { integer greater than or equal operator }
+             iltnrel,    { real less than operator }
+             iltnstr,    { string less than operator }
+             iltngst,    { general string less than operator }
+             iltnint,    { integer less than operator }
+             igtnrel,    { real greater than operator }
+             igtnstr,    { string greater than operator }
+             igtngst,    { general string greater than operator }
+             igtnint,    { integer greater than operator }
+             ibgnblk,    { begin statement block operator }
+             iendblk,    { end statement block operator }
+             iifbgn,     { if begin operator }
+             iifend,     { if end operator }
+             ielse,      { else operator } 
+             icasbgn,    { case begin operator }
+             icasend,    { case end operator }
+             icassint,   { case select integer }
+             icasstb,    { case statement begin }
+             icasste,    { case statement end }
+             iwhlexp,    { while expression marker }
+             iwhlbgn,    { while begin operator }
+             iwhlend,    { while end operator }
+             irptbgn,    { repeat begin operator }
+             irptend,    { repeat end operator }
+             ifortint,   { for 'to' integer operator }
+             ifortchr,   { for 'to' character operator }
+             ifortbol,   { for 'to' boolean operator }
+             ifordint,   { for 'downto' integer operator }
+             ifordchr,   { for 'downto' character operator }
+             ifordbol,   { for 'downto' boolean operator }
+             iforend,    { for end operator }
+             iwthbgn,    { with begin operator }
+             iwthend,    { with end operator }
+             igoto,      { goto operator }
+             iprcbgn,    { procedure call parameter begin operator }
+             iprccal,    { procedure call operator }
+             iprccali,   { procedure call indirect operator }
+             ifncbgn,    { function call parameter begin operator }
+             ifnccal,    { function call operator }
+             ifnccali,   { function call operator }
+             iwrtsrc,    { write file operator }
+             iwrtintt,   { write integer operator }
+             iwrtchrt,   { write character operator }
+             iwrtbolt,   { write boolean operator }
+             iwrtrelt,   { write real operator }
+             iwrtstrt,   { write string operator }
+             iwrtgstt,   { write general string operator }
+             iwrtintft,  { write integer fielded operator }
+             iwrtchrft,  { write character fielded operator }
+             iwrtbolft,  { write boolean fielded operator }
+             iwrtrelft,  { write real fielded operator }
+             iwrtstrft,  { write string fielded operator }
+             iwrtgstft,  { write general string fielded operator }
+             iwrtrelfft, { write real fielded and fractioned operator }
+             iwrtsrl,    { write file short real }
+             iwrtrel,    { write file real }
+             iwrtset,    { write file set }
+             iwrtbol,    { write file boolean }
+             iwrtchr,    { write file character }
+             iwrtint,    { write file integer }
+             iwrteolt,   { write file end of line }
+             iredsrc,    { read file operator }
+             iredintt,   { read integer operator }
+             iredchrt,   { read character operator }
+             iredrelt,   { read real operator }
+             iredsrlt,   { read short real operator }
+             iredeolt,   { read file end of line }
+             iabsrel,    { abs of real operator }
+             iabsint,    { abs of integer operator }
+             isqrrel,    { sqr of real operator }
+             isqrint,    { sqr of integer operator }
+             iatnrel,    { arctan of real operator }
+             icosrel,    { cos of real operator }
+             iexprel,    { exp of real operator }
+             ilgnrel,    { ln of real operator }
+             isinrel,    { sin of real operator }
+             isqtrel,    { sqrt of real operator }
+             ieolt,      { eoln of file operator }
+             ieof,       { eof of file operator }
+             iodd,       { odd of integer operator }
+             isucint,    { succ of integer operator }
+             iprdint,    { pred of integer operator }
+             irnd,       { round operator }
+             itrc,       {  trunc operator }
+             iexist,     { file exists operator }
+             ilen,       { file length operator }
+             iloc,       { file location operator }
+             iget,       { file get operator }
+             igett,      { text file get operator }
+             iput,       { file put operator }
+             ilodafbuf,  { load address of file buffer variable }
+             ilodafbuft, { load address of text file buffer variable }
+             ireset,     { file reset operator }
+             irewrite,   { file rewrite operator }
+             iclose,     { file close operator }
+             ipack,      { pack operator }
+             iunpack,    { unpack operator }
+             ipaget,     { page operator }
+             iassign,    { name file operator }
+             ipos,       { position file operator }
+             idel,       { delete file operator }
+             ichg,       { change file operator }
+             istiint,    { store integer operator }
+             istisrl,    { store short real operator }
+             istirel,    { store real operator }
+             istichr,    { store character operator }
+             istibol,    { store boolean operator }
+             istiset,    { store set operator }
+             istisrc,    { store structured operator }
+             istigar,    { store general array }
+             istitgp,    { store tagged pointer }
+             istifint,   { store function result integer operator }
+             istiftgp,   { store function result tagged pointer operator }
+             istifsrl,   { store function result short real operator }
+             istifrel,   { store function result real operator }
+             istifchr,   { store function result character operator }
+             istifbol,   { store function result boolean operator }
+             inew,       { new operator }
+             idisp,      { dispose operator }
+             itag,       { tagfield constant operator }
+             iendtag,    { end of tagfields operator }
+             ipoptop,    { remove top stack operator }
+             ilabequ,    { 'goto' label equation point }
+             irngchk,    { range check }
+             inewgar,    { allocate general array }
+             idspgar,    { deallocate general array }
+             ihalt,      { halt program }
+             iendfil,    { end of file }
+             icvtrtsr,   { convert real to short real }
+             isetlin,    { set current line }
+             isetsrc);   { set current source file }
+   { errors }
+   errcod = (enull,        { no error }
+             efnfn,        { file not found }
+             enfmt,        { invalid numeric format }
+             erfmt,        { invalid real format }
+             edbr,         { digit beyond radix }
+             enovf,        { input numeric overflow }
+             eexpovf,      { exponent overflow }
+             emquo,        { quote expected }
+             echrrng,      { character value out of range }
+             eivsym,       { invalid symbol/character }
+             eifil,        { invalid file specification }
+             eioptp,       { invalid option position }
+             eterm,        { 'include' option must be alone on line }
+             eopt,         { invalid option }
+             ecmdsyn,      { command line syntax invalid }
+             eiovf,        { input line too long }
+             eefns,        { error file not specified }
+             ecmtfe,       { comment terminated by file end }
+             elpexp,       { '(' expected }
+             erpexp,       { ')' expected }
+             elbkexp,      { '[' expected }
+             erbkexp,      { ']' expected }
+             escnexp,      { ';' expected }
+             eperexp,      { '.' expected }
+             eequexp,      { '=' expected }
+             eclnexp,      { ':' expected }
+             ebcmexp,      { ':=' expected }
+             erngexp,      { '..' expected }
+             empexp,       { 'module'/'program' expected }
+             eprgexp,      { 'program' expected }
+             ebgnexp,      { 'begin' expected }
+             eendexp,      { 'end' expected }
+             ethnexp,      { 'then' expected }
+             eofexp,       { 'of' expected }
+             edoexp,       { 'do' expected }
+             eutlexp,      { 'until' expected }
+             etdtexp,      { 'to'/'downto' expected }
+             eidnexp,      { identifier expected }
+             eintexp,      { integer expected }
+             eilexp,       { integer/label expected }
+             eeofexp,      { end of file expected }
+             einvfact,     { invalid factor }
+             einvcst,      { invalid constant }
+             einvpob,      { invalid packed object }
+             edecor,       { declarations out of order }
+             erbcmexp,     { ']' or ',' expected }
+             erpcmexp,     { ')' or ',' expected }
+             ecncmexp,     { ':' or ',' expected }
+             escrpedexp,   { ';', ')' or 'end' expected }
+             etypexp,      { type expected }
+             ecstexp,      { constant expected }
+             eordexp,      { ordinal type expected }
+             erpscexp,     { ')' or ';' expected }
+             eprctyp,      { procedure should not have result type }
+             esccmexp,     { ';' or ',' expected }
+             emspell,      { 'x' assumed to be a misspelled 'y' }
+             eedscexp,     { 'end' or ';' expected }
+             eutscexp,     { 'until' or ';' expected }
+             eedutscelexp, { 'end', 'until' or ';' expected }
+             edocmexp,     { 'do' or ',' expected }
+             einvexp,      { invalid expression }
+             earrexp,      { 'array' expected }
+             einvfld,      { invalid field specification }
+             eofcnexp,     { 'of' or ':' expected }
+             einvblk,      { invalid declaration }
+             elpscexp,     { '(' or ';' expected }
+             elpsccnrpexp, { '(', ';', ':' or ')' expected }
+             einvgln,      { Invalid goto label number }
+             edupsym,      { Duplicate symbol }
+             esymnf,       { symbol not found }
+             esymnr,       { symbol defined but not referenced }
+             esymtyp,      { symbol not appropriate type }
+             etypcon,      { type invalid for context }
+             embschr,      { string must be single character }
+             etypcmp,      { types are not compatible }
+             einvsub,      { invalid subrange }
+             eneqalt,      { use of '><' alternative }
+             eleqalt,      { use of '=<' alternative }
+             egeqalt,      { use of '=>' alternative }
+             emcasv,       { missing variant case label }
+             edcasv,       { duplicated variant case label }
+             efilcom,      { file component not allowed }
+             elabdef,      { label aready defined }
+             elabndf,      { label not defined }
+             elabref,      { label not referenced }
+             evartex,      { variable type expected }
+             earrtex,      { array type expected }
+             erectex,      { record type expected }
+             eptrtex,      { pointer or file type expected }
+             ensftr,       { no such field this record }
+             eidxtyp,      { index not compatile with index type }
+             etmbbol,      { type must be boolean }
+             einvstb,      { invalid set builder element type }
+             etmbord,      { type must be ordinal }
+             ecmborc,      { case label must be ordinal constant }
+             evarmbl,      { variable must be local }
+             evarext,      { 'for' index variable cannot be external }
+             etmpar,       { too many parameters }
+             etlpar,       { too few parameters }
+             eparcmp,      { not compatible with parameter type }
+             evarcmp,      { variable parameter must be same type }
+             ewrtpar,      { parameter of write/writeln incorrect type }
+             efldpar,      { type of field width specification must be 
+                             integer }
+             efrcpar,      { type of fractional digits spec must be integer }
+             embfunc,      { must be function label }
+             embfnty,      { must be function or type label }
+             embproc,      { must be procedure label }
+             embtext,      { writeln may output to textfile only }
+             efldtxt,      { field specifications can only be applied to text
+                             file output }
+             efmbfp,       { file must be first parameter of write }
+             efilcmp,      { not compatible with output file }
+             efaslvl,      { assignment of result to function not current }
+             embroi,       { parameter must be real or integer }
+             embint,       { parameter must be integer }
+             embfil,       { parameter must be file }
+             embtxt,       { parameter must be text file }
+             embord,       { parameter must be ordinal }
+             embrl,        { parameter must be real }
+             embstr,       { parameter must be string type }
+             emnbtxt,      { parameter cannot be text file type }
+             ecmaexp,      { ',' expected }
+             erdpar,       { parameter of read/readln incorrect type }
+             embarr,       { parameter must be array }
+             embupk,       { parameter must be unpacked array }
+             embpk,        { parameter must be packed array }
+             embscmp,      { packed and unpacked arrays must have same 
+                             component type }
+             eidxcmp,      { starting index not compatible with unpacked array
+                             index type }
+             embptr,       { parameter must be pointer }
+             embrec,       { tagfield definition parameters can only be applied
+                             to variant records }
+             entagf,       { not a variant record }
+             ercvcmp,      { tagfield value not compatible with record variant 
+                             tagfield type }
+             ercvnf,       { no variant case found for specified tagfield }
+             embcst,       { parameter must be constant }
+             enfncr,       { function must have result type }
+             escncmp,      { set constructors do not match }
+             easscmp,      { type not assignment compatible }
+             enihdf,       { 'input' header file not defined }
+             enohdf,       { 'output' header file not defined }
+             ecascmp,      { case label not compatible with case selector }
+             evidexp,      { variable identifier expected }
+             eplicp,       { parameter list incomplete }
+             eapreal,      { fraction applicatable to real only }
+             efwddef,      { bad forward definition }
+             emfwddef,     { missing forward definition }
+             efwdnptr,     { forward referenced symbol not ref by pointer }
+             eslfref,      { invalid self reference }
+             enfncra,      { no function result given }
+             evarass,      { variable never assigned }
+             eforviu,      { 'for' variable in use }
+             efmbvar,      { parameter with file component must be passed VAR }
+             evarmbr,      { variable access must be record }
+             efwdmat,      { forwarded declaration does not match }
+             efwdpar,      { forwarded declaration should not have 
+                             parameters/result }
+             eparrep,      { repetition of parameter list not allowed }
+             eresrep,      { repetition of function result not allowed }
+             eardfwd,      { procedure/function already forwarded }
+             efwdndf,      { Forwarded procedure/function never defined }
+             etagvar,      { tagfield cannot appear as variable parameter }
+             epakvar,      { packed component cannot appear as variable param }
+             edivzer,      { divide by zero }
+             emodneg,      { modulo by negative }
+             earrbnd,      { array reference out of bounds }
+             elnlez,       { parameter of 'ln' less than or equal to zero }
+             esqrtneg,     { parameter of 'sqrt' negative }
+             erange,       { value out of range for type }
+             epupbnd,      { pack/unpack operation specs elements beyond 
+                             bounds }
+             eassrng,      { value out of range for destination of assignment }
+             elabblk,      { label must be defined in same block as declared }
+             egtolvl,      { goto target at invalid statement level }
+             elabrlv,      { goto label was referenced by lesser level }
+             elabext,      { label referenced external, but is not at level 1 }
+             epgmext,      { program cannot have exit section }
+             etmbboi,      { type must be boolean or integer }
+             ebolneg,      { cannot perform boolean operation on negative }
+             eoivspf,      { operation invalid on special file }
+             eprncon,      { parameter lists not congruous }
+             efnncon,      { function result not congruous }
+             eplslen,      { parameter list lengths not equal }
+             eviewth,      { view parameter threatened }
+             ealcgar,      { attempt to allocate general array }
+             embgar,       { parameter must be general array }
+             ecmedexp,     { ',' or 'end' expected }
+             efixth,       { fixed threatened }
+             estelen,      { structured constant length does not match type }
+             einvcse,      { invalid elements for constant structure }
+             estccmp,      { constant does not match structure }
+             ecasmat,      { no case match for selector }
+             etagord,      { tag type must be ordinal }
+             elvarexp,     { must be local variable }
+             eshrent,      { share must not have entry section }
+             eppsext,      { program, process or share cannot have exit sect }
+             euseukn,      { used module type is unknown }
+             eprgmat,      { program name does not match filename }
+             emodmat,      { module name does not match filename }
+             emoduse,      { server module is incorrect type for client }
+             eshrvar,      { variables not allowed in 'share' module }
+             emonptr,      { monitor procedure/function parameter is pointer }
+             emonvar,      { variables appear in monitor export section }
+             ecstopv,      { constant operation overflows }
+             eintovf,      { integer overflow }
+             ehfudf,       { undefined header file on block }
+             esfnprp,      { attempt to pass system func/proc as param }
+             ecasdup,      { case constant was duplicated }
+             efprcexp,     { 'procedure' or 'function' expected }
+             enfnctoo,     { no procedure or function exists to overload }
+             enfncmat,     { no function or procedure matches parameter }
+             embvarpar,    { parameter must be variable reference }
+             epfparov,     { procedure/function param cannot be overloaded }
+             einvovl,      { procedure/function overload is not unique enough }
+             efwdondf,     { Forwarded overload procedure/function never defined }
+             econovl,      { convergent overload parameter modes do not match }
+             epfpovl,      { procedure/function parameter must not be overloaded }
+             easprc,       { cannot assign function result to procedure }
+             edemlim,      { demo limit exceeded }
+             edempgm,      { demo version cannot compile non-program module }
+             edemmlf,      { Demo version cannot compile multiple files }
+             edeminc,      { demo version cannot have include files }
+             { system errors, * = available }
+             esflt1,       { system fault 1: Notify Moore/CAD }
+             esflt2,       { system fault 2: Notify Moore/CAD }
+             esflt3,       { system fault 3: Notify Moore/CAD }
+             esflt4,       { system fault 4: Notify Moore/CAD }
+             esflt5,       { system fault 5: Notify Moore/CAD }
+             esflt6,       { system fault 6: Notify Moore/CAD }
+             esflt7,       { system fault 7: Notify Moore/CAD }
+             esflt8,       { system fault 8: Notify Moore/CAD }
+             esflt9,       { system fault 9: Notify Moore/CAD }
+             esflt10,      { system fault 10: Notify Moore/CAD }
+             esflt11,      { system fault 11: Notify Moore/CAD }
+             esflt12,      { system fault 12: Notify Moore/CAD }
+             esflt13,      { system fault 13: Notify Moore/CAD }
+             esflt14,      { system fault 14: Notify Moore/CAD }
+             esflt15,      { system fault 15: Notify Moore/CAD }
+             esflt16,      { system fault 16: Notify Moore/CAD }
+             esflt17,      { system fault 17: Notify Moore/CAD }
+             esflt18,      { system fault 18: Notify Moore/CAD }
+             esflt19,      { system fault 19: Notify Moore/CAD }
+             esflt20,      { system fault 20: Notify Moore/CAD }
+             esflt21,      { system fault 21: Notify Moore/CAD }
+             esflt22,      { system fault 22: Notify Moore/CAD }
+             esflt23,      { system fault 23: Notify Moore/CAD }
+             esflt24,      { system fault 24: Notify Moore/CAD }
+             esflt25,      { system fault 25: Notify Moore/CAD }
+             esflt26,      { system fault 26: Notify Moore/CAD }
+             esflt27,      { system fault 27: Notify Moore/CAD }
+             esflt28,      { system fault 28: Notify Moore/CAD }
+             esflt29,      { system fault 29: Notify Moore/CAD }
+             esflt30,      { system fault 30: Notify Moore/CAD }
+             esflt31,      { system fault 31: Notify Moore/CAD }
+             esflt32,      { system fault 32: Notify Moore/CAD }
+             esflt33,      { system fault 33: Notify Moore/CAD }
+             esflt34,      { system fault 34: Notify Moore/CAD }
+             esflt35,      { system fault 35: Notify Moore/CAD }
+             esflt36,      { system fault 35: Notify Moore/CAD }
+             esflt37);     { system fault 36: Notify Moore/CAD }
+
+begin
+end.

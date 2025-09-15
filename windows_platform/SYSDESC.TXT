@@ -1,0 +1,167 @@
+                        SYSTEM MODULE CONSTRUCTION
+
+OVERVIEW
+
+This file describes the layout and operation of the system dependent pascal
+support module.
+
+DESCRIPTION
+
+The system dependency module is linked before all other modules in a Pascal
+program link:
+
+   ln prog=syslib paslib mod1 mod2 .. cap [lib]
+
+When the system module is called or entered it performs any system setup as
+required. The stack and heap areas and pointers are set up, and the open files
+list cleared, and any other initalization performed. It then calls it's 
+neighbor module (allways to the right). When that module returns, it performs
+shutdown. This consists of closing all open files, performing any other
+cleanup, and exiting to the operating system.
+
+FILENAMES
+
+Filenames passed to the system module are in a system independent form. These
+must be translated to filenames and/or calls that are acceptable to the
+operating system. The format of a filename is:
+
+   name
+
+Any leading or trailing spaces are removed from the name. If the entire name is
+empty or consists of blanks only, the file is to be designated a "temporary".
+In this case, either a unique filename must be coined or other arrangements
+made with the operating system to create a nameless but unique file.
+To be OS independent, the name portion of filename must begin with the
+characters 'a'..'z' or '_'. It may continue with 'a'..'z', '0'..'9', or '_'.
+Case is not significant. If the operating system IS case sensitive, then all
+filenames will be translated to a standard case to defeat this.
+If a name begins with '_', it is a system name, and will allways have a special
+interpretation. Several special system names are defined:
+
+   _input   - Gives the standard input file as assigned by the operating
+              system.
+
+   _output  - Gives the standard output file as assigned by the operating
+              system.
+
+   _error   - Gives the standard error file as assigned by the operating
+              system, to be used to output error or operator attention
+              messages.
+
+   _list    - Gives the standard list file as assigned by the operating system,
+              to be used for output in hardcopy.
+
+   _command - Gives a file containing the standard startup line or lines for
+              the program, usually obtained from the command line.
+
+The special files as defined above should also receive special handling by the
+sytem module. It is an error to position, find the length of, or find the
+location in a special file. Also, multiple opens of the same special file
+should be equated to the same file, i.e., each reference should behave as
+the same file, reading and writing to the same place.
+If the name is a system name (has '_' prepended), and does not match any of the
+system names, it is termed a command parameter, and should be extracted from
+the command line or file.
+The command file is special. It is the "fileized" line returned by the 
+operating system for the command line, or a command file if there is no such
+line (for example in a graphical environment).
+
+SYSTEM DEPENDENT FILENAME ELEMENTS
+
+Each operating system may define further elements of the filename syntax that
+have special meaning to it. For example, filenames may commonly include a
+prefix that indicates the "path" of the file in the operating system's file
+storage structure. The system module typically will handle such filename
+extentions (for example, to check that the "ss_change" procedure will operate
+correctly).
+The USE of such filename extentions is very system dependent, and should be
+avioded. For the exact format of such names, the operating system manual should
+be consulted.
+
+ERRORS
+
+The system module implements it's own error handling by default. When any
+error occurs, the default behavior is to issue the message:
+
+   *** Error: System module: Xxxxx....x
+
+and exit to the operating system. The only recourse to these errors is to
+make sure that there are no errors in the filename formats and other procedures
+performed with the system module.
+
+FUNCTIONS
+
+The following functions are implemented in the system module:
+
+procedure ss_openread(var fn: filnum, view nm: string);
+
+   Open file for reading. Opens the file by the name given in the general
+   array, and returns the logical number of the file in the first parameter.
+   The file is positioned to the first byte, and set to read mode.
+
+procedure ss_openwrite(var fn: filnum, view nm: string);
+
+   Open file for writing. Opens the file by the name given in the general
+   array, and returns the logical number of the file in the first parameter.
+   The file is positioned to the first byte, and set to write mode.
+
+procedure ss_close(fn: filnum);
+
+   CLose file. Closes the file with the given logical file number.
+
+procedure ss_read(fn: filnum, var ba: bytarr);
+
+   Read from file. Reads the number of bytes in the destination array from the
+   file.
+
+procedure ss_write(fn: filnum, view bp: bytarr);
+
+   Write to file. Writes the number of bytes in the source array to the file.
+
+procedure ss_position(fn: filnum; p: integer);
+
+   Position file. Positions the file to the given byte, from 1 to N. The file
+   position allowed to be one element beyond the true end of the file, which
+   is 1 for an empty file.
+
+function ss_location(fn: filnum): integer;
+
+   Find file location. Returns the location within the given file, from 1-N.
+
+function ss_length(fn: filnum): integer;
+
+   Find file length. Returns the length of the given file, from 0-N.
+
+function ss_eof(fn: filnum): boolean;
+
+   Find eof status. Returns the eof status for the file.
+
+procedure ss_delete(view fn: string);
+
+   Delete file. The name is passed as a pointer to the filename characters, and
+   their length. The file by that name is deleted.
+
+procedure ss_change(view dn, sn: string);
+
+   Change filename. The names are passed by pointers to the filename characters,
+   and their lengths. The file with the source filename is changed to the
+   destination filename. The path specifications for the two files must match.
+
+function ss_exists(view nm: string);
+
+   Check file exists. Returns true if the given file exists.
+
+procedure ss_getspace(var bp: gbtptr; ln: integer);
+
+   Get dynamic space. The block is passed as a pointer to a pointer. The length
+   is the integer length of the required area. The space is allocated from the
+   heap, and that location placed to the indexed pointer.
+
+procedure ss_putspace(bp: gbtptr);
+
+   Release dynamic space. The block is passed as a pointer. The space in the
+   block is freed.
+
+procedure ss_wrterr(view es: string);
+
+   Print error message. Prints an error message directly to the console. This routine allows the printing of a message without having to open a console file.

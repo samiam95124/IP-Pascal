@@ -1,0 +1,464 @@
+                             USERS MANUAL FOR CH2PH
+
+OVERVIEW
+
+ch2ph translates C header files into Pascal header files. It generates two 
+products, the first being a translated .pas file, and the second being a
+.asm file with macro calls suitable to describe the functions found in 
+the header file, as well as the data structures and defines.
+
+FUNCTION
+
+The ch2ph program is executed as:
+
+ch2ph file[.ext] [options]
+
+The input files are:
+
+file.h or file.c
+file.ins
+
+The .c or .h file contains the C source header to be translated. The file .ins
+contains a series of special translation instructions.
+
+The output files are:
+
+file.pas
+file.asm
+
+#defines, typedefs, structs and function declarations are translated
+in the file. Data objects and functions are ignored, and do not appear
+in the output. This means, for example, that the contents of function
+bodies are completely skipped. However, ch2ph does evaluate these constructs
+completely, and will produce an error for non-ANSI constructs in data
+and function declarations. These generally should not appear in header
+files, and might have to be removed if they are non-standard.
+
+It is important to understand that ch2ph is not a complete compiler, and
+cannot evaluate the sematics of the program. Further, there are constructs
+in C that are not possible to map to Pascal, although these are rare.
+If the input contains an untranslatable sequence, it is up to the
+programmer to change the input source until it is acceptable for translation.
+Again, with most common C programs this should not be a problem.
+ch2ph will also accept constructs that are not valid C. ch2ph should not
+be input any file except a source that compiles with a standard C compiler,
+otherwise errors may result.
+
+Also important with ch2ph, the output file will major changes in appearance
+from the input file. It will be reordered. The comments are stripped, and the
+type heyarchy is completely flattened. It is not intended that the result file
+become the self documenting replacement for the original file. More typically,
+the original header and documents for it serve that purpose, with general rules
+for the converted file, and specific exceptions.
+The header file that results is not intended to be programmer readable. It is
+strictly an intermediate file to the IP Pascal compiler.
+
+TRANSLATION
+
+In the default mode (no options), translation of the file is fairly
+straightforward. The following simple type conversions apply:
+
+C type         Header anchor name        Pascal type
+===============================================================================
+char           c_lang_char               char
+signed char    c_lang_signed_char        -128..127
+unsigned char  c_lang_unsigned_char      0..255
+int            c_lang_int                integer
+signed int     c_lang_signed_int         integer
+unsigned int   c_lang_unsigned_int       integer
+short          c_lang_short_int          -32768..32767
+signed short   c_lang_signed_short_int   -32768..32767
+unsigned short c_lang_unsigned_short_int 0..65535
+long           c_lang_long_int           integer
+signed long    c_lang_signed_long_int    integer
+unsigned long  c_lang_unsigned_long_int  integer
+void           c_lang_void               integer
+function       c_lang_function           integer
+
+Note that IP Pascal has no unsigned integer type, so unsigned integers become
+standard integers. IP can process unsigned numbers using the + and - operators
+only, and can input them with overflow checking off, so this is less of a
+problem than it might appear.
+
+The types "c_lang_xx" are output at the start of the file, and serve as a general
+anchor point for the types used from C. These type names also protect the original
+definition of the types. For instance, "integer" can be redefined, but the type
+used for C equivalences will not change.
+
+All names created by ch2ph are prefixed by "c_lang_" which keeps them from
+colliding with names from the original program, but obviously is not a %100
+foolproof solution. 
+
+Pointers in default mode are allways translated literally. For example:
+
+char *s
+
+Becomes
+
+^char
+
+Even if a string is actually meant. In C, there are two major ambiguities
+in the use of pointers:
+
+1. On passed parameters, a pointer could be meant as an array, or as
+a pointed to item.
+
+2. On passed parameters, a pointer could indicate a parameter passed by
+reference and not value.
+
+The default mode "solves" this ambiguity by allways translating to the
+strict pointer definition. This produces compilable output, but is not
+necessarily the correct interpretation.
+
+In this version of ch2ph, there is no ability to handle the ANSI C extention
+of value passed structures. These will cause an error in ch2ph.
+
+COINING, TYPE HEYRARCHY FLATTENING
+
+C allows several items to go unnamed where Pascal does not permit that.
+Examples are:
+
+1. Parameters in functions (can have a type only).
+
+2. [Microsoft] structure field names.
+
+In addition, Pascal requires type names in places where C allows full types.
+Examples are:
+
+1. Pointer base types (^typeid).
+
+2. Function parameters.
+
+3. Function results.
+
+ch2ph "coins" a name for all of these situations. The format of a coined
+type is:
+
+c_lang_type_N
+
+Where "N" is replaced by an instance number. ch2ph keeps a running number
+of the type names that have been coined, starting with 1. Each time a type
+name is created, it gets that number as a postfix, and the instance count
+is incremented.
+
+ch2ph "flattens" all complex types. That is, for each type that uses another
+type as a building block, the subtype is given a name and declared as a type,
+then that is used in the original type. Examples are:
+
+1. Pointer types, base type is coined.
+
+2. Array types, base type is coined.
+
+3. Structure types, field types are coined.
+
+4. Function parameter types.
+
+5. Function result types.
+
+Where they exist, the original named types from the C file are used. If the
+C source has multiple names for the same type, then one of them is used, with
+the one picked arbitrarily.
+
+KEYWORD COINING
+
+C and Pascal obviously differ in keyword usage. If a C name is determined
+to be a keyword in Pascal, it is translated as:
+
+c_lang_key
+
+Such as
+
+c_lang_type
+
+UPPER CASE/LOWER CASE COINING
+
+C discriminates between upper and lower case, but Pascal does not. If there
+is no conflict between identifiers in the source after case considerations
+are removed, no action is taken. However, if there is a duplication, then
+the first occurance of a case sensitive identifier is "awarded" the caselss
+identifier, and all other definitions are coined to the form:
+
+c_lang_ident_N
+
+The "N" becomes the number of the duplication, for example, "2" is the
+second caseless id, "3" the third, etc. There is never a "1" version of
+the ID, because that is left at the original name.
+
+Because case name coining actually changes the name of an existing identifier,
+the listing ch2ph produces of such coined names becomes important, and the
+final user of the header system must refer to this list to come up with
+the proper name to use.
+
+STRUCT NAME COINING
+
+In C, the names for struct types are distinct from normal names, but in Pascal
+this is not so. Where struct names duplicate normal names, they are coined.
+
+UNION COINING
+
+C's union construct maps into undiscriminated variant records in Pascal. 
+However, Pascal requires a variant selector type, even if the tag does not
+actually occupy a field in the final record. This is handled by creating
+a tag type for the union which appears prior to the union definition. It
+is of the form:
+
+type c_lang_tag_N = 0..X-1;
+
+"N" becomes the sequential number of the type in the source. "X" is the maximum
+number of fields in the union.
+
+STRUCTURE FILL COINING
+
+In C, structure fields can be anonymous if their bit field is specified instead.
+These fields are coined as:
+
+c_lang_field_N
+
+Where "N" is the sequence number of the field within that structure.
+
+BITFIELD TYPING
+
+In C, a structure field can be specified to fit in any bitfield, subject to the
+rules of C (for example structure fields cannot be fielded). ch2ph further
+restricts fieldable types such that only integer or integer devrived types can
+be fielded. The result will be a subrange, bounded to zero, that indicates the
+same number of bits as the type. For example:
+
+struct a {
+
+    int a: 8;
+    
+}
+
+Will become
+
+type a = record
+
+   a: 0..255
+   
+end;
+
+An error will be output if the base type cannot contain the resulting subrange.
+Also note that this will not actually result in a field that occupies the
+specified number of bits unless the proper packing option for records is turned
+on.
+
+DEFINITIONS
+
+Definitions (produced with the "#define" command) can contain either constants
+used in the program or macros designed to perform manipulations on the source.
+Unfortunately, there is no perfect algorithim to determine how a macro will be
+used. For example, the original programmer could well have used a macro such
+as:
+
+#define NUM A5
+
+printf("NUM = %x\n", 0xNUM);
+
+To hide the exact syntax of a numeric constant. However, such uses are
+fortunately rare, and all that remains is to separate macros intended to be
+constants from macros intended to manipulate source.
+
+First, only the final defines are output. If an "#undef" command was used
+to remove the macro by the end of the source, it will not be considered.
+
+Second, only simple macros are translated. If a macro has parameters, it is
+automatically disincluded.
+
+Finally, each macro is evaluated as a constant expression (using the
+ANSI C constant-expression grammar). If an error free result is obtained
+(no syntax errors or other errors), then the constant value of the
+integer or string is used, and translated to the result.
+
+During the constant evaluation, all included macros are expanded, using all
+of the macros present at the end of the complete file, without regard
+for any changes during the processing of the heeader ("#undefs" for example).
+This accurately emulates how the macro would be seen by the program that
+included the header file.
+
+One consequence of the evaluation is that the formula for the constant is lost.
+Another is that all numeric constants are output as hex numbers regardless
+of their appearance in the source.
+
+VOIDS AND VOID POINTERS
+
+Voids are converted to c_lang_void, and a void pointer would be a pointer to that
+type. Void is defined to be integer by a special definition at the top of
+the output file, but allways builds on the _c_lang_void name. The reason for this
+is to make it clear what is a void pointer in the output file. Void types
+are clearly outside of the scope of Pascal translation, and as such are
+left to the instruction file to clean up.
+
+FUNCTION TYPES
+
+In C, a function is a type, and an actual function is an instantiation of that
+type. In C, functions cannot appear as data types, but pointers to functions
+can. ch2ph translates function types to integer, and pointers to functions
+then become pointers to integers. Because C does not allow functions as data,
+this will only result as pointers to integers in the output file. Since all
+function types appear as c_lang_function, they can be easily found (just as
+void types).
+Function types are not directly usefull, and the instruction file must deal
+with them. It is possible to make a routine that finds the address of a function
+and changes that to an integer using Pascal.
+
+ARRAYS
+
+When arrays are declared by formal syntax:
+
+int x[10]
+
+They are translated:
+
+x = array [0..10-1] of integer;
+
+If an array is declared with no bounds, then it becomes a pointer:
+
+int x[]
+
+becomes
+
+x = ^integer
+
+CONST PARAMETERS
+
+Parameters that are typed "const" will be typed "view" in the translated header.
+This makes little practical difference, however, since it mainly dictates what
+the rules are within functions and procedures, not how they are called.
+
+TYPE COMPRESSION
+
+Because Pascal has more strict type equivalence than C, a "compression" phase
+is performed on the complete type database. This consists of merging duplicate
+typing trees and pruning the resulting redunant type nodes. The names of types
+are moved to the cooresponding types as well, which may result in several
+type names indexing the same type (allowed in Pascal). The result is that for
+any types which are equivalent will end up being the same type.
+
+OUTPUT REPORTS
+
+ch2ph outputs several reports into the output source file. These reports are
+designed to tell you about potential interpretation problems with the file.
+
+COINING REPORTS
+
+In the coining reports, symbols are output in the form:
+
+name -> coinname_N
+
+Where N is the instance number. These reports only include symbols that are used
+in the file, and have been renamed. These reports will need to be given to users
+of the header to find out where coined names ended up.
+
+UNRESOLVABLE MACRO REPORTS
+
+When a macro #define does not yeild a valid number or string, it is output in
+the unresolved report. Typically those macros contain special "tricks" that
+yield valid C in a C compiler, but have no interpretation in Pascal.
+Empty defines, which are common in C and are used as flags, are not included in
+the report, even though they have no valid value.
+
+The unresolved macro report should be made available to the user of the header.
+
+REPORTING OPTIONS
+
+-ld or -listdefines
+
+Prints a listing of all definitions that appear in the source. Definitions that
+were removed with "#undef" do not appear. Each definition is output in the
+form:
+
+name instance value
+   param param param....
+
+The name is the name of the definition. The instance is the number of caseless
+duplicates that have appeared before, and will be the number that appears
+in a caseless coin. The value is the replacement string value.
+On the next line, indented, each parameter declared in the macro appears.
+
+-ls or -listsymbols
+
+Dumps all symbols used in the file.
+
+-lt or -listtypes
+
+Dumps all types used in the file.
+
+TRANSLATION OPTIONS
+
+Although the instruction file is what mainly drives the translation, there are
+one or two options that dramatically improve the output and reduce the need
+for translation instructions.
+
+-pp or -pointerparameter
+
+With this option, parameters that are declared of the form:
+
+type *...
+
+(where the "*" pointer declaration directly appears in the parameter definition)
+are turned in two VAR or VIEW parameters (depending on their "const" status).
+Only the first "*" in the definition is used. For example:
+
+int **x
+
+Becomes
+
+var x: ^integer
+
+(in this case, ^integer is invalid, and would be subject to parameter type
+coining as described above).
+
+This translation is applied AFTER char string coining, if enabled.
+
+-sp or -stringpointer
+
+In parameter types, turns any:
+
+char *
+
+Into
+
+packed array of char
+
+This rule works regardless of if the type appears directly in the parameter
+definition or is a named type. Unlike pointer parameter conversion, it does
+not work on more complex types, for example:
+
+char **s
+
+Will not be translated.
+
+String conversion tends to convert simple string calls into their correct
+form. The main problem with it is that any calls where the desired result
+is really a single character pointer will be changed. This can be overridden
+with instructions.
+
+.ASM HEADER FILE
+
+Besides the translated .pas header file, ch2ph also outputs an assembly language
+file that gives instructions for how to translate Pascal calls into the C system
+calls needed to interface to the operating system. This is done in a processor
+neutral way, however, that relies on assembly language macros to perform the
+convertion. The basic layout of the macro call is:
+
+ptoc   result, param1, param2, ... paramN
+
+Each parameter is a keyword that indicates two things:
+
+1. Its presense indicates a parameter exists, and so the whole parameter count
+is indicated.
+
+2. Each keyword indicates what conversion, if any, is to be performed on the
+parameter, either before the call, after the call, or both.
+
+The result keyword tells what happens with any function result. If no function
+result is present (a procedure) the code "null" is used.
+
+PARAMETER CODES
+
+The following parameter keywords exist, with their meanings:
+
+
+
+

@@ -1,0 +1,148 @@
+
+Compiler intermediate file dumper vs. 1.13.051 Copyright (C) 1994 S. A. Moore
+
+Dump of intermediate file: test.int
+
+Filename   Line  Intc   lvl Code/Source
+---------------------------------------
+               0      1  0: setsrc     Set current source file: 'C:\projects\PASCOMP\test\test.pas'
+               0      2  0: setlin     Set current line: 1
+               0      3  0: bgnlvl     Begin block, mark: (1,4)
+               0      4  1:  extmod     Module definition, module name: 'test' file: 'C:\projects\PASCOMP\test\test.pas'
+               0      5  1:  sym        Symbol: 'char' type: (1,12) export: false
+               0      6  1:  sym        Symbol: 'real' type: (1,14) export: false
+               0      7  1:  sym        Symbol: 'test' type: (1,71) export: false
+               0      8  1:  sym        Symbol: 'true' type: (1,7) export: false
+               0      9  1:  sym        Symbol: 'text' type: (1,15) export: false
+               0     10  1:  sym        Symbol: 'false' type: (1,6) export: false
+               0     11  1:  sym        Symbol: 'sreal' type: (1,16) export: false
+               0     12  1:  sym        Symbol: 'maxcrd' type: (1,19) export: false
+               0     13  1:  sym        Symbol: 'maxchr' type: (1,13) export: false
+               0     14  1:  sym        Symbol: 'maxint' type: (1,17) export: false
+               0     15  1:  sym        Symbol: 'boolean' type: (1,5) export: false
+               0     16  1:  sym        Symbol: 'maxlcrd' type: (1,20) export: false
+               0     17  1:  sym        Symbol: 'integer' type: (1,8) export: false
+               0     18  1:  sym        Symbol: 'maxlint' type: (1,18) export: false
+               0     19  1:  sym        Symbol: '_system' type: (1,4) export: false
+               0     20  1:  sym        Symbol: 'cardinal' type: (1,10) export: false
+               0     21  1:  sym        Symbol: 'linteger' type: (1,9) export: false
+               0     22  1:  sym        Symbol: 'lcardinal' type: (1,11) export: false
+               0     23  1:  sym        Symbol: 'semaphore' type: (1,21) export: false
+               0     24  1:  sym        Symbol: 'exception' type: (1,22) export: false
+               0     25  1:  nil        ( 1,  1) 'nil' universal pointer type
+               0     27  1:  eset       ( 1,  3) Empty set type
+               0     28  1:  glbl       ( 1,  4) Global mark, type: System
+               0     29  1:  boolean    ( 1,  5) Boolean type, enumerated constants: (1,6)
+               0     30  1:  enme       ( 1,  6) Enumerated constant type, next entry: (1,7) head: (1,5) value: 0
+               0     31  1:  enme       ( 1,  7) Enumerated constant type, next entry: (0,0) head: (1,5) value: 1
+               0     32  1:  int        ( 1,  8) Integer type
+               0     33  1:  lint       ( 1,  9) long Integer type
+               0     34  1:  card       ( 1, 10) cardinal type
+               0     35  1:  lcard      ( 1, 11) long cardinal type
+               0     36  1:  char       ( 1, 12) Character type
+               0     37  1:  icst       ( 1, 13) Integer constant type, value: 255
+               0     38  1:  real       ( 1, 14) Real type
+               0     39  1:  text       ( 1, 15) Text file type
+               0     40  1:  sreal      ( 1, 16) Short real type
+               0     41  1:  icst       ( 1, 17) Integer constant type, value: 2147483647
+               0     42  1:  icst       ( 1, 18) Integer constant type, value: 2147483647
+               0     43  1:  icst       ( 1, 19) Integer constant type, value: 2147483647
+               0     44  1:  icst       ( 1, 20) Integer constant type, value: 2147483647
+               0     45  1:  semaphore  ( 1, 21) Semaphore type
+               0     46  1:  exception  ( 1, 22) Exception type
+               0     95  1:  glbl       ( 1, 71) Global mark, type: Program
+               0     96  1:  setlin     Set current line: 2
+               0     97  1:  setlin     Set current line: 3
+               0     98  1:  bgnlvl     Begin block, mark: (1,71)
+               0     99  2:   setlin     Set current line: 4
+               0    100  2:   setlin     Set current line: 5
+               0    101  2:   setlin     Set current line: 6
+               0    102  2:   var        ( 2,  1) Variable type, base: (1,15) external: false module ordinal number: 0 class type: (0,0)
+               0    103  2:   scst       ( 2,  2) String constant type, value: '_output'
+               0    104  2:   var        ( 2,  3) Variable type, base: (1,9) external: false module ordinal number: 0 class type: (0,0)
+               0    105  2:   var        ( 2,  4) Variable type, base: (1,8) external: false module ordinal number: 0 class type: (0,0)
+               0    106  2:   sym        Symbol: 'x' type: (2,4) export: true
+               0    107  2:   sym        Symbol: 'li' type: (2,3) export: true
+               0    108  2:   sym        Symbol: 'output' type: (2,1) export: false
+               0    109  2:   bgnpgm     Program/procedure/function code block
+               0    110  2:    lodadr     Load address operator, type: (2,1)
+               0    111  2:    lodadr     Load address operator, type: (2,2)
+               0    112  2:    cvtftg     Convert fixed pointer to tagged, fixed type: (2,2)
+               0    113  2:    assign     Assign file operator
+               0    114  2:    lodadr     Load address operator, type: (2,1)
+               0    115  2:    rewrite    File rewrite operator, file type: (2,1)
+               0    116  2:    setlin     Set current line: 7
+               0    117  2:    setlin     Set current line: 8
+               0    118  2:    bgnblk     begin statement block operator
+               0    119  2:     lodadr     Load address operator, type: (2,3)
+               0    120  2:     limint     Load immediate integer operator, value: 2147483647
+               0    121  2:     stiint     Store indirect integer operator, variable type: (1,9)
+               0    122  2:     setlin     Set current line: 9
+               0    123  2:     lodadr     Load address operator, type: (2,4)
+               0    124  2:     limint     Load immediate integer operator, value: 0
+               0    125  2:     stiint     Store indirect integer operator, variable type: (1,8)
+               0    126  2:     setlin     Set current line: 10
+               0    127  2:     whlexp     While expression marker operator
+               0    128  2:     lodadr     Load address operator, type: (2,3)
+               0    129  2:     ldiint     Load indirect integer operator, type: (1,9)
+               0    130  2:     limint     Load immediate integer operator, value: 0
+               0    131  2:     gtnint     Integer greater than operator
+               0    132  2:     whlbgn     While begin operator
+               0    133  2:      setlin     Set current line: 11
+               0    134  2:      setlin     Set current line: 12
+               0    135  2:      bgnblk     begin statement block operator
+               0    136  2:       icst       ( 2,  5) Integer constant type, value: 0
+               0    137  2:       icst       ( 2,  6) Integer constant type, value: 0
+               0    138  2:       scst       ( 2,  7) String constant type, value: 'li: '
+               0    139  2:       lodadr     Load address operator, type: (2,7)
+               0    140  2:       lodadr     Load address operator, type: (2,1)
+               0    141  2:       swptop     Swap top and second stack operator, source: (2,7) destination: (1,15)
+               0    142  2:       wrtstrt    Write text string operator, type: (2,7)
+               0    143  2:       lodadr     Load address operator, type: (2,3)
+               0    144  2:       ldiint     Load indirect integer operator, type: (1,9)
+               0    145  2:       limint     Load immediate integer operator, value: 1
+               0    146  2:       wrtintft   Write text integer fielded operator
+               0    147  2:       wrteolt    Write text end of line
+               0    148  2:       poptop     Remove top of stack, operand: (2,1)
+               0    149  2:       setlin     Set current line: 13
+               0    150  2:       lodadr     Load address operator, type: (2,3)
+               0    151  2:       lodadr     Load address operator, type: (2,3)
+               0    152  2:       ldiint     Load indirect integer operator, type: (1,9)
+               0    153  2:       limint     Load immediate integer operator, value: 2
+               0    154  2:       divint     Divide integer operator
+               0    155  2:       stiint     Store indirect integer operator, variable type: (1,9)
+               0    156  2:       setlin     Set current line: 14
+               0    157  2:       lodadr     Load address operator, type: (2,4)
+               0    158  2:       lodadr     Load address operator, type: (2,4)
+               0    159  2:       ldiint     Load indirect integer operator, type: (1,8)
+               0    160  2:       setlin     Set current line: 15
+               0    161  2:       setlin     Set current line: 16
+               0    162  2:       limint     Load immediate integer operator, value: 1
+               0    163  2:       addint     Add integer operator
+               0    164  2:       stiint     Store indirect integer operator, variable type: (1,8)
+               0    165  2:      endblk     end statement block operator
+               0    166  2:     whlend     While end operator
+               0    167  2:     setlin     Set current line: 17
+               0    168  2:     icst       ( 2,  8) Integer constant type, value: 1
+               0    169  2:     icst       ( 2,  9) Integer constant type, value: 2
+               0    170  2:     icst       ( 2, 10) Integer constant type, value: 1
+               0    171  2:     scst       ( 2, 11) String constant type, value: 'Bit length of long integer without sign appears to be: '
+               0    172  2:     lodadr     Load address operator, type: (2,11)
+               0    173  2:     lodadr     Load address operator, type: (2,1)
+               0    174  2:     swptop     Swap top and second stack operator, source: (2,11) destination: (1,15)
+               0    175  2:     wrtstrt    Write text string operator, type: (2,11)
+               0    176  2:     lodadr     Load address operator, type: (2,4)
+               0    177  2:     ldiint     Load indirect integer operator, type: (1,8)
+               0    178  2:     limint     Load immediate integer operator, value: 1
+               0    179  2:     wrtintft   Write text integer fielded operator
+               0    180  2:     setlin     Set current line: 18
+               0    181  2:     setlin     Set current line: 19
+               0    182  2:     wrteolt    Write text end of line
+               0    183  2:     poptop     Remove top of stack, operand: (2,1)
+               0    184  2:    endblk     end statement block operator
+               0    185  2:   endpgm     Program/procedure/function code block end
+               0    186  2:  endlvl     End block
+               0    187  1:  setsrc     Set current source file: ''
+               0    188  1: endlvl     End block
+               0    189  0: endfil     
+Function complete

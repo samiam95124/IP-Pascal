@@ -1,0 +1,18 @@
+1. gendoiir was changed to add signed operation mode. This routine is used in
+several places, for example bounds checking, and the correctness of each use
+must be checked.
+
+2. Genmltir was changed to add signed operation mode. This routine is used in
+several places, check for new mode usage.
+
+3. In conflg, the comments mention that a store might use an instruction that
+only uses the lowest bit of the destination. This seems cross purposes for
+value range checking, and I believe that letting the other bits be set would
+cause an error with a value checked store. The answer would seem to be to
+always clear the result completely when value range checking is on.
+
+4. What is the difference between conflg and genflg2bol? How are they used?
+Note that flag to register code appears in line yet again in restran.
+
+5. Why does restran feature code to exhange a doublet with itself? Aren't
+double operands allocated to specific register pairs?

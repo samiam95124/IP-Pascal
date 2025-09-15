@@ -1,0 +1,40 @@
+###############################################################################
+#                                                                             #
+# Make parser module                                                          #
+#                                                                             #
+# The parser has a very even dependancy graph. Each primitive module is used  #
+# in all the modules upstairs. Of course, ideally, each module would          #
+# reference only the module below it (encapsulisation), and in fact, this is  #
+# mostly true in practice. But as in nature, the occasional deeper reference  #
+# is required.                                                                #
+#                                                                             #
+###############################################################################
+
+parse.exe: parsedef.j common.j basicio.j parserot.j scanner.j symbol.j parser.j parse.pas
+   svs +d +r -stack 200k parse.j parser.j scanner.j symbol.j parserot.j basicio.j -o parse
+   copy parse.exe ..
+        
+parsedef.j: parsedef.pas
+   svs -S +d +r parsedef.pas
+
+common.j:   common.pas   parsedef.j
+   svs -S +d +r common.pas
+
+basicio.j:  basicio.pas  parsedef.j common.j
+   svs -S +d +r basicio.pas
+
+parserot.j: parserot.pas parsedef.j common.j basicio.j
+   svs -S +d +r parserot.pas
+
+scanner.j:  scanner.pas  parsedef.j common.j basicio.j parserot.j
+   svs -S +d +r scanner.pas
+
+symbol.j:   symbol.pas   parsedef.j common.j basicio.j parserot.j scanner.j
+   svs -S +d +r symbol.pas
+
+parser.j:   parser.pas   parsedef.j common.j basicio.j parserot.j scanner.j symbol.j
+   svs -S +d +r parser.pas
+
+parse.j:    parse.pas    parsedef.j common.j basicio.j parserot.j scanner.j symbol.j parser.j
+   svs -S +d +r parse.pas
+

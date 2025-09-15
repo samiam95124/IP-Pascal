@@ -1,0 +1,2 @@
+cp parse.exe /mnt/windrv/ip/windows/i80386/bin
+cp parse /mnt/windrv/ip/linux/i80386/bin

@@ -1,0 +1,123 @@
+         11111111112222222222333333333344444444445555555555666666666677777777778
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+                         THE NEW MODULAR METHOD
+
+Overview
+--------
+
+The new modular method solves several outstanding issues with the modular method
+in IP Pascal. These were:
+
+1. Isolation. Several modules used "coins", or prefixes, to make sure that they
+don't conflict with user names. Examples include "sc_" and "ps_" for the syslib
+and paslib modules, respectively.
+
+2. "Zipper effect". Because modules need the support of other modules, those
+lower modules would get pulled in by the used modules, and so forth. The result
+is that an innocent module gets a lot of unrelated support module definitions
+that it may not even need.
+
+3. "loop locking". This is the effect where two mutual referencing modules lock
+out each others definitions. For example, mod a uses mod b, which again uses
+mod a. If mod a is parsed, it effectively suspends processing a to read b,
+which cannot get the definitions from a, since it is suspended.
+
+Previous method
+---------------
+
+The previous module method was based on the properties of the symbol table. 
+Symbols are placed in lists according to a hash header, and trailed out from the
+header. Each symbol has a level number it is associated with, and these levels
+appear in the symbol table with the lowest level at the back, and the highest
+level at the front. This means that global searches, searches of symbols in all
+nesting of blocks, are found by looking through the symbols lists regardless of
+the level number. Local searches, searchs of just the current block, search only
+while the level number matches the current level, and stop when that is not
+found.
+
+The levels divided into:
+
+0: system definitions (like "text", "integer", etc.).
+1: module definitions
+2-N: procedure/function definitions.
+
+The current module, as well as all used modules, reside in the module level.
+The definitions for the module being compiled, as well as the modules being 
+used, are placed into the same level. This works because IP Pascal requires all
+used modules to have distinct names. Where necessary, external flags are placed,
+in procedure, function, variable and fixed entries. Otherwise, there is no
+difference between a locally defined symbol and a used module one.
+
+New method
+----------
+
+The new method separates symbol tables up by module. The same hash headers are
+used, but they are encapsulated within modtrk records. Searches travel down 
+symbols chains, but "leap" the gap between modules. This is done by keeping the
+same hash index, then simply skipping to the next module when the end of the
+chain is reached. Levels can span module blocks, and in fact this must occur by
+definition, because all uses modules are resident in the same level 1.
+
+There are a few rules that make a series of linked modules not the same as the
+old unified symbols list:
+
+1. Delayed defintions never cross module boundaries.
+
+2. Overloads never cross module boundaries.
+
+This allows certain routines to only address the current module when, say, 
+ripping a symbols list out of the table.
+
+The main idea of the new module blocks system is that it allows a list of uses
+blocks to be assembled to process a particular module, then rearranged for the
+next. In this way, a used module gets only the visibility of modules it
+specifically asks for in its uses list.
+
+Because of the rearrangement requirement, there are  mltety records that exist
+only to make flexible lists of modules. They are created and distroyed as needed
+to create a specific list for a particular module. There are two stacks that
+contain the current module lists, the uselst and joinlst. The uselst is the main
+entity we refer to in the program parse, and it replaces the old unified symbols
+table.
+
+When a module is read in, it is created at the top of the logical modules stack.
+Then its definitions are filled out, and it may be removed and inserted into
+other modules at will.
+
+A module starts by creating a new module entry, and creating a new list entry
+it and pushing that onto the uses stack. This will create a uselst consisting of
+the system module, with the new module ontop of it.
+
+When the new module processes a uses or joins, it removes itself from the top of
+the uselst, then the paruses routine is called. For each module to be used or
+joined, both a new module entry is created, and a new list entry stacked to
+the uselst. This will create a series of modules stacked onto the uselst, in
+order of their appearance in the uses list. If the module is in the joins list,
+the only difference is that the module is moved from the top of the uses list to
+the top of the joins list, and all of the modules in its uses list are removed
+from uselst.
+
+When a module process is complete, it will have the following arrangement on
+uselst:
+
+1. system module.
+2. Uses modules.
+3. Current module.
+
+This means that it will virtually have the same symbols table as the old system,
+except that it is divided up into modules.
+
+MODULE REUSE
+
+Because a given module can come and go, as it is referenced by submodules, we
+have a system to remove and reinsert such modules into the uses list. When it
+needs to be removed, it is simply delinked, and the list entry discarded. This
+is because the module entry still exists, only the list reference to it is
+discarded.
+
+When a module is reinserted to the uses list, a new list entry record is created
+for it, and it is inserted. Then, it is checked for conflicts with the existing
+uses list. This consists of checking for duplicates in the entire uses deck. 
+This process is time consuming, but it can be reduced by keeping track of what
+modules were checked with what others, and not performing this work again.

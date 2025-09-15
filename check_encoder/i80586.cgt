@@ -1,0 +1,100 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                                             !
+!                     I80586 CODE GENERATOR TABLE FILE                        !
+!                                                                             !
+!                           12/96 S. A. Moore                                 !
+!                                                                             !
+! Contains the generator articles for Intel 80586 processors.                 !
+! An article file is a series of "articles" or sections of processor specific !
+! code needed to get a job done. As an article is called for, the check       !
+! encoder substitutes parameters within the article, then outputs the article !
+! as final code.                                                              !
+! In the short term, an article file reduces the complexity and work in the   !
+! check encoder, since instruction formatting is left to the assembler.       !
+! In the long term, this file should expand to contain all of the processor   !
+! specific data. Then, an article file will be all that is required to        !
+! quickly adapt to a new processor.                                           !
+! The format of an article is:                                                !
+!                                                                             !
+!   <header>                                                                  !
+!   <code>                                                                    !
+!                                                                             !
+! The header contains all of the customization parameters. The code is simply !
+! the bytes that make up the article code.                                    !
+! The format of an article header is:                                         !
+!                                                                             !
+!   <article code byte>                                                       !
+!   <article code length>                                                     !
+!   <insertion entry 1>                                                       !
+!   <insertion entry 2>                                                       !
+!   ...                                                                       !
+!   <insertion entry N>                                                       !
+!   0                                                                         !
+!                                                                             !
+! All articles are assigned a code in the range 1..255. The article code      !
+! tells which article is being supplied. Articles may appear in any order.    !
+! At the present stage, we consider it an error if an article is missing from !
+! the file, but this may be used at a later time to allow special functions   !
+! not present on all implementations.                                         !
+! The article code length is simply the number of bytes in the code section.  !
+! Insertion entries have the form:                                            !
+!                                                                             !
+!   <type>                                                                    !
+!   <mode>                                                                    !
+!   <offset>                                                                  !
+!                                                                             !
+! The type tells what is to be inserted. There are 1..255 possible insertion  !
+! The mode gives the number of bytes affected. The high bit of the mode is    !
+! set if the insertion is to be little endian, otherwise it is clear.         !
+! types. The offset gives the number of bytes from the start of article code  !
+! until the insertion point.                                                  !
+! You'll notice that in this file, I formulate the offsets counting from the  !
+! BACK end of the target instruction. This is because on this processor, data !
+! allways appears at the END of the instruction. This means that I don't have !
+! to worry about the exact number of opcode or mode bytes before the data.    !
+!                                                                             !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+hold:   equ     0                       ! place holder for insertions
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+! Place current frame on stack, and set new frame from esp
+!
+        defb    atplcfrm                ! place stack frame
+        defd    plcfrm_end-plcfrm_bgn   ! set length of article
+        defb    0                       ! end
+!
+plcfrm_bgn:
+        link    0,0
+plcfrm_end:
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+! Perform procedure or function activation
+!
+        defb    atprcact                ! activate procedure
+        defd    prcat_end-prcat_bgn     ! set length of article
+        defb    itlocsiz                ! insert locals length
+        defd    prcat01-4-prcat_bgn
+        defb    itlocsiz                ! insert locals length
+        defd    prcat02-4-prcat_bgn
+        defb    0                       ! end
+!
+prcat_bgn:
+        sub     esp,hold                ! allocate locals
+prcat01:
+!
+! Clear local area to all zeros. This is mainly done to allow files to work
+! in a local area, but also helps during debug.
+!
+        mov     edi,esp                 ! index locals
+        mov     esi,edi                 ! copy that
+        inc     edi                     ! index the next location
+        movb    [esi],hold              ! place initial zero
+        mov     ecx,0                   ! get size of space
+prcat02:
+        dec     ecx                     ! decrement to account for 1st
+        repnz                           ! copy zeros
+        movsb
+prcat_end:

@@ -1,0 +1,48 @@
+@echo off
+rem
+rem Compile parser
+rem
+
+rem del parse.exe
+rem del parse
+
+rem
+rem Check single module specified
+rem
+
+if "%1"=="" goto all
+
+rem
+rem Compile specific module
+rem
+
+parse %1=%1 #u=.,\ip\lib
+ce %1=%1
+goto link
+
+rem
+rem Compile all modules
+rem
+
+:all
+parse common=common #u=.,\ip\windows\i80386\lib
+parse parserot=parserot #u=.,\ip\windows\i80386\lib
+parse scanner=scanner #u=.,\ip\windows\i80386\lib
+parse symbol=symbol #u=.,\ip\windows\i80386\lib
+parse parser=parser #u=.,\ip\windows\i80386\lib
+parse parse=parse #u=.,\ip\windows\i80386\lib
+ce common=common
+ce parserot=parserot
+ce scanner=scanner
+ce symbol=symbol
+ce parser=parser
+ce parse=parse
+
+rem
+rem perform link for windows
+rem
+
+:link
+ln runfile=c:\ip\windows\i80386\lib\serlib c:\ip\windows\i80386\lib\strlib c:\ip\windows\i80386\lib\extlib common parserot scanner symbol parser parse c:\ip\windows\i80386\lib\cap
+genpe parse=runfile c:\windows\system\kernel32 c:\windows\system\user32 c:\windows\system\gdi32 c:\windows\system\winmm/v
+del runfile.*

@@ -1,0 +1,6597 @@
+Pascal parser vs. 1.13.05 Copyright (C) 2005 S. A. Moore
+Processing: C:\projects\PASCOMP\pparse\test.pas
+wrttyp: begin
+wrttyp: t:           1
+wrttyp: t:           0
+wrttyp: t:          40
+wrttyp: t:          42
+wrttyp: t:          36
+wrttyp: t:          14
+wrttyp: t:          14
+wrttyp: t:          35
+wrttyp: t:          34
+wrttyp: t:          37
+wrttyp: t:          39
+wrttyp: t:          38
+wrttyp: t:           3
+wrttyp: s: false 2147483647
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          28
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          27
+wrttyp: t:          42
+wrttyp: end
+Processing: c:\ip\windows\i80386\lib\stddef.pas
+Processing: c:\ip\windows\i80386\lib\windows.pas
+
+Types for level: 3
+
+
+Name:  sc_getstdhandle
+Depth: 2
+
+hdlrc         0 [loomlist]2713
+
+Types for level: 3
+
+
+Name:  sc__lopen
+Depth: 2
+
+name          0 [loomlist]2715
+mode          0 [loomlist]2716
+
+Types for level: 3
+
+
+Name:  sc__lcreat
+Depth: 2
+
+name          0 [loomlist]2718
+mode          0 [loomlist]2719
+
+Types for level: 3
+
+
+Name:  sc__lclose
+Depth: 2
+
+hdl           0 [loomlist]2721
+
+Types for level: 3
+
+
+Name:  sc__lread
+Depth: 2
+
+hdl           0 [loomlist]2723
+ba            0 [loomlist]2724
+
+Types for level: 3
+
+
+Name:  sc__lwrite
+Depth: 2
+
+hdl           0 [loomlist]2726
+ba            0 [loomlist]2727
+
+Types for level: 3
+
+
+Name:  sc__llseek
+Depth: 2
+
+org           0 [loomlist]2731
+off           0 [loomlist]2730
+hdl           0 [loomlist]2729
+
+Types for level: 3
+
+
+Name:  sc_getfilesize
+Depth: 2
+
+ups           0 [loomlist]2734
+hdl           0 [loomlist]2733
+
+Types for level: 3
+
+
+Name:  sc_deletefile
+Depth: 2
+
+name          0 [loomlist]2736
+
+Types for level: 3
+
+
+Name:  sc_movefile
+Depth: 2
+
+sn            0 [loomlist]2738
+dn            0 [loomlist]2739
+
+Types for level: 3
+
+
+Name:  sc_globalalloc
+Depth: 2
+
+len           0 [loomlist]2742
+flg           0 [loomlist]2741
+
+Types for level: 3
+
+
+Name:  sc_globalfree
+Depth: 2
+
+bp            0 [loomlist]2744
+
+Types for level: 3
+
+
+Name:  sc_getcommandline
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_findfirstfile
+Depth: 2
+
+name          0 [loomlist]2747
+data          0 [loomlist]2748
+
+Types for level: 3
+
+
+Name:  sc_findnextfile
+Depth: 2
+
+hdl           0 [loomlist]2750
+data          0 [loomlist]2751
+
+Types for level: 3
+
+
+Name:  sc_findclose
+Depth: 2
+
+hdl           0 [loomlist]2753
+
+Types for level: 3
+
+
+Name:  sc_filetimetosystemtime
+Depth: 2
+
+st            0 [loomlist]2756
+ft            0 [loomlist]2755
+
+Types for level: 3
+
+
+Name:  sc_systemtimetofiletime
+Depth: 2
+
+st            0 [loomlist]2758
+ft            0 [loomlist]2759
+
+Types for level: 3
+
+
+Name:  sc_filetimetodosdatetime
+Depth: 2
+
+time          0 [loomlist]2763
+ft            0 [loomlist]2761
+date          0 [loomlist]2762
+
+Types for level: 3
+
+
+Name:  sc_getsystemtime
+Depth: 2
+
+st            0 [loomlist]2765
+
+Types for level: 3
+
+
+Name:  sc_gettickcount
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_getlocaltime
+Depth: 2
+
+st            0 [loomlist]2768
+
+Types for level: 3
+
+
+Name:  sc_gettimezoneinformation
+Depth: 2
+
+tz            0 [loomlist]2770
+
+Types for level: 3
+
+
+Name:  sc_getlasterror
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_getsystemmetrics
+Depth: 2
+
+i             0 [loomlist]2773
+
+Types for level: 3
+
+
+Name:  sc_CreateWindow
+Depth: 2
+
+y             0 [loomlist]2779
+x             0 [loomlist]2778
+nWidth        0 [loomlist]2780
+nHeight       0 [loomlist]2781
+lpWindowNa    0 [loomlist]2776
+lpParam       0 [loomlist]2785
+lpClassNam    0 [loomlist]2775
+hWndParent    0 [loomlist]2782
+hMenu         0 [loomlist]2783
+hInstance     0 [loomlist]2784
+dwStyle       0 [loomlist]2777
+
+Types for level: 3
+
+
+Name:  sc_CreateWindow
+Depth: 2
+
+y             0 [loomlist]2791
+x             0 [loomlist]2790
+nWidth        0 [loomlist]2792
+nHeight       0 [loomlist]2793
+lpWindowNa    0 [loomlist]2788
+lpClassNam    0 [loomlist]2787
+hWndParent    0 [loomlist]2794
+hMenu         0 [loomlist]2795
+hInstance     0 [loomlist]2796
+dwStyle       0 [loomlist]2789
+
+Types for level: 3
+
+
+Name:  sc_CreateWindowEx
+Depth: 2
+
+y             0 [loomlist]2803
+x             0 [loomlist]2802
+nWidth        0 [loomlist]2804
+nHeight       0 [loomlist]2805
+lpWindowNa    0 [loomlist]2800
+lpParam       0 [loomlist]2809
+lpClassNam    0 [loomlist]2799
+hWndParent    0 [loomlist]2806
+hMenu         0 [loomlist]2807
+hInstance     0 [loomlist]2808
+dwStyle       0 [loomlist]2801
+dwExStyle     0 [loomlist]2798
+
+Types for level: 3
+
+
+Name:  sc_CreateWindowEx
+Depth: 2
+
+y             0 [loomlist]2816
+x             0 [loomlist]2815
+nWidth        0 [loomlist]2817
+nHeight       0 [loomlist]2818
+lpWindowNa    0 [loomlist]2813
+lpClassNam    0 [loomlist]2812
+hWndParent    0 [loomlist]2819
+hMenu         0 [loomlist]2820
+hInstance     0 [loomlist]2821
+dwStyle       0 [loomlist]2814
+dwExStyle     0 [loomlist]2811
+
+Types for level: 3
+
+
+Name:  sc_destroywindow
+Depth: 2
+
+h             0 [loomlist]2823
+
+Types for level: 3
+
+
+Name:  sc_showwindow
+Depth: 2
+
+hdl           0 [loomlist]2825
+cmd           0 [loomlist]2826
+
+Types for level: 3
+
+
+Name:  sc_registerclass
+Depth: 2
+
+wc            0 [loomlist]2828
+
+Types for level: 3
+
+
+Name:  sc_updatewindow
+Depth: 2
+
+hdl           0 [loomlist]2830
+
+Types for level: 3
+
+
+Name:  sc_msgmirroraddr
+Depth: 2
+
+
+Name:  wndproc
+Depth: 3
+
+wparam        0 [loomlist]2836
+lparam        0 [loomlist]2837
+imsg          0 [loomlist]2835
+hwnd          0 [loomlist]2834
+
+Types for level: 3
+
+
+Name:  sc_wndprocadr
+Depth: 2
+
+wndproc       0 [loomlist]2833
+
+Types for level: 3
+
+
+Name:  sc_callwindowproc
+Depth: 2
+
+wp            0 [loomlist]2842
+pw            0 [loomlist]2839
+ms            0 [loomlist]2841
+lp            0 [loomlist]2843
+hw            0 [loomlist]2840
+
+Types for level: 3
+
+
+Name:  sc_getmodulehandle_n
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_loadicon_n
+Depth: 2
+
+it            0 [loomlist]2846
+
+Types for level: 3
+
+
+Name:  sc_loadcursor_n
+Depth: 2
+
+ct            0 [loomlist]2848
+
+Types for level: 3
+
+
+Name:  sc_getstockobject
+Depth: 2
+
+index         0 [loomlist]2850
+
+Types for level: 3
+
+
+Name:  sc_selectobject
+Depth: 2
+
+o             0 [loomlist]2853
+h             0 [loomlist]2852
+
+Types for level: 3
+
+
+Name:  sc_messagebox
+Depth: 2
+
+typ           0 [loomlist]2858
+text          0 [loomlist]2856
+hdl           0 [loomlist]2855
+capt          0 [loomlist]2857
+
+Types for level: 3
+
+
+Name:  sc_getmessage
+Depth: 2
+
+mx            0 [loomlist]2863
+mn            0 [loomlist]2862
+m             0 [loomlist]2860
+h             0 [loomlist]2861
+
+Types for level: 3
+
+
+Name:  sc_peekmessage
+Depth: 2
+
+rf            0 [loomlist]2869
+mx            0 [loomlist]2868
+mn            0 [loomlist]2867
+m             0 [loomlist]2865
+h             0 [loomlist]2866
+
+Types for level: 3
+
+
+Name:  sc_translatemessage
+Depth: 2
+
+m             0 [loomlist]2871
+
+Types for level: 3
+
+
+Name:  sc_postmessage
+Depth: 2
+
+w             0 [loomlist]2875
+m             0 [loomlist]2874
+l             0 [loomlist]2876
+h             0 [loomlist]2873
+
+Types for level: 3
+
+
+Name:  sc_postquitmessage
+Depth: 2
+
+ec            0 [loomlist]2878
+
+Types for level: 3
+
+
+Name:  sc_defwindowproc
+Depth: 2
+
+wp            0 [loomlist]2882
+um            0 [loomlist]2881
+lp            0 [loomlist]2883
+hw            0 [loomlist]2880
+
+Types for level: 3
+
+
+Name:  sc_dispatchmessage
+Depth: 2
+
+m             0 [loomlist]2885
+
+Types for level: 3
+
+
+Name:  sc_beginpaint
+Depth: 2
+
+p             0 [loomlist]2888
+h             0 [loomlist]2887
+
+Types for level: 3
+
+
+Name:  sc_endpaint
+Depth: 2
+
+p             0 [loomlist]2891
+h             0 [loomlist]2890
+
+Types for level: 3
+
+
+Name:  sc_getclientrect
+Depth: 2
+
+r             0 [loomlist]2894
+h             0 [loomlist]2893
+
+Types for level: 3
+
+
+Name:  sc_getupdaterect
+Depth: 2
+
+r             0 [loomlist]2897
+h             0 [loomlist]2896
+e             0 [loomlist]2898
+
+Types for level: 3
+
+
+Name:  sc_getwindowrect
+Depth: 2
+
+r             0 [loomlist]2901
+h             0 [loomlist]2900
+
+Types for level: 3
+
+
+Name:  sc_drawtext
+Depth: 2
+
+s             0 [loomlist]2904
+r             0 [loomlist]2905
+h             0 [loomlist]2903
+f             0 [loomlist]2906
+
+Types for level: 3
+
+
+Name:  sc_textout
+Depth: 2
+
+y             0 [loomlist]2910
+x             0 [loomlist]2909
+s             0 [loomlist]2911
+h             0 [loomlist]2908
+
+Types for level: 3
+
+
+Name:  sc_getdc
+Depth: 2
+
+h             0 [loomlist]2913
+
+Types for level: 3
+
+
+Name:  sc_releasedc
+Depth: 2
+
+wh            0 [loomlist]2915
+dh            0 [loomlist]2916
+
+Types for level: 3
+
+
+Name:  sc_gettextmetrics
+Depth: 2
+
+tm            0 [loomlist]2919
+h             0 [loomlist]2918
+
+Types for level: 3
+
+
+Name:  sc_validatergn_n
+Depth: 2
+
+h             0 [loomlist]2921
+
+Types for level: 3
+
+
+Name:  sc_showcursor
+Depth: 2
+
+b             0 [loomlist]2923
+
+Types for level: 3
+
+
+Name:  sc_createcaret
+Depth: 2
+
+y             0 [loomlist]2928
+x             0 [loomlist]2927
+w             0 [loomlist]2925
+b             0 [loomlist]2926
+
+Types for level: 3
+
+
+Name:  sc_destroycaret
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_showcaret
+Depth: 2
+
+w             0 [loomlist]2931
+
+Types for level: 3
+
+
+Name:  sc_hidecaret
+Depth: 2
+
+w             0 [loomlist]2933
+
+Types for level: 3
+
+
+Name:  sc_setcaretpos
+Depth: 2
+
+y             0 [loomlist]2936
+x             0 [loomlist]2935
+
+Types for level: 3
+
+
+Name:  sc_settextcolor
+Depth: 2
+
+dc            0 [loomlist]2938
+c             0 [loomlist]2939
+
+Types for level: 3
+
+
+Name:  sc_setbkcolor
+Depth: 2
+
+dc            0 [loomlist]2941
+c             0 [loomlist]2942
+
+Types for level: 3
+
+
+Name:  sc_rectangle
+Depth: 2
+
+y2            0 [loomlist]2948
+y1            0 [loomlist]2946
+x2            0 [loomlist]2947
+x1            0 [loomlist]2945
+dc            0 [loomlist]2944
+
+Types for level: 3
+
+
+Name:  sc_roundrect
+Depth: 2
+
+y2            0 [loomlist]2954
+y1            0 [loomlist]2952
+ys            0 [loomlist]2956
+x2            0 [loomlist]2953
+x1            0 [loomlist]2951
+xs            0 [loomlist]2955
+dc            0 [loomlist]2950
+
+Types for level: 3
+
+
+Name:  sc_setbkmode
+Depth: 2
+
+dc            0 [loomlist]2958
+bm            0 [loomlist]2959
+
+Name:  timcal
+Depth: 3
+
+
+Types for level: 3
+
+
+Name:  sc_settimer
+Depth: 2
+
+wh            0 [loomlist]2961
+timcal        0 [loomlist]2964
+ti            0 [loomlist]2962
+t             0 [loomlist]2963
+
+Types for level: 3
+
+
+Name:  sc_settimer_n
+Depth: 2
+
+wh            0 [loomlist]2966
+ti            0 [loomlist]2967
+t             0 [loomlist]2968
+
+Types for level: 3
+
+
+Name:  sc_killtimer
+Depth: 2
+
+wh            0 [loomlist]2970
+ti            0 [loomlist]2971
+
+Types for level: 3
+
+
+Name:  sc_setwindowtext
+Depth: 2
+
+wh            0 [loomlist]2973
+s             0 [loomlist]2974
+
+Types for level: 3
+
+
+Name:  sc_crkmsg
+Depth: 2
+
+m             0 [loomlist]2976
+l             0 [loomlist]2978
+h             0 [loomlist]2977
+
+Types for level: 3
+
+
+Name:  sc_setwindowpos
+Depth: 2
+
+y             0 [loomlist]2983
+x             0 [loomlist]2982
+wh            0 [loomlist]2980
+w             0 [loomlist]2984
+ins           0 [loomlist]2981
+h             0 [loomlist]2985
+f             0 [loomlist]2986
+
+Types for level: 3
+
+
+Name:  sc_adjustwindowrectex
+Depth: 2
+
+s             0 [loomlist]2989
+r             0 [loomlist]2988
+m             0 [loomlist]2990
+es            0 [loomlist]2991
+
+Types for level: 3
+
+
+Name:  sc_getenvironmentvariable
+Depth: 2
+
+v             0 [loomlist]2994
+n             0 [loomlist]2993
+
+Types for level: 3
+
+
+Name:  sc_setenvironmentvariable
+Depth: 2
+
+v             0 [loomlist]2997
+n             0 [loomlist]2996
+
+Types for level: 3
+
+
+Name:  sc_setenvironmentvariable_n
+Depth: 2
+
+n             0 [loomlist]2999
+
+Types for level: 3
+
+
+Name:  sc_getenvironmentstrings
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_CreateProcess_nn
+Depth: 2
+
+lpStartupI    0 [loomlist]3008
+lpProcessI    0 [loomlist]3009
+lpEnvironm    0 [loomlist]3006
+lpCurrentD    0 [loomlist]3007
+lpCommandL    0 [loomlist]3003
+lpApplicat    0 [loomlist]3002
+dwCreation    0 [loomlist]3005
+bInheritHa    0 [loomlist]3004
+
+Name:  thread
+Depth: 3
+
+
+Types for level: 3
+
+
+Name:  sc_createthread_nn
+Depth: 2
+
+ti            0 [loomlist]3014
+thread        0 [loomlist]3012
+ss            0 [loomlist]3011
+f             0 [loomlist]3013
+
+Types for level: 3
+
+
+Name:  sc_getcurrentthreadid
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_attachthreadinput
+Depth: 2
+
+att           0 [loomlist]3018
+ath           0 [loomlist]3019
+atf           0 [loomlist]3017
+
+Types for level: 3
+
+
+Name:  sc_setthreadpriority
+Depth: 2
+
+p             0 [loomlist]3022
+h             0 [loomlist]3021
+
+Types for level: 3
+
+
+Name:  sc_WaitForSingleObject
+Depth: 2
+
+hHandle       0 [loomlist]3024
+dwMillisec    0 [loomlist]3025
+
+Types for level: 3
+
+
+Name:  sc_sleep
+Depth: 2
+
+t             0 [loomlist]3027
+
+Types for level: 3
+
+
+Name:  sc_switchtothread
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_CloseHandle
+Depth: 2
+
+hObject       0 [loomlist]3030
+
+Types for level: 3
+
+
+Name:  sc_GetCurrentDirectory
+Depth: 2
+
+p             0 [loomlist]3032
+
+Types for level: 3
+
+
+Name:  sc_SetCurrentDirectory
+Depth: 2
+
+p             0 [loomlist]3034
+
+Types for level: 3
+
+
+Name:  sc_SetFileAttributes
+Depth: 2
+
+lpFileName    0 [loomlist]3036
+dwFileAttr    0 [loomlist]3037
+
+Types for level: 3
+
+
+Name:  sc_GetFileAttributes
+Depth: 2
+
+lpFileName    0 [loomlist]3039
+
+Types for level: 3
+
+
+Name:  sc_GetExitCodeProcess
+Depth: 2
+
+lpExitCode    0 [loomlist]3042
+hProcess      0 [loomlist]3041
+
+Types for level: 3
+
+
+Name:  sc_CreateDirectory_n
+Depth: 2
+
+lpPathName    0 [loomlist]3044
+
+Types for level: 3
+
+
+Name:  sc_RemoveDirectory
+Depth: 2
+
+lpPathName    0 [loomlist]3046
+
+Types for level: 3
+
+
+Name:  sc_GetDiskFreeSpace
+Depth: 2
+
+lpTotalNum    0 [loomlist]3052
+lpSectorsP    0 [loomlist]3049
+lpRootPath    0 [loomlist]3048
+lpNumberOf    0 [loomlist]3051
+lpBytesPer    0 [loomlist]3050
+
+Types for level: 3
+
+
+Name:  sc_exitprocess
+Depth: 2
+
+ec            0 [loomlist]3054
+
+Types for level: 3
+
+
+Name:  sc_beep
+Depth: 2
+
+f             0 [loomlist]3056
+d             0 [loomlist]3057
+
+Types for level: 3
+
+
+Name:  sc_createsolidbrush
+Depth: 2
+
+c             0 [loomlist]3059
+
+Types for level: 3
+
+
+Name:  sc_fillrect
+Depth: 2
+
+r             0 [loomlist]3062
+h             0 [loomlist]3061
+b             0 [loomlist]3063
+
+Types for level: 3
+
+
+Name:  sc_deleteobject
+Depth: 2
+
+o             0 [loomlist]3065
+
+Types for level: 3
+
+
+Name:  sc_bitblt
+Depth: 2
+
+w             0 [loomlist]3070
+sy            0 [loomlist]3074
+sx            0 [loomlist]3073
+s             0 [loomlist]3072
+rop           0 [loomlist]3075
+h             0 [loomlist]3071
+dy            0 [loomlist]3069
+dx            0 [loomlist]3068
+d             0 [loomlist]3067
+
+Types for level: 3
+
+
+Name:  sc_stretchblt
+Depth: 2
+
+sy            0 [loomlist]3084
+sx            0 [loomlist]3083
+sw            0 [loomlist]3085
+sh            0 [loomlist]3086
+s             0 [loomlist]3082
+rop           0 [loomlist]3087
+dy            0 [loomlist]3079
+dx            0 [loomlist]3078
+dw            0 [loomlist]3080
+dh            0 [loomlist]3081
+d             0 [loomlist]3077
+
+Types for level: 3
+
+
+Name:  sc_createcompatibledc
+Depth: 2
+
+h             0 [loomlist]3089
+
+Types for level: 3
+
+
+Name:  sc_createcompatiblebitmap
+Depth: 2
+
+w             0 [loomlist]3092
+hdl           0 [loomlist]3091
+h             0 [loomlist]3093
+
+Types for level: 3
+
+
+Name:  sc_movetoex_n
+Depth: 2
+
+y             0 [loomlist]3097
+x             0 [loomlist]3096
+h             0 [loomlist]3095
+
+Types for level: 3
+
+
+Name:  sc_lineto
+Depth: 2
+
+y             0 [loomlist]3101
+x             0 [loomlist]3100
+h             0 [loomlist]3099
+
+Types for level: 3
+
+
+Name:  sc_polyline
+Depth: 2
+
+pt            0 [loomlist]3104
+l             0 [loomlist]3105
+h             0 [loomlist]3103
+
+Types for level: 3
+
+
+Name:  sc_createpen
+Depth: 2
+
+w             0 [loomlist]3108
+ps            0 [loomlist]3107
+c             0 [loomlist]3109
+
+Types for level: 3
+
+
+Name:  sc_extcreatepen_nn
+Depth: 2
+
+w             0 [loomlist]3112
+ps            0 [loomlist]3111
+lb            0 [loomlist]3113
+
+Types for level: 3
+
+
+Name:  sc_ellipse
+Depth: 2
+
+y2            0 [loomlist]3119
+y1            0 [loomlist]3117
+x2            0 [loomlist]3118
+x1            0 [loomlist]3116
+h             0 [loomlist]3115
+
+Types for level: 3
+
+
+Name:  sc_setpixel
+Depth: 2
+
+y             0 [loomlist]3123
+x             0 [loomlist]3122
+h             0 [loomlist]3121
+c             0 [loomlist]3124
+
+Types for level: 3
+
+
+Name:  sc_setrop2
+Depth: 2
+
+m             0 [loomlist]3127
+h             0 [loomlist]3126
+
+Name:  ef
+Depth: 3
+
+pfd           0 [loomlist]3133
+lfd           0 [loomlist]3132
+ft            0 [loomlist]3134
+ad            0 [loomlist]3135
+
+Types for level: 3
+
+
+Name:  sc_enumfontfamiliesex
+Depth: 2
+
+lp            0 [loomlist]3136
+lf            0 [loomlist]3130
+h             0 [loomlist]3129
+f             0 [loomlist]3137
+ef            0 [loomlist]3131
+
+Types for level: 3
+
+
+Name:  sc_createfont
+Depth: 2
+
+wt            0 [loomlist]3143
+w             0 [loomlist]3140
+u             0 [loomlist]3145
+s             0 [loomlist]3146
+q             0 [loomlist]3150
+pf            0 [loomlist]3151
+op            0 [loomlist]3148
+o             0 [loomlist]3142
+i             0 [loomlist]3144
+h             0 [loomlist]3139
+fn            0 [loomlist]3152
+e             0 [loomlist]3141
+cs            0 [loomlist]3147
+cp            0 [loomlist]3149
+
+Types for level: 3
+
+
+Name:  sc_getoutlinetextmetrics
+Depth: 2
+
+tm            0 [loomlist]3156
+l             0 [loomlist]3155
+h             0 [loomlist]3154
+
+Types for level: 3
+
+
+Name:  sc_getcharabcwidths
+Depth: 2
+
+wa            0 [loomlist]3161
+lc            0 [loomlist]3160
+h             0 [loomlist]3158
+fc            0 [loomlist]3159
+
+Types for level: 3
+
+
+Name:  sc_getglyphoutline_metrics
+Depth: 2
+
+t             0 [loomlist]3166
+m             0 [loomlist]3165
+h             0 [loomlist]3163
+c             0 [loomlist]3164
+
+Types for level: 3
+
+
+Name:  sc_gettextextentpoint32
+Depth: 2
+
+sz            0 [loomlist]3170
+s             0 [loomlist]3169
+h             0 [loomlist]3168
+
+Types for level: 3
+
+
+Name:  sc_getdevicecaps
+Depth: 2
+
+i             0 [loomlist]3173
+h             0 [loomlist]3172
+
+Types for level: 3
+
+
+Name:  sc_initializecriticalsection
+Depth: 2
+
+l             0 [loomlist]3175
+
+Types for level: 3
+
+
+Name:  sc_entercriticalsection
+Depth: 2
+
+l             0 [loomlist]3177
+
+Types for level: 3
+
+
+Name:  sc_leavecriticalsection
+Depth: 2
+
+l             0 [loomlist]3179
+
+Types for level: 3
+
+
+Name:  sc_deletecriticalsection
+Depth: 2
+
+l             0 [loomlist]3181
+
+Types for level: 3
+
+
+Name:  sc_CreateMutex
+Depth: 2
+
+bInitialOw    0 [loomlist]3183
+
+Types for level: 3
+
+
+Name:  sc_releasemutex
+Depth: 2
+
+hmutex        0 [loomlist]3185
+
+Types for level: 3
+
+
+Name:  sc_loadimage
+Depth: 2
+
+t             0 [loomlist]3189
+s             0 [loomlist]3188
+h             0 [loomlist]3187
+f             0 [loomlist]3192
+cy            0 [loomlist]3191
+cx            0 [loomlist]3190
+
+Types for level: 3
+
+
+Name:  sc_getbitmapdimensionex
+Depth: 2
+
+s             0 [loomlist]3195
+h             0 [loomlist]3194
+
+Types for level: 3
+
+
+Name:  sc_getobject_bitmap
+Depth: 2
+
+l             0 [loomlist]3198
+h             0 [loomlist]3197
+bm            0 [loomlist]3199
+
+Types for level: 3
+
+
+Name:  sc_setstretchbltmode
+Depth: 2
+
+m             0 [loomlist]3202
+h             0 [loomlist]3201
+
+Types for level: 3
+
+
+Name:  sc_deletedc
+Depth: 2
+
+h             0 [loomlist]3204
+
+Types for level: 3
+
+
+Name:  sc_setviewportorgex_n
+Depth: 2
+
+y             0 [loomlist]3208
+x             0 [loomlist]3207
+h             0 [loomlist]3206
+
+Types for level: 3
+
+
+Name:  sc_getviewportextex
+Depth: 2
+
+s             0 [loomlist]3211
+h             0 [loomlist]3210
+
+Types for level: 3
+
+
+Name:  sc_setviewportextex
+Depth: 2
+
+y             0 [loomlist]3215
+x             0 [loomlist]3214
+s             0 [loomlist]3216
+h             0 [loomlist]3213
+
+Types for level: 3
+
+
+Name:  sc_setwindowextex
+Depth: 2
+
+y             0 [loomlist]3220
+x             0 [loomlist]3219
+s             0 [loomlist]3221
+h             0 [loomlist]3218
+
+Types for level: 3
+
+
+Name:  sc_scaleviewportextex
+Depth: 2
+
+ym            0 [loomlist]3226
+yd            0 [loomlist]3227
+xm            0 [loomlist]3224
+xd            0 [loomlist]3225
+s             0 [loomlist]3228
+h             0 [loomlist]3223
+
+Types for level: 3
+
+
+Name:  sc_setmapmode
+Depth: 2
+
+mm            0 [loomlist]3231
+h             0 [loomlist]3230
+
+Types for level: 3
+
+
+Name:  sc_lptodp_o
+Depth: 2
+
+p             0 [loomlist]3234
+h             0 [loomlist]3233
+
+Types for level: 3
+
+
+Name:  sc_settextjustification
+Depth: 2
+
+h             0 [loomlist]3236
+be            0 [loomlist]3237
+bc            0 [loomlist]3238
+
+Types for level: 3
+
+
+Name:  sc_getcharacterplacement
+Depth: 2
+
+s             0 [loomlist]3241
+r             0 [loomlist]3243
+me            0 [loomlist]3242
+h             0 [loomlist]3240
+f             0 [loomlist]3244
+
+Types for level: 3
+
+
+Name:  sc_exttextout_n
+Depth: 2
+
+y             0 [loomlist]3248
+x             0 [loomlist]3247
+sp            0 [loomlist]3251
+s             0 [loomlist]3250
+h             0 [loomlist]3246
+f             0 [loomlist]3249
+
+Types for level: 3
+
+
+Name:  sc_polygon
+Depth: 2
+
+pa            0 [loomlist]3254
+h             0 [loomlist]3253
+
+Types for level: 3
+
+
+Name:  sc_arc
+Depth: 2
+
+y2            0 [loomlist]3260
+y1            0 [loomlist]3258
+x2            0 [loomlist]3259
+x1            0 [loomlist]3257
+sy            0 [loomlist]3262
+sx            0 [loomlist]3261
+h             0 [loomlist]3256
+ey            0 [loomlist]3264
+ex            0 [loomlist]3263
+
+Types for level: 3
+
+
+Name:  sc_pie
+Depth: 2
+
+y2            0 [loomlist]3270
+y1            0 [loomlist]3268
+x2            0 [loomlist]3269
+x1            0 [loomlist]3267
+sy            0 [loomlist]3272
+sx            0 [loomlist]3271
+h             0 [loomlist]3266
+ey            0 [loomlist]3274
+ex            0 [loomlist]3273
+
+Types for level: 3
+
+
+Name:  sc_chord
+Depth: 2
+
+y2            0 [loomlist]3280
+y1            0 [loomlist]3278
+x2            0 [loomlist]3279
+x1            0 [loomlist]3277
+sy            0 [loomlist]3282
+sx            0 [loomlist]3281
+h             0 [loomlist]3276
+ey            0 [loomlist]3284
+ex            0 [loomlist]3283
+
+Types for level: 3
+
+
+Name:  sc_CreateMenu
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_DestroyMenu
+Depth: 2
+
+hMenu         0 [loomlist]3287
+
+Types for level: 3
+
+
+Name:  sc_AppendMenu
+Depth: 2
+
+uIDNewItem    0 [loomlist]3291
+uFlags        0 [loomlist]3290
+lpNewItem     0 [loomlist]3292
+hMenu         0 [loomlist]3289
+
+Types for level: 3
+
+
+Name:  sc_DrawMenuBar
+Depth: 2
+
+hWnd          0 [loomlist]3294
+
+Types for level: 3
+
+
+Name:  sc_setmenu
+Depth: 2
+
+hwnd          0 [loomlist]3296
+hmenu         0 [loomlist]3297
+
+Types for level: 3
+
+
+Name:  sc_enablemenuitem
+Depth: 2
+
+hmenu         0 [loomlist]3299
+enableitem    0 [loomlist]3300
+enable        0 [loomlist]3301
+
+Types for level: 3
+
+
+Name:  sc_checkmenuitem
+Depth: 2
+
+hmenu         0 [loomlist]3303
+enableitem    0 [loomlist]3304
+enable        0 [loomlist]3305
+
+Types for level: 3
+
+
+Name:  sc_getdesktopwindow
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_getwindowlong
+Depth: 2
+
+i             0 [loomlist]3309
+h             0 [loomlist]3308
+
+Types for level: 3
+
+
+Name:  sc_setwindowlong
+Depth: 2
+
+v             0 [loomlist]3313
+i             0 [loomlist]3312
+h             0 [loomlist]3311
+
+Types for level: 3
+
+
+Name:  sc_SendMessage
+Depth: 2
+
+wparam        0 [loomlist]3317
+msg           0 [loomlist]3316
+lparam        0 [loomlist]3318
+hWnd          0 [loomlist]3315
+
+Types for level: 3
+
+
+Name:  sc_SendMessage
+Depth: 2
+
+msg           0 [loomlist]3321
+lparam        0 [loomlist]3322
+hWnd          0 [loomlist]3320
+
+Types for level: 3
+
+
+Name:  sc_SendMessage
+Depth: 2
+
+wparam        0 [loomlist]3326
+msg           0 [loomlist]3325
+lparam        0 [loomlist]3327
+hWnd          0 [loomlist]3324
+
+Types for level: 3
+
+
+Name:  sc_SetScrollRange
+Depth: 2
+
+nminpos       0 [loomlist]3331
+nmaxpos       0 [loomlist]3332
+nbar          0 [loomlist]3330
+hWnd          0 [loomlist]3329
+bredraw       0 [loomlist]3333
+
+Types for level: 3
+
+
+Name:  sc_SetScrollPos
+Depth: 2
+
+npos          0 [loomlist]3337
+nbar          0 [loomlist]3336
+hWnd          0 [loomlist]3335
+bRedraw       0 [loomlist]3338
+
+Types for level: 3
+
+
+Name:  sc_setscrollinfo
+Depth: 2
+
+lpsi          0 [loomlist]3342
+hwnd          0 [loomlist]3340
+fredraw       0 [loomlist]3343
+fnbar         0 [loomlist]3341
+
+Types for level: 3
+
+
+Name:  sc_getscrollinfo
+Depth: 2
+
+lpsi          0 [loomlist]3347
+hwnd          0 [loomlist]3345
+fnbar         0 [loomlist]3346
+
+Types for level: 3
+
+
+Name:  sc_createupdowncontrol
+Depth: 2
+
+y             0 [loomlist]3351
+x             0 [loomlist]3350
+nupper        0 [loomlist]3358
+npos          0 [loomlist]3360
+nlower        0 [loomlist]3359
+nid           0 [loomlist]3355
+hparent       0 [loomlist]3354
+hinst         0 [loomlist]3356
+hbuddy        0 [loomlist]3357
+dwstyle       0 [loomlist]3349
+cy            0 [loomlist]3353
+cx            0 [loomlist]3352
+
+Types for level: 3
+
+
+Name:  sc_setfocus
+Depth: 2
+
+hwnd          0 [loomlist]3362
+
+Types for level: 3
+
+
+Name:  sc_setforegroundwindow
+Depth: 2
+
+hwnd          0 [loomlist]3364
+
+Types for level: 3
+
+
+Name:  sc_movewindow
+Depth: 2
+
+y             0 [loomlist]3368
+x             0 [loomlist]3367
+nwidth        0 [loomlist]3369
+nheight       0 [loomlist]3370
+hwnd          0 [loomlist]3366
+brepaint      0 [loomlist]3371
+
+Types for level: 3
+
+
+Name:  sc_getwindowtext
+Depth: 2
+
+lpstring      0 [loomlist]3374
+hwnd          0 [loomlist]3373
+
+Types for level: 3
+
+
+Name:  sc_getwindowtextlength
+Depth: 2
+
+hwnd          0 [loomlist]3376
+
+Types for level: 3
+
+
+Name:  sc_choosecolor
+Depth: 2
+
+lpcc          0 [loomlist]3378
+
+Types for level: 3
+
+
+Name:  sc_getopenfilename
+Depth: 2
+
+lpofn         0 [loomlist]3380
+
+Types for level: 3
+
+
+Name:  sc_getsavefilename
+Depth: 2
+
+lpofn         0 [loomlist]3382
+
+Types for level: 3
+
+
+Name:  sc_commdlgextendederror
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_findtext
+Depth: 2
+
+lpfr          0 [loomlist]3385
+
+Types for level: 3
+
+
+Name:  sc_replacetext
+Depth: 2
+
+lpfr          0 [loomlist]3387
+
+Types for level: 3
+
+
+Name:  sc_registerwindowmessage
+Depth: 2
+
+lpstring      0 [loomlist]3389
+
+Types for level: 3
+
+
+Name:  sc_choosefont
+Depth: 2
+
+lpcf          0 [loomlist]3391
+
+Types for level: 3
+
+
+Name:  sc_createevent
+Depth: 2
+
+s             0 [loomlist]3394
+r             0 [loomlist]3393
+
+Types for level: 3
+
+
+Name:  sc_setevent
+Depth: 2
+
+h             0 [loomlist]3396
+
+Types for level: 3
+
+
+Name:  sc_resetevent
+Depth: 2
+
+h             0 [loomlist]3398
+
+Types for level: 3
+
+
+Name:  sc_getdialogbaseunits
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_getparent
+Depth: 2
+
+h             0 [loomlist]3401
+
+Types for level: 3
+
+
+Name:  sc_getifentry
+Depth: 2
+
+ifr           0 [loomlist]3403
+
+Types for level: 3
+
+
+Name:  sc_getversion
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_regopenkey
+Depth: 2
+
+s             0 [loomlist]3407
+r             0 [loomlist]3408
+k             0 [loomlist]3406
+
+Types for level: 3
+
+
+Name:  sc_regcreatekey
+Depth: 2
+
+s             0 [loomlist]3411
+r             0 [loomlist]3412
+k             0 [loomlist]3410
+
+Types for level: 3
+
+
+Name:  sc_regqueryvalue
+Depth: 2
+
+sv            0 [loomlist]3416
+sk            0 [loomlist]3415
+s             0 [loomlist]3417
+k             0 [loomlist]3414
+
+Types for level: 3
+
+
+Name:  sc_regqueryvalueex
+Depth: 2
+
+vn            0 [loomlist]3420
+t             0 [loomlist]3421
+sv            0 [loomlist]3422
+s             0 [loomlist]3423
+k             0 [loomlist]3419
+
+Types for level: 3
+
+
+Name:  sc_regsetvalueex
+Depth: 2
+
+vn            0 [loomlist]3426
+t             0 [loomlist]3427
+sv            0 [loomlist]3428
+s             0 [loomlist]3429
+k             0 [loomlist]3425
+
+Types for level: 3
+
+
+Name:  sc_regclosekey
+Depth: 2
+
+k             0 [loomlist]3431
+
+Types for level: 3
+
+
+Name:  sc_regflushkey
+Depth: 2
+
+k             0 [loomlist]3433
+
+Types for level: 3
+
+
+Name:  sc_regdeletekey
+Depth: 2
+
+v             0 [loomlist]3436
+k             0 [loomlist]3435
+
+Types for level: 3
+
+
+Name:  sc_getdrivetype
+Depth: 2
+
+ds            0 [loomlist]3438
+
+Types for level: 3
+
+
+Name:  sc_getwindowdc
+Depth: 2
+
+wh            0 [loomlist]3440
+
+Types for level: 3
+
+
+Name:  sc_enablewindow
+Depth: 2
+
+wh            0 [loomlist]3442
+e             0 [loomlist]3443
+
+Types for level: 3
+
+
+Name:  sc_gdiflush
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_peekconsoleinput
+Depth: 2
+
+n             0 [loomlist]3560
+h             0 [loomlist]3558
+ers           0 [loomlist]3559
+
+Types for level: 3
+
+
+Name:  sc_readconsoleinput
+Depth: 2
+
+n             0 [loomlist]3564
+h             0 [loomlist]3562
+ers           0 [loomlist]3563
+
+Types for level: 3
+
+
+Name:  sc_writeconsoleinput
+Depth: 2
+
+n             0 [loomlist]3568
+ir            0 [loomlist]3567
+h             0 [loomlist]3566
+
+Types for level: 3
+
+
+Name:  sc_readconsoleoutputcharacter
+Depth: 2
+
+s             0 [loomlist]3571
+n             0 [loomlist]3573
+h             0 [loomlist]3570
+c             0 [loomlist]3572
+
+Types for level: 3
+
+
+Name:  sc_readconsoleoutputattribute
+Depth: 2
+
+n             0 [loomlist]3578
+h             0 [loomlist]3575
+c             0 [loomlist]3577
+a             0 [loomlist]3576
+
+Types for level: 3
+
+
+Name:  sc_writeconsoleoutputcharacter
+Depth: 2
+
+xy            0 [loomlist]3582
+s             0 [loomlist]3581
+l             0 [loomlist]3583
+h             0 [loomlist]3580
+
+Types for level: 3
+
+
+Name:  sc_writeconsoleoutputattribute
+Depth: 2
+
+xy            0 [loomlist]3587
+s             0 [loomlist]3586
+l             0 [loomlist]3588
+h             0 [loomlist]3585
+
+Types for level: 3
+
+
+Name:  sc_fillconsoleoutputcharacter
+Depth: 2
+
+xy            0 [loomlist]3593
+n             0 [loomlist]3592
+l             0 [loomlist]3594
+h             0 [loomlist]3590
+c             0 [loomlist]3591
+
+Types for level: 3
+
+
+Name:  sc_fillconsoleoutputattribute
+Depth: 2
+
+xy            0 [loomlist]3599
+w             0 [loomlist]3597
+n             0 [loomlist]3598
+l             0 [loomlist]3600
+h             0 [loomlist]3596
+
+Types for level: 3
+
+
+Name:  sc_getconsolemode
+Depth: 2
+
+m             0 [loomlist]3603
+h             0 [loomlist]3602
+
+Types for level: 3
+
+
+Name:  sc_getnumberofconsoleinputevents
+Depth: 2
+
+n             0 [loomlist]3606
+h             0 [loomlist]3605
+
+Types for level: 3
+
+
+Name:  sc_getconsolescreenbufferinfo
+Depth: 2
+
+h             0 [loomlist]3608
+bi            0 [loomlist]3609
+
+Types for level: 3
+
+
+Name:  sc_getlargestconsolewindowsize
+Depth: 2
+
+h             0 [loomlist]3611
+
+Types for level: 3
+
+
+Name:  sc_getconsolecursorinfo
+Depth: 2
+
+h             0 [loomlist]3613
+ci            0 [loomlist]3614
+
+Types for level: 3
+
+
+Name:  sc_getnumberofconsolemousebuttons
+Depth: 2
+
+n             0 [loomlist]3616
+
+Types for level: 3
+
+
+Name:  sc_setconsolemode
+Depth: 2
+
+m             0 [loomlist]3619
+h             0 [loomlist]3618
+
+Types for level: 3
+
+
+Name:  sc_setconsoleactivescreenbuffer
+Depth: 2
+
+h             0 [loomlist]3621
+
+Types for level: 3
+
+
+Name:  sc_flushconsoleinputbuffer
+Depth: 2
+
+h             0 [loomlist]3623
+
+Types for level: 3
+
+
+Name:  sc_setconsolescreenbuffersize
+Depth: 2
+
+s             0 [loomlist]3626
+h             0 [loomlist]3625
+
+Types for level: 3
+
+
+Name:  sc_setconsolecursorposition
+Depth: 2
+
+xy            0 [loomlist]3629
+h             0 [loomlist]3628
+
+Types for level: 3
+
+
+Name:  sc_setconsolecursorinfo
+Depth: 2
+
+h             0 [loomlist]3631
+ci            0 [loomlist]3632
+
+Types for level: 3
+
+
+Name:  sc_scrollconsolescreenbuffer
+Depth: 2
+
+sr            0 [loomlist]3635
+h             0 [loomlist]3634
+f             0 [loomlist]3638
+d             0 [loomlist]3637
+cr            0 [loomlist]3636
+
+Types for level: 3
+
+
+Name:  sc_scrollconsolescreenbuffer_n
+Depth: 2
+
+sr            0 [loomlist]3641
+h             0 [loomlist]3640
+f             0 [loomlist]3643
+d             0 [loomlist]3642
+
+Types for level: 3
+
+
+Name:  sc_setconsolewindowinfo
+Depth: 2
+
+h             0 [loomlist]3645
+cw            0 [loomlist]3647
+a             0 [loomlist]3646
+
+Types for level: 3
+
+
+Name:  sc_setconsoletextattribute
+Depth: 2
+
+h             0 [loomlist]3649
+a             0 [loomlist]3650
+
+Name:  ctlhan
+Depth: 3
+
+ct            0 [loomlist]3653
+
+Types for level: 3
+
+
+Name:  sc_setconsolectrlhandler
+Depth: 2
+
+ctlhan        0 [loomlist]3652
+a             0 [loomlist]3654
+
+Types for level: 3
+
+
+Name:  sc_generateconsolectrlevent
+Depth: 2
+
+gid           0 [loomlist]3657
+ce            0 [loomlist]3656
+
+Types for level: 3
+
+
+Name:  sc_allocconsole
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_freeconsole
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_getconsoletitle
+Depth: 2
+
+s             0 [loomlist]3661
+
+Types for level: 3
+
+
+Name:  sc_setconsoletitle
+Depth: 2
+
+s             0 [loomlist]3663
+
+Types for level: 3
+
+
+Name:  sc_readconsole
+Depth: 2
+
+s             0 [loomlist]3666
+h             0 [loomlist]3665
+cr            0 [loomlist]3667
+
+Types for level: 3
+
+
+Name:  sc_createconsolescreenbuffer_nn
+Depth: 2
+
+s             0 [loomlist]3670
+f             0 [loomlist]3671
+a             0 [loomlist]3669
+
+Types for level: 3
+
+
+Name:  sc_getconsolecp
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_setconsolecp
+Depth: 2
+
+ci            0 [loomlist]3674
+
+Types for level: 3
+
+
+Name:  sc_getconsoleoutputcp
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_setconsoleoutputcp
+Depth: 2
+
+cp            0 [loomlist]3677
+
+Types for level: 3
+
+
+Name:  sc_joysetcapture
+Depth: 2
+
+wh            0 [loomlist]3698
+pt            0 [loomlist]3700
+di            0 [loomlist]3699
+c             0 [loomlist]3701
+
+Types for level: 3
+
+
+Name:  sc_joyreleasecapture
+Depth: 2
+
+di            0 [loomlist]3703
+
+Types for level: 3
+
+
+Name:  sc_joygetnumdevs
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_joygetdevcaps
+Depth: 2
+
+id            0 [loomlist]3706
+caps          0 [loomlist]3707
+caplen        0 [loomlist]3708
+
+Types for level: 3
+
+
+Name:  sc_midioutgetnumdevs
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_midioutopen_nnn
+Depth: 2
+
+id            0 [loomlist]3712
+h             0 [loomlist]3711
+
+Types for level: 3
+
+
+Name:  sc_midioutclose
+Depth: 2
+
+h             0 [loomlist]3714
+
+Types for level: 3
+
+
+Name:  sc_midioutshortmsg
+Depth: 2
+
+msg           0 [loomlist]3717
+h             0 [loomlist]3716
+
+Types for level: 3
+
+
+Name:  sc_playsound
+Depth: 2
+
+s             0 [loomlist]3719
+h             0 [loomlist]3720
+f             0 [loomlist]3721
+
+Types for level: 3
+
+
+Name:  sc_mcisendstring_nnn
+Depth: 2
+
+s             0 [loomlist]3723
+
+Types for level: 3
+
+
+Name:  sc_timegettime
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  sc_timekillevent
+Depth: 2
+
+tid           0 [loomlist]3726
+
+Name:  tp
+Depth: 3
+
+u             0 [loomlist]3733
+m             0 [loomlist]3732
+id            0 [loomlist]3731
+dw2           0 [loomlist]3735
+dw1           0 [loomlist]3734
+
+Types for level: 3
+
+
+Name:  sc_timesetevent
+Depth: 2
+
+u             0 [loomlist]3736
+tp            0 [loomlist]3730
+r             0 [loomlist]3729
+f             0 [loomlist]3737
+d             0 [loomlist]3728
+Processing: c:\ip\windows\i80386\lib\strlib.pas
+
+Types for level: 3
+
+
+Name:  lcase
+Depth: 2
+
+c             0 [loomlist]3739
+
+Types for level: 3
+
+
+Name:  lcase
+Depth: 2
+
+s             0 [loomlist]3741
+
+Types for level: 3
+
+
+Name:  lcases
+Depth: 2
+
+s             0 [loomlist]3743
+
+Types for level: 3
+
+
+Name:  lcases
+Depth: 2
+
+s             0 [loomlist]3745
+
+Types for level: 3
+
+
+Name:  ucase
+Depth: 2
+
+c             0 [loomlist]3747
+
+Types for level: 3
+
+
+Name:  ucase
+Depth: 2
+
+s             0 [loomlist]3749
+
+Types for level: 3
+
+
+Name:  ucases
+Depth: 2
+
+s             0 [loomlist]3751
+
+Types for level: 3
+
+
+Name:  ucases
+Depth: 2
+
+s             0 [loomlist]3753
+
+Types for level: 3
+
+
+Name:  clears
+Depth: 2
+
+s             0 [loomlist]3755
+
+Types for level: 3
+
+
+Name:  len
+Depth: 2
+
+s             0 [loomlist]3757
+
+Types for level: 3
+
+
+Name:  len
+Depth: 2
+
+s             0 [loomlist]3759
+
+Types for level: 3
+
+
+Name:  copy
+Depth: 2
+
+s             0 [loomlist]3762
+d             0 [loomlist]3761
+
+Types for level: 3
+
+
+Name:  copy
+Depth: 2
+
+s             0 [loomlist]3765
+d             0 [loomlist]3764
+
+Types for level: 3
+
+
+Name:  copy
+Depth: 2
+
+s             0 [loomlist]3767
+
+Types for level: 3
+
+
+Name:  copy
+Depth: 2
+
+s             0 [loomlist]3769
+
+Types for level: 3
+
+
+Name:  copy
+Depth: 2
+
+s             0 [loomlist]3772
+d             0 [loomlist]3771
+
+Types for level: 3
+
+
+Name:  cat
+Depth: 2
+
+s             0 [loomlist]3775
+d             0 [loomlist]3774
+
+Types for level: 3
+
+
+Name:  cat
+Depth: 2
+
+sb            0 [loomlist]3778
+sa            0 [loomlist]3777
+
+Types for level: 3
+
+
+Name:  cat
+Depth: 2
+
+s2            0 [loomlist]3781
+s1            0 [loomlist]3780
+
+Types for level: 3
+
+
+Name:  cat
+Depth: 2
+
+s2            0 [loomlist]3784
+s1            0 [loomlist]3783
+
+Types for level: 3
+
+
+Name:  cat
+Depth: 2
+
+s2            0 [loomlist]3787
+s1            0 [loomlist]3786
+
+Types for level: 3
+
+
+Name:  compc
+Depth: 2
+
+s             0 [loomlist]3790
+d             0 [loomlist]3789
+
+Types for level: 3
+
+
+Name:  compc
+Depth: 2
+
+s             0 [loomlist]3793
+d             0 [loomlist]3792
+
+Types for level: 3
+
+
+Name:  compc
+Depth: 2
+
+s             0 [loomlist]3796
+d             0 [loomlist]3795
+
+Types for level: 3
+
+
+Name:  compc
+Depth: 2
+
+s             0 [loomlist]3799
+d             0 [loomlist]3798
+
+Types for level: 3
+
+
+Name:  compcp
+Depth: 2
+
+s             0 [loomlist]3802
+d             0 [loomlist]3801
+
+Types for level: 3
+
+
+Name:  comp
+Depth: 2
+
+s             0 [loomlist]3805
+d             0 [loomlist]3804
+
+Types for level: 3
+
+
+Name:  comp
+Depth: 2
+
+s             0 [loomlist]3808
+d             0 [loomlist]3807
+
+Types for level: 3
+
+
+Name:  comp
+Depth: 2
+
+s             0 [loomlist]3811
+d             0 [loomlist]3810
+
+Types for level: 3
+
+
+Name:  comp
+Depth: 2
+
+s             0 [loomlist]3814
+d             0 [loomlist]3813
+
+Types for level: 3
+
+
+Name:  compp
+Depth: 2
+
+s             0 [loomlist]3817
+d             0 [loomlist]3816
+
+Types for level: 3
+
+
+Name:  gtrc
+Depth: 2
+
+s             0 [loomlist]3820
+d             0 [loomlist]3819
+
+Types for level: 3
+
+
+Name:  gtrc
+Depth: 2
+
+s             0 [loomlist]3823
+d             0 [loomlist]3822
+
+Types for level: 3
+
+
+Name:  gtrc
+Depth: 2
+
+s             0 [loomlist]3826
+d             0 [loomlist]3825
+
+Types for level: 3
+
+
+Name:  gtrc
+Depth: 2
+
+s             0 [loomlist]3829
+d             0 [loomlist]3828
+
+Types for level: 3
+
+
+Name:  gtrcp
+Depth: 2
+
+s             0 [loomlist]3832
+d             0 [loomlist]3831
+
+Types for level: 3
+
+
+Name:  gtr
+Depth: 2
+
+s             0 [loomlist]3835
+d             0 [loomlist]3834
+
+Types for level: 3
+
+
+Name:  gtr
+Depth: 2
+
+s             0 [loomlist]3838
+d             0 [loomlist]3837
+
+Types for level: 3
+
+
+Name:  gtr
+Depth: 2
+
+s             0 [loomlist]3841
+d             0 [loomlist]3840
+
+Types for level: 3
+
+
+Name:  gtr
+Depth: 2
+
+s             0 [loomlist]3844
+d             0 [loomlist]3843
+
+Types for level: 3
+
+
+Name:  gtrp
+Depth: 2
+
+s             0 [loomlist]3847
+d             0 [loomlist]3846
+
+Types for level: 3
+
+
+Name:  indexc
+Depth: 2
+
+s             0 [loomlist]3850
+d             0 [loomlist]3849
+
+Types for level: 3
+
+
+Name:  indexc
+Depth: 2
+
+s             0 [loomlist]3853
+d             0 [loomlist]3852
+
+Types for level: 3
+
+
+Name:  indexc
+Depth: 2
+
+s             0 [loomlist]3856
+d             0 [loomlist]3855
+
+Types for level: 3
+
+
+Name:  indexc
+Depth: 2
+
+s             0 [loomlist]3859
+d             0 [loomlist]3858
+
+Types for level: 3
+
+
+Name:  indexcp
+Depth: 2
+
+s             0 [loomlist]3862
+d             0 [loomlist]3861
+
+Types for level: 3
+
+
+Name:  index
+Depth: 2
+
+s             0 [loomlist]3865
+d             0 [loomlist]3864
+
+Types for level: 3
+
+
+Name:  index
+Depth: 2
+
+s             0 [loomlist]3868
+d             0 [loomlist]3867
+
+Types for level: 3
+
+
+Name:  index
+Depth: 2
+
+s             0 [loomlist]3871
+d             0 [loomlist]3870
+
+Types for level: 3
+
+
+Name:  index
+Depth: 2
+
+s             0 [loomlist]3874
+d             0 [loomlist]3873
+
+Types for level: 3
+
+
+Name:  indexp
+Depth: 2
+
+s             0 [loomlist]3877
+d             0 [loomlist]3876
+
+Types for level: 3
+
+
+Name:  extract
+Depth: 2
+
+s             0 [loomlist]3880
+r             0 [loomlist]3882
+l             0 [loomlist]3881
+d             0 [loomlist]3879
+
+Types for level: 3
+
+
+Name:  extract
+Depth: 2
+
+s             0 [loomlist]3884
+r             0 [loomlist]3886
+l             0 [loomlist]3885
+
+Types for level: 3
+
+
+Name:  extract
+Depth: 2
+
+s             0 [loomlist]3888
+r             0 [loomlist]3890
+l             0 [loomlist]3889
+
+Types for level: 3
+
+
+Name:  insert
+Depth: 2
+
+s             0 [loomlist]3893
+p             0 [loomlist]3894
+d             0 [loomlist]3892
+
+Types for level: 3
+
+
+Name:  insert
+Depth: 2
+
+sb            0 [loomlist]3897
+sa            0 [loomlist]3896
+p             0 [loomlist]3898
+
+Types for level: 3
+
+
+Name:  insert
+Depth: 2
+
+sb            0 [loomlist]3901
+sa            0 [loomlist]3900
+p             0 [loomlist]3902
+
+Types for level: 3
+
+
+Name:  insert
+Depth: 2
+
+sb            0 [loomlist]3905
+sa            0 [loomlist]3904
+p             0 [loomlist]3906
+
+Types for level: 3
+
+
+Name:  insert
+Depth: 2
+
+sb            0 [loomlist]3909
+sa            0 [loomlist]3908
+p             0 [loomlist]3910
+
+Types for level: 3
+
+
+Name:  rep
+Depth: 2
+
+s             0 [loomlist]3912
+r             0 [loomlist]3913
+
+Types for level: 3
+
+
+Name:  rep
+Depth: 2
+
+s             0 [loomlist]3915
+r             0 [loomlist]3916
+
+Types for level: 3
+
+
+Name:  rep
+Depth: 2
+
+s             0 [loomlist]3919
+r             0 [loomlist]3920
+d             0 [loomlist]3918
+
+Types for level: 3
+
+
+Name:  trim
+Depth: 2
+
+s             0 [loomlist]3922
+
+Types for level: 3
+
+
+Name:  trim
+Depth: 2
+
+s             0 [loomlist]3924
+
+Types for level: 3
+
+
+Name:  trim
+Depth: 2
+
+s             0 [loomlist]3927
+d             0 [loomlist]3926
+
+Types for level: 3
+
+
+Name:  words
+Depth: 2
+
+s             0 [loomlist]3929
+
+Types for level: 3
+
+
+Name:  words
+Depth: 2
+
+s             0 [loomlist]3931
+
+Types for level: 3
+
+
+Name:  extwords
+Depth: 2
+
+s             0 [loomlist]3933
+r             0 [loomlist]3935
+l             0 [loomlist]3934
+
+Types for level: 3
+
+
+Name:  extwords
+Depth: 2
+
+s             0 [loomlist]3937
+r             0 [loomlist]3939
+l             0 [loomlist]3938
+
+Types for level: 3
+
+
+Name:  extwords
+Depth: 2
+
+s             0 [loomlist]3942
+r             0 [loomlist]3944
+l             0 [loomlist]3943
+d             0 [loomlist]3941
+
+Types for level: 3
+
+
+Name:  reads
+Depth: 2
+
+s             0 [loomlist]3947
+ovf           0 [loomlist]3948
+f             0 [loomlist]3946
+
+Types for level: 3
+
+
+Name:  reads
+Depth: 2
+
+s             0 [loomlist]3951
+ovf           0 [loomlist]3952
+f             0 [loomlist]3950
+
+Types for level: 3
+
+
+Name:  reads
+Depth: 2
+
+s             0 [loomlist]3955
+f             0 [loomlist]3954
+
+Types for level: 3
+
+
+Name:  reads
+Depth: 2
+
+s             0 [loomlist]3958
+f             0 [loomlist]3957
+
+Types for level: 3
+
+
+Name:  ints
+Depth: 2
+
+s             0 [loomlist]3960
+i             0 [loomlist]3961
+f             0 [loomlist]3962
+
+Types for level: 3
+
+
+Name:  ints
+Depth: 2
+
+i             0 [loomlist]3964
+f             0 [loomlist]3965
+
+Types for level: 3
+
+
+Name:  ints
+Depth: 2
+
+s             0 [loomlist]3967
+i             0 [loomlist]3968
+
+Types for level: 3
+
+
+Name:  ints
+Depth: 2
+
+i             0 [loomlist]3970
+
+Types for level: 3
+
+
+Name:  ints
+Depth: 2
+
+s             0 [loomlist]3972
+i             0 [loomlist]3973
+fmt           0 [loomlist]3974
+
+Types for level: 3
+
+
+Name:  ints
+Depth: 2
+
+i             0 [loomlist]3976
+fmt           0 [loomlist]3977
+
+Types for level: 3
+
+
+Name:  reals
+Depth: 2
+
+s             0 [loomlist]3979
+r             0 [loomlist]3980
+f             0 [loomlist]3981
+
+Types for level: 3
+
+
+Name:  reals
+Depth: 2
+
+r             0 [loomlist]3983
+f             0 [loomlist]3984
+
+Types for level: 3
+
+
+Name:  reals
+Depth: 2
+
+s             0 [loomlist]3986
+r             0 [loomlist]3987
+
+Types for level: 3
+
+
+Name:  reals
+Depth: 2
+
+r             0 [loomlist]3989
+
+Types for level: 3
+
+
+Name:  reals
+Depth: 2
+
+s             0 [loomlist]3991
+r             0 [loomlist]3992
+fr            0 [loomlist]3994
+fl            0 [loomlist]3993
+
+Types for level: 3
+
+
+Name:  reals
+Depth: 2
+
+r             0 [loomlist]3996
+fr            0 [loomlist]3998
+fl            0 [loomlist]3997
+
+Types for level: 3
+
+
+Name:  reals
+Depth: 2
+
+s             0 [loomlist]4000
+r             0 [loomlist]4001
+fmt           0 [loomlist]4002
+
+Types for level: 3
+
+
+Name:  reals
+Depth: 2
+
+r             0 [loomlist]4004
+fmt           0 [loomlist]4005
+
+Types for level: 3
+
+
+Name:  reales
+Depth: 2
+
+s             0 [loomlist]4007
+r             0 [loomlist]4008
+f             0 [loomlist]4009
+
+Types for level: 3
+
+
+Name:  reales
+Depth: 2
+
+r             0 [loomlist]4011
+f             0 [loomlist]4012
+
+Types for level: 3
+
+
+Name:  reales
+Depth: 2
+
+s             0 [loomlist]4014
+r             0 [loomlist]4015
+
+Types for level: 3
+
+
+Name:  reales
+Depth: 2
+
+r             0 [loomlist]4017
+
+Types for level: 3
+
+
+Name:  hexs
+Depth: 2
+
+w             0 [loomlist]4020
+s             0 [loomlist]4019
+f             0 [loomlist]4021
+
+Types for level: 3
+
+
+Name:  hexs
+Depth: 2
+
+w             0 [loomlist]4023
+f             0 [loomlist]4024
+
+Types for level: 3
+
+
+Name:  hexs
+Depth: 2
+
+w             0 [loomlist]4027
+s             0 [loomlist]4026
+
+Types for level: 3
+
+
+Name:  hexs
+Depth: 2
+
+w             0 [loomlist]4029
+
+Types for level: 3
+
+
+Name:  hexs
+Depth: 2
+
+s             0 [loomlist]4031
+i             0 [loomlist]4032
+fmt           0 [loomlist]4033
+
+Types for level: 3
+
+
+Name:  hexs
+Depth: 2
+
+i             0 [loomlist]4035
+fmt           0 [loomlist]4036
+
+Types for level: 3
+
+
+Name:  octs
+Depth: 2
+
+w             0 [loomlist]4039
+s             0 [loomlist]4038
+f             0 [loomlist]4040
+
+Types for level: 3
+
+
+Name:  octs
+Depth: 2
+
+w             0 [loomlist]4042
+f             0 [loomlist]4043
+
+Types for level: 3
+
+
+Name:  octs
+Depth: 2
+
+w             0 [loomlist]4046
+s             0 [loomlist]4045
+
+Types for level: 3
+
+
+Name:  octs
+Depth: 2
+
+w             0 [loomlist]4048
+
+Types for level: 3
+
+
+Name:  octs
+Depth: 2
+
+s             0 [loomlist]4050
+i             0 [loomlist]4051
+fmt           0 [loomlist]4052
+
+Types for level: 3
+
+
+Name:  octs
+Depth: 2
+
+i             0 [loomlist]4054
+fmt           0 [loomlist]4055
+
+Types for level: 3
+
+
+Name:  bins
+Depth: 2
+
+w             0 [loomlist]4058
+s             0 [loomlist]4057
+f             0 [loomlist]4059
+
+Types for level: 3
+
+
+Name:  bins
+Depth: 2
+
+w             0 [loomlist]4061
+f             0 [loomlist]4062
+
+Types for level: 3
+
+
+Name:  bins
+Depth: 2
+
+w             0 [loomlist]4065
+s             0 [loomlist]4064
+
+Types for level: 3
+
+
+Name:  bins
+Depth: 2
+
+w             0 [loomlist]4067
+
+Types for level: 3
+
+
+Name:  bins
+Depth: 2
+
+s             0 [loomlist]4069
+i             0 [loomlist]4070
+fmt           0 [loomlist]4071
+
+Types for level: 3
+
+
+Name:  bins
+Depth: 2
+
+i             0 [loomlist]4073
+fmt           0 [loomlist]4074
+
+Types for level: 3
+
+
+Name:  writed
+Depth: 2
+
+i             0 [loomlist]4077
+fmt           0 [loomlist]4078
+f             0 [loomlist]4076
+
+Types for level: 3
+
+
+Name:  writed
+Depth: 2
+
+i             0 [loomlist]4080
+fmt           0 [loomlist]4081
+
+Types for level: 3
+
+
+Name:  writer
+Depth: 2
+
+r             0 [loomlist]4084
+fmt           0 [loomlist]4085
+f             0 [loomlist]4083
+
+Types for level: 3
+
+
+Name:  writer
+Depth: 2
+
+r             0 [loomlist]4087
+fmt           0 [loomlist]4088
+
+Types for level: 3
+
+
+Name:  writere
+Depth: 2
+
+r             0 [loomlist]4091
+fl            0 [loomlist]4092
+f             0 [loomlist]4090
+
+Types for level: 3
+
+
+Name:  writere
+Depth: 2
+
+r             0 [loomlist]4094
+fl            0 [loomlist]4095
+
+Types for level: 3
+
+
+Name:  writere
+Depth: 2
+
+r             0 [loomlist]4098
+f             0 [loomlist]4097
+
+Types for level: 3
+
+
+Name:  writere
+Depth: 2
+
+r             0 [loomlist]4100
+
+Types for level: 3
+
+
+Name:  writeh
+Depth: 2
+
+i             0 [loomlist]4103
+fl            0 [loomlist]4104
+f             0 [loomlist]4102
+
+Types for level: 3
+
+
+Name:  writeh
+Depth: 2
+
+i             0 [loomlist]4106
+fl            0 [loomlist]4107
+
+Types for level: 3
+
+
+Name:  writeh
+Depth: 2
+
+i             0 [loomlist]4110
+f             0 [loomlist]4109
+
+Types for level: 3
+
+
+Name:  writeh
+Depth: 2
+
+i             0 [loomlist]4112
+
+Types for level: 3
+
+
+Name:  writeh
+Depth: 2
+
+i             0 [loomlist]4115
+fmt           0 [loomlist]4116
+f             0 [loomlist]4114
+
+Types for level: 3
+
+
+Name:  writeh
+Depth: 2
+
+i             0 [loomlist]4118
+fmt           0 [loomlist]4119
+
+Types for level: 3
+
+
+Name:  writeo
+Depth: 2
+
+i             0 [loomlist]4122
+fl            0 [loomlist]4123
+f             0 [loomlist]4121
+
+Types for level: 3
+
+
+Name:  writeo
+Depth: 2
+
+i             0 [loomlist]4125
+fl            0 [loomlist]4126
+
+Types for level: 3
+
+
+Name:  writeo
+Depth: 2
+
+i             0 [loomlist]4129
+f             0 [loomlist]4128
+
+Types for level: 3
+
+
+Name:  writeo
+Depth: 2
+
+i             0 [loomlist]4131
+
+Types for level: 3
+
+
+Name:  writeo
+Depth: 2
+
+i             0 [loomlist]4134
+fmt           0 [loomlist]4135
+f             0 [loomlist]4133
+
+Types for level: 3
+
+
+Name:  writeo
+Depth: 2
+
+i             0 [loomlist]4137
+fmt           0 [loomlist]4138
+
+Types for level: 3
+
+
+Name:  writeb
+Depth: 2
+
+i             0 [loomlist]4141
+fl            0 [loomlist]4142
+f             0 [loomlist]4140
+
+Types for level: 3
+
+
+Name:  writeb
+Depth: 2
+
+i             0 [loomlist]4144
+fl            0 [loomlist]4145
+
+Types for level: 3
+
+
+Name:  writeb
+Depth: 2
+
+i             0 [loomlist]4148
+f             0 [loomlist]4147
+
+Types for level: 3
+
+
+Name:  writeb
+Depth: 2
+
+i             0 [loomlist]4150
+
+Types for level: 3
+
+
+Name:  writeb
+Depth: 2
+
+i             0 [loomlist]4153
+fmt           0 [loomlist]4154
+f             0 [loomlist]4152
+
+Types for level: 3
+
+
+Name:  writeb
+Depth: 2
+
+i             0 [loomlist]4156
+fmt           0 [loomlist]4157
+
+Types for level: 3
+
+
+Name:  intv
+Depth: 2
+
+s             0 [loomlist]4159
+
+Types for level: 3
+
+
+Name:  intv
+Depth: 2
+
+s             0 [loomlist]4161
+
+Types for level: 3
+
+
+Name:  intv
+Depth: 2
+
+s             0 [loomlist]4163
+ovf           0 [loomlist]4164
+
+Types for level: 3
+
+
+Name:  intv
+Depth: 2
+
+s             0 [loomlist]4166
+ovf           0 [loomlist]4167
+
+Types for level: 3
+
+
+Name:  hexv
+Depth: 2
+
+s             0 [loomlist]4169
+
+Types for level: 3
+
+
+Name:  hexv
+Depth: 2
+
+s             0 [loomlist]4171
+
+Types for level: 3
+
+
+Name:  hexv
+Depth: 2
+
+s             0 [loomlist]4173
+ovf           0 [loomlist]4174
+
+Types for level: 3
+
+
+Name:  hexv
+Depth: 2
+
+s             0 [loomlist]4176
+ovf           0 [loomlist]4177
+
+Types for level: 3
+
+
+Name:  octv
+Depth: 2
+
+s             0 [loomlist]4179
+
+Types for level: 3
+
+
+Name:  octv
+Depth: 2
+
+s             0 [loomlist]4181
+
+Types for level: 3
+
+
+Name:  octv
+Depth: 2
+
+s             0 [loomlist]4183
+ovf           0 [loomlist]4184
+
+Types for level: 3
+
+
+Name:  octv
+Depth: 2
+
+s             0 [loomlist]4186
+ovf           0 [loomlist]4187
+
+Types for level: 3
+
+
+Name:  binv
+Depth: 2
+
+s             0 [loomlist]4189
+
+Types for level: 3
+
+
+Name:  binv
+Depth: 2
+
+s             0 [loomlist]4191
+
+Types for level: 3
+
+
+Name:  binv
+Depth: 2
+
+s             0 [loomlist]4193
+ovf           0 [loomlist]4194
+
+Types for level: 3
+
+
+Name:  binv
+Depth: 2
+
+s             0 [loomlist]4196
+ovf           0 [loomlist]4197
+
+Types for level: 3
+
+
+Name:  realv
+Depth: 2
+
+s             0 [loomlist]4199
+
+Types for level: 3
+
+
+Name:  realv
+Depth: 2
+
+s             0 [loomlist]4201
+
+Types for level: 3
+
+
+Name:  openstring
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  closestring
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  exportstring
+Depth: 2
+
+p             0 [loomlist]4205
+
+Types for level: 3
+
+
+Name:  upstring
+Depth: 2
+
+p             0 [loomlist]4207
+
+Types for level: 3
+
+
+Name:  subst
+Depth: 2
+
+s             0 [loomlist]4209
+r             0 [loomlist]4211
+m             0 [loomlist]4210
+
+Types for level: 3
+
+
+Name:  subst
+Depth: 2
+
+s             0 [loomlist]4213
+r             0 [loomlist]4215
+m             0 [loomlist]4214
+
+Types for level: 3
+
+
+Name:  subst
+Depth: 2
+
+s             0 [loomlist]4217
+r             0 [loomlist]4219
+m             0 [loomlist]4218
+
+Types for level: 3
+
+
+Name:  subst
+Depth: 2
+
+s             0 [loomlist]4221
+r             0 [loomlist]4223
+m             0 [loomlist]4222
+
+Types for level: 3
+
+
+Name:  subst
+Depth: 2
+
+s             0 [loomlist]4225
+r             0 [loomlist]4227
+m             0 [loomlist]4226
+
+Types for level: 3
+
+
+Name:  subst
+Depth: 2
+
+s             0 [loomlist]4229
+r             0 [loomlist]4231
+m             0 [loomlist]4230
+
+Types for level: 3
+
+
+Name:  subst
+Depth: 2
+
+s             0 [loomlist]4233
+r             0 [loomlist]4235
+m             0 [loomlist]4234
+
+Types for level: 3
+
+
+Name:  subst
+Depth: 2
+
+s             0 [loomlist]4237
+r             0 [loomlist]4239
+m             0 [loomlist]4238
+
+Types for level: 3
+
+
+Name:  subst
+Depth: 2
+
+s             0 [loomlist]4241
+r             0 [loomlist]4243
+m             0 [loomlist]4242
+
+Types for level: 3
+
+
+Name:  substc
+Depth: 2
+
+s             0 [loomlist]4245
+r             0 [loomlist]4247
+m             0 [loomlist]4246
+
+Types for level: 3
+
+
+Name:  substc
+Depth: 2
+
+s             0 [loomlist]4249
+r             0 [loomlist]4251
+m             0 [loomlist]4250
+
+Types for level: 3
+
+
+Name:  substc
+Depth: 2
+
+s             0 [loomlist]4253
+r             0 [loomlist]4255
+m             0 [loomlist]4254
+
+Types for level: 3
+
+
+Name:  substc
+Depth: 2
+
+s             0 [loomlist]4257
+r             0 [loomlist]4259
+m             0 [loomlist]4258
+
+Types for level: 3
+
+
+Name:  substc
+Depth: 2
+
+s             0 [loomlist]4261
+r             0 [loomlist]4263
+m             0 [loomlist]4262
+
+Types for level: 3
+
+
+Name:  substc
+Depth: 2
+
+s             0 [loomlist]4265
+r             0 [loomlist]4267
+m             0 [loomlist]4266
+
+Types for level: 3
+
+
+Name:  substc
+Depth: 2
+
+s             0 [loomlist]4269
+r             0 [loomlist]4271
+m             0 [loomlist]4270
+
+Types for level: 3
+
+
+Name:  substc
+Depth: 2
+
+s             0 [loomlist]4273
+r             0 [loomlist]4275
+m             0 [loomlist]4274
+
+Types for level: 3
+
+
+Name:  substc
+Depth: 2
+
+s             0 [loomlist]4277
+r             0 [loomlist]4279
+m             0 [loomlist]4278
+
+Types for level: 3
+
+
+Name:  substall
+Depth: 2
+
+s             0 [loomlist]4281
+r             0 [loomlist]4283
+m             0 [loomlist]4282
+
+Types for level: 3
+
+
+Name:  substall
+Depth: 2
+
+s             0 [loomlist]4285
+r             0 [loomlist]4287
+m             0 [loomlist]4286
+
+Types for level: 3
+
+
+Name:  substall
+Depth: 2
+
+s             0 [loomlist]4289
+r             0 [loomlist]4291
+m             0 [loomlist]4290
+
+Types for level: 3
+
+
+Name:  substall
+Depth: 2
+
+s             0 [loomlist]4293
+r             0 [loomlist]4295
+m             0 [loomlist]4294
+
+Types for level: 3
+
+
+Name:  substall
+Depth: 2
+
+s             0 [loomlist]4297
+r             0 [loomlist]4299
+m             0 [loomlist]4298
+
+Types for level: 3
+
+
+Name:  substall
+Depth: 2
+
+s             0 [loomlist]4301
+r             0 [loomlist]4303
+m             0 [loomlist]4302
+
+Types for level: 3
+
+
+Name:  substall
+Depth: 2
+
+s             0 [loomlist]4305
+r             0 [loomlist]4307
+m             0 [loomlist]4306
+
+Types for level: 3
+
+
+Name:  substall
+Depth: 2
+
+s             0 [loomlist]4309
+r             0 [loomlist]4311
+m             0 [loomlist]4310
+
+Types for level: 3
+
+
+Name:  substall
+Depth: 2
+
+s             0 [loomlist]4313
+r             0 [loomlist]4315
+m             0 [loomlist]4314
+
+Types for level: 3
+
+
+Name:  substcall
+Depth: 2
+
+s             0 [loomlist]4317
+r             0 [loomlist]4319
+m             0 [loomlist]4318
+
+Types for level: 3
+
+
+Name:  substcall
+Depth: 2
+
+s             0 [loomlist]4321
+r             0 [loomlist]4323
+m             0 [loomlist]4322
+
+Types for level: 3
+
+
+Name:  substcall
+Depth: 2
+
+s             0 [loomlist]4325
+r             0 [loomlist]4327
+m             0 [loomlist]4326
+
+Types for level: 3
+
+
+Name:  substcall
+Depth: 2
+
+s             0 [loomlist]4329
+r             0 [loomlist]4331
+m             0 [loomlist]4330
+
+Types for level: 3
+
+
+Name:  substcall
+Depth: 2
+
+s             0 [loomlist]4333
+r             0 [loomlist]4335
+m             0 [loomlist]4334
+
+Types for level: 3
+
+
+Name:  substcall
+Depth: 2
+
+s             0 [loomlist]4337
+r             0 [loomlist]4339
+m             0 [loomlist]4338
+
+Types for level: 3
+
+
+Name:  substcall
+Depth: 2
+
+s             0 [loomlist]4341
+r             0 [loomlist]4343
+m             0 [loomlist]4342
+
+Types for level: 3
+
+
+Name:  substcall
+Depth: 2
+
+s             0 [loomlist]4345
+r             0 [loomlist]4347
+m             0 [loomlist]4346
+
+Types for level: 3
+
+
+Name:  substcall
+Depth: 2
+
+s             0 [loomlist]4349
+r             0 [loomlist]4351
+m             0 [loomlist]4350
+Processing: c:\ip\windows\i80386\lib\extlib.pas
+
+Types for level: 3
+
+
+Name:  list
+Depth: 2
+
+l             0 [loomlist]4391
+f             0 [loomlist]4390
+
+Types for level: 3
+
+
+Name:  list
+Depth: 2
+
+l             0 [loomlist]4394
+f             0 [loomlist]4393
+
+Types for level: 3
+
+
+Name:  times
+Depth: 2
+
+t             0 [loomlist]4397
+s             0 [loomlist]4396
+
+Types for level: 3
+
+
+Name:  times
+Depth: 2
+
+t             0 [loomlist]4399
+
+Types for level: 3
+
+
+Name:  dates
+Depth: 2
+
+t             0 [loomlist]4402
+s             0 [loomlist]4401
+
+Types for level: 3
+
+
+Name:  dates
+Depth: 2
+
+t             0 [loomlist]4404
+
+Types for level: 3
+
+
+Name:  writetime
+Depth: 2
+
+t             0 [loomlist]4407
+f             0 [loomlist]4406
+
+Types for level: 3
+
+
+Name:  writetime
+Depth: 2
+
+t             0 [loomlist]4409
+
+Types for level: 3
+
+
+Name:  writedate
+Depth: 2
+
+t             0 [loomlist]4412
+f             0 [loomlist]4411
+
+Types for level: 3
+
+
+Name:  writedate
+Depth: 2
+
+t             0 [loomlist]4414
+
+Types for level: 3
+
+
+Name:  time
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  local
+Depth: 2
+
+t             0 [loomlist]4417
+
+Types for level: 3
+
+
+Name:  clock
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  elapsed
+Depth: 2
+
+r             0 [loomlist]4420
+
+Types for level: 3
+
+
+Name:  validfile
+Depth: 2
+
+s             0 [loomlist]4422
+
+Types for level: 3
+
+
+Name:  validfile
+Depth: 2
+
+s             0 [loomlist]4424
+
+Types for level: 3
+
+
+Name:  validpath
+Depth: 2
+
+s             0 [loomlist]4426
+
+Types for level: 3
+
+
+Name:  validpath
+Depth: 2
+
+s             0 [loomlist]4428
+
+Types for level: 3
+
+
+Name:  wild
+Depth: 2
+
+s             0 [loomlist]4430
+
+Types for level: 3
+
+
+Name:  wild
+Depth: 2
+
+s             0 [loomlist]4432
+
+Types for level: 3
+
+
+Name:  getenv
+Depth: 2
+
+ls            0 [loomlist]4434
+ds            0 [loomlist]4435
+
+Types for level: 3
+
+
+Name:  getenv
+Depth: 2
+
+ls            0 [loomlist]4437
+
+Types for level: 3
+
+
+Name:  setenv
+Depth: 2
+
+sn            0 [loomlist]4439
+sd            0 [loomlist]4440
+
+Types for level: 3
+
+
+Name:  setenv
+Depth: 2
+
+sn            0 [loomlist]4442
+sd            0 [loomlist]4443
+
+Types for level: 3
+
+
+Name:  setenv
+Depth: 2
+
+sn            0 [loomlist]4445
+sd            0 [loomlist]4446
+
+Types for level: 3
+
+
+Name:  setenv
+Depth: 2
+
+sn            0 [loomlist]4448
+sd            0 [loomlist]4449
+
+Types for level: 3
+
+
+Name:  allenv
+Depth: 2
+
+el            0 [loomlist]4451
+
+Types for level: 3
+
+
+Name:  remenv
+Depth: 2
+
+sn            0 [loomlist]4453
+
+Types for level: 3
+
+
+Name:  remenv
+Depth: 2
+
+sn            0 [loomlist]4455
+
+Types for level: 3
+
+
+Name:  exec
+Depth: 2
+
+cmd           0 [loomlist]4457
+
+Types for level: 3
+
+
+Name:  exec
+Depth: 2
+
+cmd           0 [loomlist]4459
+
+Types for level: 3
+
+
+Name:  exece
+Depth: 2
+
+el            0 [loomlist]4462
+cmd           0 [loomlist]4461
+
+Types for level: 3
+
+
+Name:  exece
+Depth: 2
+
+el            0 [loomlist]4465
+cmd           0 [loomlist]4464
+
+Types for level: 3
+
+
+Name:  execw
+Depth: 2
+
+e             0 [loomlist]4468
+cmd           0 [loomlist]4467
+
+Types for level: 3
+
+
+Name:  execw
+Depth: 2
+
+e             0 [loomlist]4471
+cmd           0 [loomlist]4470
+
+Types for level: 3
+
+
+Name:  execew
+Depth: 2
+
+el            0 [loomlist]4474
+e             0 [loomlist]4475
+cmd           0 [loomlist]4473
+
+Types for level: 3
+
+
+Name:  execew
+Depth: 2
+
+el            0 [loomlist]4478
+e             0 [loomlist]4479
+cmd           0 [loomlist]4477
+
+Types for level: 3
+
+
+Name:  getcur
+Depth: 2
+
+fn            0 [loomlist]4481
+
+Types for level: 3
+
+
+Name:  getcur
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  setcur
+Depth: 2
+
+fn            0 [loomlist]4484
+
+Types for level: 3
+
+
+Name:  setcur
+Depth: 2
+
+fn            0 [loomlist]4486
+
+Types for level: 3
+
+
+Name:  brknam
+Depth: 2
+
+p             0 [loomlist]4489
+n             0 [loomlist]4490
+fn            0 [loomlist]4488
+e             0 [loomlist]4491
+
+Types for level: 3
+
+
+Name:  brknam
+Depth: 2
+
+p             0 [loomlist]4494
+n             0 [loomlist]4495
+fn            0 [loomlist]4493
+e             0 [loomlist]4496
+
+Types for level: 3
+
+
+Name:  brknam
+Depth: 2
+
+p             0 [loomlist]4499
+n             0 [loomlist]4500
+fn            0 [loomlist]4498
+e             0 [loomlist]4501
+
+Types for level: 3
+
+
+Name:  maknam
+Depth: 2
+
+p             0 [loomlist]4504
+n             0 [loomlist]4505
+fn            0 [loomlist]4503
+e             0 [loomlist]4506
+
+Types for level: 3
+
+
+Name:  maknam
+Depth: 2
+
+p             0 [loomlist]4508
+n             0 [loomlist]4509
+e             0 [loomlist]4510
+
+Types for level: 3
+
+
+Name:  maknam
+Depth: 2
+
+p             0 [loomlist]4512
+n             0 [loomlist]4513
+e             0 [loomlist]4514
+
+Types for level: 3
+
+
+Name:  maknam
+Depth: 2
+
+p             0 [loomlist]4516
+n             0 [loomlist]4517
+e             0 [loomlist]4518
+
+Types for level: 3
+
+
+Name:  maknam
+Depth: 2
+
+p             0 [loomlist]4520
+n             0 [loomlist]4521
+e             0 [loomlist]4522
+
+Types for level: 3
+
+
+Name:  maknam
+Depth: 2
+
+p             0 [loomlist]4524
+n             0 [loomlist]4525
+e             0 [loomlist]4526
+
+Types for level: 3
+
+
+Name:  maknam
+Depth: 2
+
+p             0 [loomlist]4528
+n             0 [loomlist]4529
+e             0 [loomlist]4530
+
+Types for level: 3
+
+
+Name:  maknam
+Depth: 2
+
+p             0 [loomlist]4532
+n             0 [loomlist]4533
+e             0 [loomlist]4534
+
+Types for level: 3
+
+
+Name:  maknam
+Depth: 2
+
+p             0 [loomlist]4536
+n             0 [loomlist]4537
+e             0 [loomlist]4538
+
+Types for level: 3
+
+
+Name:  fulnam
+Depth: 2
+
+fn            0 [loomlist]4540
+
+Types for level: 3
+
+
+Name:  fulnam
+Depth: 2
+
+fn            0 [loomlist]4542
+
+Types for level: 3
+
+
+Name:  getpgm
+Depth: 2
+
+p             0 [loomlist]4544
+
+Types for level: 3
+
+
+Name:  getpgm
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  getusr
+Depth: 2
+
+fn            0 [loomlist]4547
+
+Types for level: 3
+
+
+Name:  getusr
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  setatr
+Depth: 2
+
+fn            0 [loomlist]4550
+a             0 [loomlist]4551
+
+Types for level: 3
+
+
+Name:  setatr
+Depth: 2
+
+fn            0 [loomlist]4553
+a             0 [loomlist]4554
+
+Types for level: 3
+
+
+Name:  resatr
+Depth: 2
+
+fn            0 [loomlist]4556
+a             0 [loomlist]4557
+
+Types for level: 3
+
+
+Name:  resatr
+Depth: 2
+
+fn            0 [loomlist]4559
+a             0 [loomlist]4560
+
+Types for level: 3
+
+
+Name:  bakupd
+Depth: 2
+
+fn            0 [loomlist]4562
+
+Types for level: 3
+
+
+Name:  bakupd
+Depth: 2
+
+fn            0 [loomlist]4564
+
+Types for level: 3
+
+
+Name:  setuper
+Depth: 2
+
+p             0 [loomlist]4567
+fn            0 [loomlist]4566
+
+Types for level: 3
+
+
+Name:  setuper
+Depth: 2
+
+p             0 [loomlist]4570
+fn            0 [loomlist]4569
+
+Types for level: 3
+
+
+Name:  resuper
+Depth: 2
+
+p             0 [loomlist]4573
+fn            0 [loomlist]4572
+
+Types for level: 3
+
+
+Name:  resuper
+Depth: 2
+
+p             0 [loomlist]4576
+fn            0 [loomlist]4575
+
+Types for level: 3
+
+
+Name:  setgper
+Depth: 2
+
+p             0 [loomlist]4579
+fn            0 [loomlist]4578
+
+Types for level: 3
+
+
+Name:  setgper
+Depth: 2
+
+p             0 [loomlist]4582
+fn            0 [loomlist]4581
+
+Types for level: 3
+
+
+Name:  resgper
+Depth: 2
+
+p             0 [loomlist]4585
+fn            0 [loomlist]4584
+
+Types for level: 3
+
+
+Name:  resgper
+Depth: 2
+
+p             0 [loomlist]4588
+fn            0 [loomlist]4587
+
+Types for level: 3
+
+
+Name:  setoper
+Depth: 2
+
+p             0 [loomlist]4591
+fn            0 [loomlist]4590
+
+Types for level: 3
+
+
+Name:  setoper
+Depth: 2
+
+p             0 [loomlist]4594
+fn            0 [loomlist]4593
+
+Types for level: 3
+
+
+Name:  resoper
+Depth: 2
+
+p             0 [loomlist]4597
+fn            0 [loomlist]4596
+
+Types for level: 3
+
+
+Name:  resoper
+Depth: 2
+
+p             0 [loomlist]4600
+fn            0 [loomlist]4599
+
+Types for level: 3
+
+
+Name:  seterr
+Depth: 2
+
+c             0 [loomlist]4602
+
+Types for level: 3
+
+
+Name:  makpth
+Depth: 2
+
+fn            0 [loomlist]4604
+
+Types for level: 3
+
+
+Name:  makpth
+Depth: 2
+
+fn            0 [loomlist]4606
+
+Types for level: 3
+
+
+Name:  rempth
+Depth: 2
+
+fn            0 [loomlist]4608
+
+Types for level: 3
+
+
+Name:  rempth
+Depth: 2
+
+fn            0 [loomlist]4610
+
+Types for level: 3
+
+
+Name:  filchr
+Depth: 2
+
+fc            0 [loomlist]4612
+
+Types for level: 3
+
+
+Name:  optchr
+Depth: 2
+
+
+Types for level: 3
+
+
+Name:  pthchr
+Depth: 2
+
+wrttyp: begin
+wrttyp: t:          25
+wrttyp: t:           4
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false        255
+wrttyp: t:          15
+wrttyp: t:          16
+wrttyp: t:          18
+wrttyp: t:          16
+wrttyp: t:          19
+wrttyp: t:          18
+wrttyp: t:          16
+wrttyp: t:          20
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false        255
+wrttyp: t:          15
+wrttyp: t:           3
+wrttyp: s: false      32768
+wrttyp: t:           3
+wrttyp: s:  true      32768
+wrttyp: t:           3
+wrttyp: s: false      32767
+wrttyp: t:          15
+wrttyp: t:           3
+wrttyp: s: false      32768
+wrttyp: t:           3
+wrttyp: s:  true      32768
+wrttyp: t:           3
+wrttyp: s: false      32767
+wrttyp: t:          15
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false      65535
+wrttyp: t:          15
+wrttyp: t:           3
+wrttyp: s: false         10
+wrttyp: t:           3
+wrttyp: s:  true         10
+wrttyp: t:           3
+wrttyp: s: false         11
+wrttyp: t:           3
+wrttyp: s:  true         11
+wrttyp: t:           3
+wrttyp: s: false         12
+wrttyp: t:           3
+wrttyp: s:  true         12
+wrttyp: t:           3
+wrttyp: s: false          1
+wrttyp: t:           3
+wrttyp: s:  true          1
+wrttyp: t:           3
+wrttyp: s: false 1073741824
+wrttyp: t:           3
+wrttyp: s: false  536870912
+wrttyp: t:           3
+wrttyp: s: false  268435456
+wrttyp: t:           3
+wrttyp: s: false   13369376
+wrttyp: t:           3
+wrttyp: s: false   15597702
+wrttyp: t:           3
+wrttyp: s: false    8913094
+wrttyp: t:           3
+wrttyp: s: false    6684742
+wrttyp: t:           3
+wrttyp: s: false    4457256
+wrttyp: t:           3
+wrttyp: s: false    3342344
+wrttyp: t:           3
+wrttyp: s: false    1114278
+wrttyp: t:           3
+wrttyp: s: false   12583114
+wrttyp: t:           3
+wrttyp: s: false   12255782
+wrttyp: t:           3
+wrttyp: s: false   15728673
+wrttyp: t:           3
+wrttyp: s: false   16452105
+wrttyp: t:           3
+wrttyp: s: false    5898313
+wrttyp: t:           3
+wrttyp: s: false    5570569
+wrttyp: t:           3
+wrttyp: s: false         66
+wrttyp: t:           3
+wrttyp: s: false   16711778
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false          1
+wrttyp: t:           3
+wrttyp: s: false          2
+wrttyp: t:           3
+wrttyp: s: false          3
+wrttyp: t:           3
+wrttyp: s: false          4
+wrttyp: t:           3
+wrttyp: s: false          5
+wrttyp: t:           3
+wrttyp: s: false          6
+wrttyp: t:           3
+wrttyp: s: false          7
+wrttyp: t:           3
+wrttyp: s: false          8
+wrttyp: t:           3
+wrttyp: s: false         15
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false        256
+wrttyp: t:           3
+wrttyp: s: false        512
+wrttyp: t:           3
+wrttyp: s: false       3840
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false       4096
+wrttyp: t:           3
+wrttyp: s: false       8192
+wrttyp: t:           3
+wrttyp: s: false      61440
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false      65536
+wrttyp: t:           3
+wrttyp: s: false     983040
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false          1
+wrttyp: t:           3
+wrttyp: s: false          2
+wrttyp: t:           3
+wrttyp: s: false          3
+wrttyp: t:           3
+wrttyp: s: false          4
+wrttyp: t:           3
+wrttyp: s: false          5
+wrttyp: t:           3
+wrttyp: s: false          6
+wrttyp: t:           3
+wrttyp: s: false          7
+wrttyp: t:           3
+wrttyp: s: false          1
+wrttyp: t:           3
+wrttyp: s: false          2
+wrttyp: t:           3
+wrttyp: s: false          3
+wrttyp: t:           3
+wrttyp: s: false          4
+wrttyp: t:           3
+wrttyp: s: false          5
+wrttyp: t:           3
+wrttyp: s: false          6
+wrttyp: t:           3
+wrttyp: s: false          7
+wrttyp: t:           3
+wrttyp: s: false          8
+wrttyp: t:           3
+wrttyp: s: false          9
+wrttyp: t:           3
+wrttyp: s: false         10
+wrttyp: t:           3
+wrttyp: s: false         11
+wrttyp: t:           3
+wrttyp: s: false         12
+wrttyp: t:           3
+wrttyp: s: false         13
+wrttyp: t:           3
+wrttyp: s: false         14
+wrttyp: t:           3
+wrttyp: s: false         15
+wrttyp: t:           3
+wrttyp: s: false         16
+wrttyp: t:           3
+wrttyp: s: false         16
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false          1
+wrttyp: t:           3
+wrttyp: s: false          2
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false         16
+wrttyp: t:           3
+wrttyp: s: false         32
+wrttyp: t:           3
+wrttyp: s: false         48
+wrttyp: t:           3
+wrttyp: s: false         64
+wrttyp: t:           3
+wrttyp: s: false        256
+wrttyp: t:           3
+wrttyp: s: false        512
+wrttyp: t:           3
+wrttyp: s: false       1024
+wrttyp: t:           3
+wrttyp: s: false       2048
+wrttyp: t:           3
+wrttyp: s: false       4096
+wrttyp: t:           3
+wrttyp: s: false       8192
+wrttyp: t:           3
+wrttyp: s: false      16384
+wrttyp: t:           3
+wrttyp: s: false      32768
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false          2
+wrttyp: t:           3
+wrttyp: s: false         16
+wrttyp: t:           3
+wrttyp: s: false         32
+wrttyp: t:           3
+wrttyp: s: false         64
+wrttyp: t:           3
+wrttyp: s: false        128
+wrttyp: t:           3
+wrttyp: s: false        256
+wrttyp: t:           3
+wrttyp: s: false       4096
+wrttyp: t:           3
+wrttyp: s: false       8192
+wrttyp: t:           3
+wrttyp: s: false       8192
+wrttyp: t:           3
+wrttyp: s: false      16384
+wrttyp: t:           3
+wrttyp: s: false      32626
+wrttyp: t:           3
+wrttyp: s: false      32768
+wrttyp: t:           3
+wrttyp: s: false          1
+wrttyp: t:           3
+wrttyp: s: false          2
+wrttyp: t:           3
+wrttyp: s: false          3
+wrttyp: t:           3
+wrttyp: s: false          4
+wrttyp: t:           3
+wrttyp: s: false          8
+wrttyp: t:           3
+wrttyp: s: false          9
+wrttyp: t:           3
+wrttyp: s: false         12
+wrttyp: t:           3
+wrttyp: s: false         13
+wrttyp: t:           3
+wrttyp: s: false         16
+wrttyp: t:           3
+wrttyp: s: false         17
+wrttyp: t:           3
+wrttyp: s: false         18
+wrttyp: t:           3
+wrttyp: s: false         19
+wrttyp: t:           3
+wrttyp: s: false         20
+wrttyp: t:           3
+wrttyp: s: false         27
+wrttyp: t:           3
+wrttyp: s: false         32
+wrttyp: t:           3
+wrttyp: s: false         33
+wrttyp: t:           3
+wrttyp: s: false         34
+wrttyp: t:           3
+wrttyp: s: false         35
+wrttyp: t:           3
+wrttyp: s: false         36
+wrttyp: t:           3
+wrttyp: s: false         37
+wrttyp: t:           3
+wrttyp: s: false         38
+wrttyp: t:           3
+wrttyp: s: false         39
+wrttyp: t:           3
+wrttyp: s: false         40
+wrttyp: t:           3
+wrttyp: s: false         41
+wrttyp: t:           3
+wrttyp: s: false         42
+wrttyp: t:           3
+wrttyp: s: false         43
+wrttyp: t:           3
+wrttyp: s: false         44
+wrttyp: t:           3
+wrttyp: s: false         45
+wrttyp: t:           3
+wrttyp: s: false         46
+wrttyp: t:           3
+wrttyp: s: false         47
+wrttyp: t:           3
+wrttyp: s: false         96
+wrttyp: t:           3
+wrttyp: s: false         97
+wrttyp: t:           3
+wrttyp: s: false         98
+wrttyp: t:           3
+wrttyp: s: false         99
+wrttyp: t:           3
+wrttyp: s: false        100
+wrttyp: t:           3
+wrttyp: s: false        101
+wrttyp: t:           3
+wrttyp: s: false        102
+wrttyp: t:           3
+wrttyp: s: false        103
+wrttyp: t:           3
+wrttyp: s: false        104
+wrttyp: t:           3
+wrttyp: s: false        105
+wrttyp: t:           3
+wrttyp: s: false        106
+wrttyp: t:           3
+wrttyp: s: false        107
+wrttyp: t:           3
+wrttyp: s: false        108
+wrttyp: t:           3
+wrttyp: s: false        109
+wrttyp: t:           3
+wrttyp: s: false        110
+wrttyp: t:           3
+wrttyp: s: false        111
+wrttyp: t:           3
+wrttyp: s: false        112
+wrttyp: t:           3
+wrttyp: s: false        113
+wrttyp: t:           3
+wrttyp: s: false        114
+wrttyp: t:           3
+wrttyp: s: false        115
+wrttyp: t:           3
+wrttyp: s: false        116
+wrttyp: t:           3
+wrttyp: s: false        117
+wrttyp: t:           3
+wrttyp: s: false        118
+wrttyp: t:           3
+wrttyp: s: false        119
+wrttyp: t:           3
+wrttyp: s: false        120
+wrttyp: t:           3
+wrttyp: s: false        121
+wrttyp: t:           3
+wrttyp: s: false        122
+wrttyp: t:           3
+wrttyp: s: false        123
+wrttyp: t:           3
+wrttyp: s: false        124
+wrttyp: t:           3
+wrttyp: s: false        125
+wrttyp: t:           3
+wrttyp: s: false        126
+wrttyp: t:           3
+wrttyp: s: false        127
+wrttyp: t:           3
+wrttyp: s: false        128
+wrttyp: t:           3
+wrttyp: s: false        129
+wrttyp: t:           3
+wrttyp: s: false        130
+wrttyp: t:           3
+wrttyp: s: false        131
+wrttyp: t:           3
+wrttyp: s: false        132
+wrttyp: t:           3
+wrttyp: s: false        133
+wrttyp: t:           3
+wrttyp: s: false        134
+wrttyp: t:           3
+wrttyp: s: false        135
+wrttyp: t:           3
+wrttyp: s: false        144
+wrttyp: t:           3
+wrttyp: s: false        145
+wrttyp: t:           3
+wrttyp: s: false        160
+wrttyp: t:           3
+wrttyp: s: false        161
+wrttyp: t:           3
+wrttyp: s: false        162
+wrttyp: t:           3
+wrttyp: s: false        163
+wrttyp: t:           3
+wrttyp: s: false        164
+wrttyp: t:           3
+wrttyp: s: false        165
+wrttyp: t:           3
+wrttyp: s: false        246
+wrttyp: t:           3
+wrttyp: s: false        247
+wrttyp: t:           3
+wrttyp: s: false        248
+wrttyp: t:           3
+wrttyp: s: false        249
+wrttyp: t:           3
+wrttyp: s: false        250
+wrttyp: t:           3
+wrttyp: s: false        251
+wrttyp: t:           3
+wrttyp: s: false        252
+wrttyp: t:           3
+wrttyp: s: false        253
+wrttyp: t:           3
+wrttyp: s: false        254
+wrttyp: t:           3
+wrttyp: s: false        260
+wrttyp: t:           3
+wrttyp: s: false          1
+wrttyp: t:           3
+wrttyp: s: false          2
+wrttyp: t:           3
+wrttyp: s: false          1
+wrttyp: t:           3
+wrttyp: s: false          2
+wrttyp: t:           3
+wrttyp: s: false          4
+wrttyp: t:           3
+wrttyp: s: false         16
+wrttyp: t:           3
+wrttyp: s: false         32
+wrttyp: t:           3
+wrttyp: s: false        128
+wrttyp: t:           3
+wrttyp: s: false        256
+wrttyp: t:           3
+wrttyp: s: false        512
+wrttyp: t:           3
+wrttyp: s: false       1024
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false          1
+wrttyp: t:           3
+wrttyp: s: false          2
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false          1
+wrttyp: t:           3
+wrttyp: s: false          2
+wrttyp: t:           3
+wrttyp: s: false          3
+wrttyp: t:           3
+wrttyp: s: false          4
+wrttyp: t:           3
+wrttyp: s: false          5
+wrttyp: t:           3
+wrttyp: s: false          6
+wrttyp: t:           3
+wrttyp: s: false          7
+wrttyp: t:           3
+wrttyp: s: false          8
+wrttyp: t:           3
+wrttyp: s: false          9
+wrttyp: t:           3
+wrttyp: s: false         10
+wrttyp: t:           3
+wrttyp: s: false         11
+wrttyp: t:           3
+wrttyp: s: false         12
+wrttyp: t:           3
+wrttyp: s: false         13
+wrttyp: t:           3
+wrttyp: s: false         14
+wrttyp: t:           3
+wrttyp: s: false         15
+wrttyp: t:           3
+wrttyp: s: false         16
+wrttyp: t:           3
+wrttyp: s: false         17
+wrttyp: t:           3
+wrttyp: s: false         18
+wrttyp: t:           3
+wrttyp: s: false         19
+wrttyp: t:           3
+wrttyp: s: false         20
+wrttyp: t:           3
+wrttyp: s: false         21
+wrttyp: t:           3
+wrttyp: s: false         22
+wrttyp: t:           3
+wrttyp: s: false         23
+wrttyp: t:           3
+wrttyp: s: false         24
+wrttyp: t:           3
+wrttyp: s: false         25
+wrttyp: t:           3
+wrttyp: s: false         26
+wrttyp: t:           3
+wrttyp: s: false         27
+wrttyp: t:           3
+wrttyp: s: false         28
+wrttyp: t:           3
+wrttyp: s: false         29
+wrttyp: t:           3
+wrttyp: s: false         30
+wrttyp: t:           3
+wrttyp: s: false         31
+wrttyp: t:           3
+wrttyp: s: false         32
+wrttyp: t:           3
+wrttyp: s: false         33
+wrttyp: t:           3
+wrttyp: s: false         34
+wrttyp: t:           3
+wrttyp: s: false         36
+wrttyp: t:           3
+wrttyp: s: false         38
+wrttyp: t:           3
+wrttyp: s: false         39
+wrttyp: t:           3
+wrttyp: s: false         50
+wrttyp: t:           3
+wrttyp: s: false         51
+wrttyp: t:           3
+wrttyp: s: false         52
+wrttyp: t:           3
+wrttyp: s: false         53
+wrttyp: t:           3
+wrttyp: s: false         54
+wrttyp: t:           3
+wrttyp: s: false         55
+wrttyp: t:           3
+wrttyp: s: false         56
+wrttyp: t:           3
+wrttyp: s: false         57
+wrttyp: t:           3
+wrttyp: s: false         58
+wrttyp: t:           3
+wrttyp: s: false         59
+wrttyp: t:           3
+wrttyp: s: false         60
+wrttyp: t:           3
+wrttyp: s: false         61
+wrttyp: t:           3
+wrttyp: s: false         62
+wrttyp: t:           3
+wrttyp: s: false         63
+wrttyp: t:           3
+wrttyp: s: false         64
+wrttyp: t:           3
+wrttyp: s: false         65
+wrttyp: t:           3
+wrttyp: s: false         66
+wrttyp: t:           3
+wrttyp: s: false         67
+wrttyp: t:           3
+wrttyp: s: false         68
+wrttyp: t:           3
+wrttyp: s: false         69
+wrttyp: t:           3
+wrttyp: s: false         70
+wrttyp: t:           3
+wrttyp: s: false         71
+wrttyp: t:           3
+wrttyp: s: false         72
+wrttyp: t:           3
+wrttyp: s: false         80
+wrttyp: t:           3
+wrttyp: s: false         82
+wrttyp: t:           3
+wrttyp: s: false         83
+wrttyp: t:           3
+wrttyp: s: false         84
+wrttyp: t:           3
+wrttyp: s: false         85
+wrttyp: t:           3
+wrttyp: s: false         86
+wrttyp: t:           3
+wrttyp: s: false         87
+wrttyp: t:           3
+wrttyp: s: false         88
+wrttyp: t:           3
+wrttyp: s: false         89
+wrttyp: t:           3
+wrttyp: s: false        100
+wrttyp: t:           3
+wrttyp: s: false        101
+wrttyp: t:           3
+wrttyp: s: false        102
+wrttyp: t:           3
+wrttyp: s: false        103
+wrttyp: t:           3
+wrttyp: s: false        104
+wrttyp: t:           3
+wrttyp: s: false        105
+wrttyp: t:           3
+wrttyp: s: false        106
+wrttyp: t:           3
+wrttyp: s: false        107
+wrttyp: t:           3
+wrttyp: s: false        108
+wrttyp: t:           3
+wrttyp: s: false        109
+wrttyp: t:           3
+wrttyp: s: false        110
+wrttyp: t:           3
+wrttyp: s: false        111
+wrttyp: t:           3
+wrttyp: s: false        112
+wrttyp: t:           3
+wrttyp: s: false        113
+wrttyp: t:           3
+wrttyp: s: false        114
+wrttyp: t:           3
+wrttyp: s: false        117
+wrttyp: t:           3
+wrttyp: s: false        118
+wrttyp: t:           3
+wrttyp: s: false        119
+wrttyp: t:           3
+wrttyp: s: false        120
+wrttyp: t:           3
+wrttyp: s: false        121
+wrttyp: t:           3
+wrttyp: s: false        122
+wrttyp: t:           3
+wrttyp: s: false        123
+wrttyp: t:           3
+wrttyp: s: false        124
+wrttyp: t:           3
+wrttyp: s: false        125
+wrttyp: t:           3
+wrttyp: s: false        126
+wrttyp: t:           3
+wrttyp: s: false        127
+wrttyp: t:           3
+wrttyp: s: false        128
+wrttyp: t:           3
+wrttyp: s: false        129
+wrttyp: t:           3
+wrttyp: s: false        130
+wrttyp: t:           3
+wrttyp: s: false        131
+wrttyp: t:           3
+wrttyp: s: false        132
+wrttyp: t:           3
+wrttyp: s: false        133
+wrttyp: t:           3
+wrttyp: s: false        134
+wrttyp: t:           3
+wrttyp: s: false        135
+wrttyp: t:           3
+wrttyp: s: false        136
+wrttyp: t:           3
+wrttyp: s: false        137
+wrttyp: t:           3
+wrttyp: s: false        138
+wrttyp: t:           3
+wrttyp: s: false        139
+wrttyp: t:           3
+wrttyp: s: false        140
+wrttyp: t:           3
+wrttyp: s: false        141
+wrttyp: t:           3
+wrttyp: s: false        142
+wrttyp: t:           3
+wrttyp: s: false        143
+wrttyp: t:           3
+wrttyp: s: false        144
+wrttyp: t:           3
+wrttyp: s: false        145
+wrttyp: t:           3
+wrttyp: s: false        146
+wrttyp: t:           3
+wrttyp: s: false        147
+wrttyp: t:           3
+wrttyp: s: false        148
+wrttyp: t:           3
+wrttyp: s: false        149
+wrttyp: t:           3
+wrttyp: s: false        150
+wrttyp: t:           3
+wrttyp: s: false        151
+wrttyp: t:           3
+wrttyp: s: false        152
+wrttyp: t:           3
+wrttyp: s: false        153
+wrttyp: t:           3
+wrttyp: s: false        154
+wrttyp: t:           3
+wrttyp: s: false        155
+wrttyp: t:           3
+wrttyp: s: false        156
+wrttyp: t:           3
+wrttyp: s: false        157
+wrttyp: t:           3
+wrttyp: s: false        158
+wrttyp: t:           3
+wrttyp: s: false        159
+wrttyp: t:           3
+wrttyp: s: false        160
+wrttyp: t:           3
+wrttyp: s: false        161
+wrttyp: t:           3
+wrttyp: s: false        162
+wrttyp: t:           3
+wrttyp: s: false        164
+wrttyp: t:           3
+wrttyp: s: false        167
+wrttyp: t:           3
+wrttyp: s: false        170
+wrttyp: t:           3
+wrttyp: s: false        173
+wrttyp: t:           3
+wrttyp: s: false        174
+wrttyp: t:           3
+wrttyp: s: false        180
+wrttyp: t:           3
+wrttyp: s: false        182
+wrttyp: t:           3
+wrttyp: s: false        183
+wrttyp: t:           3
+wrttyp: s: false        186
+wrttyp: t:           3
+wrttyp: s: false        187
+wrttyp: t:           3
+wrttyp: s: false        188
+wrttyp: t:           3
+wrttyp: s: false        189
+wrttyp: t:           3
+wrttyp: s: false        190
+wrttyp: t:           3
+wrttyp: s: false        191
+wrttyp: t:           3
+wrttyp: s: false        192
+wrttyp: t:           3
+wrttyp: s: false        193
+wrttyp: t:           3
+wrttyp: s: false        194
+wrttyp: t:           3
+wrttyp: s: false        195
+wrttyp: t:           3
+wrttyp: s: false        196
+wrttyp: t:           3
+wrttyp: s: false        197
+wrttyp: t:           3
+wrttyp: s: false        198
+wrttyp: t:           3
+wrttyp: s: false        199
+wrttyp: t:           3
+wrttyp: s: false        200
+wrttyp: t:           3
+wrttyp: s: false        201
+wrttyp: t:           3
+wrttyp: s: false        202
+wrttyp: t:           3
+wrttyp: s: false        203
+wrttyp: t:           3
+wrttyp: s: false        205
+wrttyp: t:           3
+wrttyp: s: false        206
+wrttyp: t:           3
+wrttyp: s: false        207
+wrttyp: t:           3
+wrttyp: s: false        208
+wrttyp: t:           3
+wrttyp: s: false        209
+wrttyp: t:           3
+wrttyp: s: false        210
+wrttyp: t:           3
+wrttyp: s: false        212
+wrttyp: t:           3
+wrttyp: s: false        214
+wrttyp: t:           3
+wrttyp: s: false        215
+wrttyp: t:           3
+wrttyp: s: false        230
+wrttyp: t:           3
+wrttyp: s: false        231
+wrttyp: t:           3
+wrttyp: s: false        232
+wrttyp: t:           3
+wrttyp: s: false        233
+wrttyp: t:           3
+wrttyp: s: false        234
+wrttyp: t:           3
+wrttyp: s: false        240
+wrttyp: t:           3
+wrttyp: s: false        254
+wrttyp: t:           3
+wrttyp: s: false        255
+wrttyp: t:           3
+wrttyp: s: false        259
+wrttyp: t:           3
+wrttyp: s: false        266
+wrttyp: t:           3
+wrttyp: s: false        267
+wrttyp: t:           3
+wrttyp: s: false        275
+wrttyp: t:           3
+wrttyp: s: false        276
+wrttyp: t:           3
+wrttyp: s: false        277
+wrttyp: t:           3
+wrttyp: s: false        278
+wrttyp: t:           3
+wrttyp: s: false        282
+wrttyp: t:           3
+wrttyp: s: false        288
+wrttyp: t:           3
+wrttyp: s: false        298
+wrttyp: t:           3
+wrttyp: s: false        317
+wrttyp: t:           3
+wrttyp: s: false        487
+wrttyp: t:           3
+wrttyp: s: false        534
+wrttyp: t:           3
+wrttyp: s: false        535
+wrttyp: t:           3
+wrttyp: s: false        536
+wrttyp: t:           3
+wrttyp: s: false        994
+wrttyp: t:           3
+wrttyp: s: false        995
+wrttyp: t:           3
+wrttyp: s: false        996
+wrttyp: t:           3
+wrttyp: s: false        997
+wrttyp: t:           3
+wrttyp: s: false        998
+wrttyp: t:           3
+wrttyp: s: false        999
+wrttyp: t:           3
+wrttyp: s: false       1001
+wrttyp: t:           3
+wrttyp: s: false       1002
+wrttyp: t:           3
+wrttyp: s: false       1003
+wrttyp: t:           3
+wrttyp: s: false       1004
+wrttyp: t:           3
+wrttyp: s: false       1005
+wrttyp: t:           3
+wrttyp: s: false       1006
+wrttyp: t:           3
+wrttyp: s: false       1007
+wrttyp: t:           3
+wrttyp: s: false       1008
+wrttyp: t:           3
+wrttyp: s: false       1009
+wrttyp: t:           3
+wrttyp: s: false       1010
+wrttyp: t:           3
+wrttyp: s: false       1011
+wrttyp: t:           3
+wrttyp: s: false       1012
+wrttyp: t:           3
+wrttyp: s: false       1013
+wrttyp: t:           3
+wrttyp: s: false       1014
+wrttyp: t:           3
+wrttyp: s: false       1015
+wrttyp: t:           3
+wrttyp: s: false       1016
+wrttyp: t:           3
+wrttyp: s: false       1017
+wrttyp: t:           3
+wrttyp: s: false       1018
+wrttyp: t:           3
+wrttyp: s: false       1019
+wrttyp: t:           3
+wrttyp: s: false       1020
+wrttyp: t:           3
+wrttyp: s: false       1021
+wrttyp: t:           3
+wrttyp: s: false       1022
+wrttyp: t:           3
+wrttyp: s: false       1051
+wrttyp: t:           3
+wrttyp: s: false       1052
+wrttyp: t:           3
+wrttyp: s: false       1053
+wrttyp: t:           3
+wrttyp: s: false       1054
+wrttyp: t:           3
+wrttyp: s: false       1055
+wrttyp: t:           3
+wrttyp: s: false       1056
+wrttyp: t:           3
+wrttyp: s: false       1057
+wrttyp: t:           3
+wrttyp: s: false       1058
+wrttyp: t:           3
+wrttyp: s: false       1059
+wrttyp: t:           3
+wrttyp: s: false       1060
+wrttyp: t:           3
+wrttyp: s: false       1061
+wrttyp: t:           3
+wrttyp: s: false       1062
+wrttyp: t:           3
+wrttyp: s: false       1063
+wrttyp: t:           3
+wrttyp: s: false       1064
+wrttyp: t:           3
+wrttyp: s: false       1065
+wrttyp: t:           3
+wrttyp: s: false       1066
+wrttyp: t:           3
+wrttyp: s: false       1067
+wrttyp: t:           3
+wrttyp: s: false       1068
+wrttyp: t:           3
+wrttyp: s: false       1069
+wrttyp: t:           3
+wrttyp: s: false       1070
+wrttyp: t:           3
+wrttyp: s: false       1071
+wrttyp: t:           3
+wrttyp: s: false       1072
+wrttyp: t:           3
+wrttyp: s: false       1073
+wrttyp: t:           3
+wrttyp: s: false       1074
+wrttyp: t:           3
+wrttyp: s: false       1075
+wrttyp: t:           3
+wrttyp: s: false       1076
+wrttyp: t:           3
+wrttyp: s: false       1077
+wrttyp: t:           3
+wrttyp: s: false       1078
+wrttyp: t:           3
+wrttyp: s: false       1100
+wrttyp: t:           3
+wrttyp: s: false       1101
+wrttyp: t:           3
+wrttyp: s: false       1102
+wrttyp: t:           3
+wrttyp: s: false       1103
+wrttyp: t:           3
+wrttyp: s: false       1104
+wrttyp: t:           3
+wrttyp: s: false       1105
+wrttyp: t:           3
+wrttyp: s: false       1106
+wrttyp: t:           3
+wrttyp: s: false       1107
+wrttyp: t:           3
+wrttyp: s: false       1108
+wrttyp: t:           3
+wrttyp: s: false       1109
+wrttyp: t:           3
+wrttyp: s: false       1110
+wrttyp: t:           3
+wrttyp: s: false       1111
+wrttyp: t:           3
+wrttyp: s: false       1112
+wrttyp: t:           3
+wrttyp: s: false       1113
+wrttyp: t:           3
+wrttyp: s: false       1114
+wrttyp: t:           3
+wrttyp: s: false       1115
+wrttyp: t:           3
+wrttyp: s: false       1116
+wrttyp: t:           3
+wrttyp: s: false       1117
+wrttyp: t:           3
+wrttyp: s: false       1118
+wrttyp: t:           3
+wrttyp: s: false       1119
+wrttyp: t:           3
+wrttyp: s: false       1120
+wrttyp: t:           3
+wrttyp: s: false       1121
+wrttyp: t:           3
+wrttyp: s: false       1122
+wrttyp: t:           3
+wrttyp: s: false       1123
+wrttyp: t:           3
+wrttyp: s: false       1124
+wrttyp: t:           3
+wrttyp: s: false       1125
+wrttyp: t:           3
+wrttyp: s: false       1126
+wrttyp: t:           3
+wrttyp: s: false       1127
+wrttyp: t:           3
+wrttyp: s: false       1128
+wrttyp: t:           3
+wrttyp: s: false       1129
+wrttyp: t:           3
+wrttyp: s: false       1130
+wrttyp: t:           3
+wrttyp: s: false       1131
+wrttyp: t:           3
+wrttyp: s: false       1132
+wrttyp: t:           3
+wrttyp: s: false       2202
+wrttyp: t:           3
+wrttyp: s: false       2250
+wrttyp: t:           3
+wrttyp: s: false       2401
+wrttyp: t:           3
+wrttyp: s: false       2404
+wrttyp: t:           3
+wrttyp: s: false       1200
+wrttyp: t:           3
+wrttyp: s: false       1201
+wrttyp: t:           3
+wrttyp: s: false       1202
+wrttyp: t:           3
+wrttyp: s: false       1203
+wrttyp: t:           3
+wrttyp: s: false       1204
+wrttyp: t:           3
+wrttyp: s: false       1205
+wrttyp: t:           3
+wrttyp: s: false       1206
+wrttyp: t:           3
+wrttyp: s: false       1207
+wrttyp: t:           3
+wrttyp: s: false       1208
+wrttyp: t:           3
+wrttyp: s: false       1209
+wrttyp: t:           3
+wrttyp: s: false       1210
+wrttyp: t:           3
+wrttyp: s: false       1211
+wrttyp: t:           3
+wrttyp: s: false       1212
+wrttyp: t:           3
+wrttyp: s: false       1213
+wrttyp: t:           3
+wrttyp: s: false       1214
+wrttyp: t:           3
+wrttyp: s: false       1215
+wrttyp: t:           3
+wrttyp: s: false       1216
+wrttyp: t:           3
+wrttyp: s: false       1217
+wrttyp: t:           3
+wrttyp: s: false       1218
+wrttyp: t:           3
+wrttyp: s: false       1219
+wrttyp: t:           3
+wrttyp: s: false       1220
+wrttyp: t:           3
+wrttyp: s: false       1221
+wrttyp: t:           3
+wrttyp: s: false       1222
+wrttyp: t:           3
+wrttyp: s: false       1300
+wrttyp: t:           3
+wrttyp: s: false       1301
+wrttyp: t:           3
+wrttyp: s: false       1302
+wrttyp: t:           3
+wrttyp: s: false       1303
+wrttyp: t:           3
+wrttyp: s: false       1304
+wrttyp: t:           3
+wrttyp: s: false       1305
+wrttyp: t:           3
+wrttyp: s: false       1306
+wrttyp: t:           3
+wrttyp: s: false       1307
+wrttyp: t:           3
+wrttyp: s: false       1308
+wrttyp: t:           3
+wrttyp: s: false       1309
+wrttyp: t:           3
+wrttyp: s: false       1310
+wrttyp: t:           3
+wrttyp: s: false       1311
+wrttyp: t:           3
+wrttyp: s: false       1312
+wrttyp: t:           3
+wrttyp: s: false       1313
+wrttyp: t:           3
+wrttyp: s: false       1314
+wrttyp: t:           3
+wrttyp: s: false       1315
+wrttyp: t:           3
+wrttyp: s: false       1316
+wrttyp: t:           3
+wrttyp: s: false       1317
+wrttyp: t:           3
+wrttyp: s: false       1318
+wrttyp: t:           3
+wrttyp: s: false       1319
+wrttyp: t:           3
+wrttyp: s: false       1320
+wrttyp: t:           3
+wrttyp: s: false       1321
+wrttyp: t:           3
+wrttyp: s: false       1322
+wrttyp: t:           3
+wrttyp: s: false       1323
+wrttyp: t:           3
+wrttyp: s: false       1324
+wrttyp: t:           3
+wrttyp: s: false       1325
+wrttyp: t:           3
+wrttyp: s: false       1326
+wrttyp: t:           3
+wrttyp: s: false       1327
+wrttyp: t:           3
+wrttyp: s: false       1328
+wrttyp: t:           3
+wrttyp: s: false       1329
+wrttyp: t:           3
+wrttyp: s: false       1330
+wrttyp: t:           3
+wrttyp: s: false       1331
+wrttyp: t:           3
+wrttyp: s: false       1332
+wrttyp: t:           3
+wrttyp: s: false       1333
+wrttyp: t:           3
+wrttyp: s: false       1334
+wrttyp: t:           3
+wrttyp: s: false       1335
+wrttyp: t:           3
+wrttyp: s: false       1336
+wrttyp: t:           3
+wrttyp: s: false       1337
+wrttyp: t:           3
+wrttyp: s: false       1338
+wrttyp: t:           3
+wrttyp: s: false       1340
+wrttyp: t:           3
+wrttyp: s: false       1341
+wrttyp: t:           3
+wrttyp: s: false       1342
+wrttyp: t:           3
+wrttyp: s: false       1343
+wrttyp: t:           3
+wrttyp: s: false       1344
+wrttyp: t:           3
+wrttyp: s: false       1345
+wrttyp: t:           3
+wrttyp: s: false       1346
+wrttyp: t:           3
+wrttyp: s: false       1347
+wrttyp: t:           3
+wrttyp: s: false       1348
+wrttyp: t:           3
+wrttyp: s: false       1349
+wrttyp: t:           3
+wrttyp: s: false       1350
+wrttyp: t:           3
+wrttyp: s: false       1351
+wrttyp: t:           3
+wrttyp: s: false       1352
+wrttyp: t:           3
+wrttyp: s: false       1353
+wrttyp: t:           3
+wrttyp: s: false       1354
+wrttyp: t:           3
+wrttyp: s: false       1355
+wrttyp: t:           3
+wrttyp: s: false       1356
+wrttyp: t:           3
+wrttyp: s: false       1357
+wrttyp: t:           3
+wrttyp: s: false       1358
+wrttyp: t:           3
+wrttyp: s: false       1359
+wrttyp: t:           3
+wrttyp: s: false       1360
+wrttyp: t:           3
+wrttyp: s: false       1361
+wrttyp: t:           3
+wrttyp: s: false       1362
+wrttyp: t:           3
+wrttyp: s: false       1363
+wrttyp: t:           3
+wrttyp: s: false       1364
+wrttyp: t:           3
+wrttyp: s: false       1365
+wrttyp: t:           3
+wrttyp: s: false       1366
+wrttyp: t:           3
+wrttyp: s: false       1367
+wrttyp: t:           3
+wrttyp: s: false       1368
+wrttyp: t:           3
+wrttyp: s: false       1369
+wrttyp: t:           3
+wrttyp: s: false       1370
+wrttyp: t:           3
+wrttyp: s: false       1371
+wrttyp: t:           3
+wrttyp: s: false       1372
+wrttyp: t:           3
+wrttyp: s: false       1373
+wrttyp: t:           3
+wrttyp: s: false       1374
+wrttyp: t:           3
+wrttyp: s: false       1375
+wrttyp: t:           3
+wrttyp: s: false       1376
+wrttyp: t:           3
+wrttyp: s: false       1377
+wrttyp: t:           3
+wrttyp: s: false       1378
+wrttyp: t:           3
+wrttyp: s: false       1379
+wrttyp: t:           3
+wrttyp: s: false       1380
+wrttyp: t:           3
+wrttyp: s: false       1381
+wrttyp: t:           3
+wrttyp: s: false       1382
+wrttyp: t:           3
+wrttyp: s: false       1383
+wrttyp: t:           3
+wrttyp: s: false       1384
+wrttyp: t:           3
+wrttyp: s: false       1385
+wrttyp: t:           3
+wrttyp: s: false       1386
+wrttyp: t:           3
+wrttyp: s: false       1387
+wrttyp: t:           3
+wrttyp: s: false       1388
+wrttyp: t:           3
+wrttyp: s: false       1389
+wrttyp: t:           3
+wrttyp: s: false       1390
+wrttyp: t:           3
+wrttyp: s: false       1391
+wrttyp: t:           3
+wrttyp: s: false       1392
+wrttyp: t:           3
+wrttyp: s: false       1393
+wrttyp: t:           3
+wrttyp: s: false       1394
+wrttyp: t:           3
+wrttyp: s: false       1400
+wrttyp: t:           3
+wrttyp: s: false       1401
+wrttyp: t:           3
+wrttyp: s: false       1402
+wrttyp: t:           3
+wrttyp: s: false       1403
+wrttyp: t:           3
+wrttyp: s: false       1404
+wrttyp: t:           3
+wrttyp: s: false       1405
+wrttyp: t:           3
+wrttyp: s: false       1406
+wrttyp: t:           3
+wrttyp: s: false       1407
+wrttyp: t:           3
+wrttyp: s: false       1408
+wrttyp: t:           3
+wrttyp: s: false       1409
+wrttyp: t:           3
+wrttyp: s: false       1410
+wrttyp: t:           3
+wrttyp: s: false       1411
+wrttyp: t:           3
+wrttyp: s: false       1412
+wrttyp: t:           3
+wrttyp: s: false       1413
+wrttyp: t:           3
+wrttyp: s: false       1414
+wrttyp: t:           3
+wrttyp: s: false       1415
+wrttyp: t:           3
+wrttyp: s: false       1416
+wrttyp: t:           3
+wrttyp: s: false       1417
+wrttyp: t:           3
+wrttyp: s: false       1418
+wrttyp: t:           3
+wrttyp: s: false       1419
+wrttyp: t:           3
+wrttyp: s: false       1420
+wrttyp: t:           3
+wrttyp: s: false       1421
+wrttyp: t:           3
+wrttyp: s: false       1422
+wrttyp: t:           3
+wrttyp: s: false       1423
+wrttyp: t:           3
+wrttyp: s: false       1424
+wrttyp: t:           3
+wrttyp: s: false       1425
+wrttyp: t:           3
+wrttyp: s: false       1426
+wrttyp: t:           3
+wrttyp: s: false       1427
+wrttyp: t:           3
+wrttyp: s: false       1428
+wrttyp: t:           3
+wrttyp: s: false       1429
+wrttyp: t:           3
+wrttyp: s: false       1430
+wrttyp: t:           3
+wrttyp: s: false       1431
+wrttyp: t:           3
+wrttyp: s: false       1432
+wrttyp: t:           3
+wrttyp: s: false       1433
+wrttyp: t:           3
+wrttyp: s: false       1434
+wrttyp: t:           3
+wrttyp: s: false       1435
+wrttyp: t:           3
+wrttyp: s: false       1436
+wrttyp: t:           3
+wrttyp: s: false       1437
+wrttyp: t:           3
+wrttyp: s: false       1438
+wrttyp: t:           3
+wrttyp: s: false       1439
+wrttyp: t:           3
+wrttyp: s: false       1440
+wrttyp: t:           3
+wrttyp: s: false       1441
+wrttyp: t:           3
+wrttyp: s: false       1442
+wrttyp: t:           3
+wrttyp: s: false       1443
+wrttyp: t:           3
+wrttyp: s: false       1444
+wrttyp: t:           3
+wrttyp: s: false       1445
+wrttyp: t:           3
+wrttyp: s: false       1446
+wrttyp: t:           3
+wrttyp: s: false       1447
+wrttyp: t:           3
+wrttyp: s: false       1448
+wrttyp: t:           3
+wrttyp: s: false       1449
+wrttyp: t:           3
+wrttyp: s: false       1500
+wrttyp: t:           3
+wrttyp: s: false       1501
+wrttyp: t:           3
+wrttyp: s: false       1502
+wrttyp: t:           3
+wrttyp: s: false       1503
+wrttyp: t:           3
+wrttyp: s: false       1700
+wrttyp: t:           3
+wrttyp: s: false       1701
+wrttyp: t:           3
+wrttyp: s: false       1702
+wrttyp: t:           3
+wrttyp: s: false       1703
+wrttyp: t:           3
+wrttyp: s: false       1704
+wrttyp: t:           3
+wrttyp: s: false       1705
+wrttyp: t:           3
+wrttyp: s: false       1706
+wrttyp: t:           3
+wrttyp: s: false       1707
+wrttyp: t:           3
+wrttyp: s: false       1708
+wrttyp: t:           3
+wrttyp: s: false       1709
+wrttyp: t:           3
+wrttyp: s: false       1710
+wrttyp: t:           3
+wrttyp: s: false       1711
+wrttyp: t:           3
+wrttyp: s: false       1712
+wrttyp: t:           3
+wrttyp: s: false       1713
+wrttyp: t:           3
+wrttyp: s: false       1714
+wrttyp: t:           3
+wrttyp: s: false       1715
+wrttyp: t:           3
+wrttyp: s: false       1716
+wrttyp: t:           3
+wrttyp: s: false       1717
+wrttyp: t:           3
+wrttyp: s: false       1718
+wrttyp: t:           3
+wrttyp: s: false       1719
+wrttyp: t:           3
+wrttyp: s: false       1720
+wrttyp: t:           3
+wrttyp: s: false       1721
+wrttyp: t:           3
+wrttyp: s: false       1722
+wrttyp: t:           3
+wrttyp: s: false       1723
+wrttyp: t:           3
+wrttyp: s: false       1724
+wrttyp: t:           3
+wrttyp: s: false       1725
+wrttyp: t:           3
+wrttyp: s: false       1726
+wrttyp: t:           3
+wrttyp: s: false       1727
+wrttyp: t:           3
+wrttyp: s: false       1728
+wrttyp: t:           3
+wrttyp: s: false       1730
+wrttyp: t:           3
+wrttyp: s: false       1732
+wrttyp: t:           3
+wrttyp: s: false       1733
+wrttyp: t:           3
+wrttyp: s: false       1734
+wrttyp: t:           3
+wrttyp: s: false       1735
+wrttyp: t:           3
+wrttyp: s: false       1736
+wrttyp: t:           3
+wrttyp: s: false       1737
+wrttyp: t:           3
+wrttyp: s: false       1739
+wrttyp: t:           3
+wrttyp: s: false       1740
+wrttyp: t:           3
+wrttyp: s: false       1741
+wrttyp: t:           3
+wrttyp: s: false       1742
+wrttyp: t:           3
+wrttyp: s: false       1743
+wrttyp: t:           3
+wrttyp: s: false       1744
+wrttyp: t:           3
+wrttyp: s: false       1745
+wrttyp: t:           3
+wrttyp: s: false       1746
+wrttyp: t:           3
+wrttyp: s: false       1747
+wrttyp: t:           3
+wrttyp: s: false       1748
+wrttyp: t:           3
+wrttyp: s: false       1749
+wrttyp: t:           3
+wrttyp: s: false       1750
+wrttyp: t:           3
+wrttyp: s: false       1751
+wrttyp: t:           3
+wrttyp: s: false       1752
+wrttyp: t:           3
+wrttyp: s: false       1753
+wrttyp: t:           3
+wrttyp: s: false       1754
+wrttyp: t:           3
+wrttyp: s: false       1755
+wrttyp: t:           3
+wrttyp: s: false       1756
+wrttyp: t:           3
+wrttyp: s: false       1757
+wrttyp: t:           3
+wrttyp: s: false       1758
+wrttyp: t:           3
+wrttyp: s: false       1759
+wrttyp: t:           3
+wrttyp: s: false       1760
+wrttyp: t:           3
+wrttyp: s: false       1761
+wrttyp: t:           3
+wrttyp: s: false       1762
+wrttyp: t:           3
+wrttyp: s: false       1763
+wrttyp: t:           3
+wrttyp: s: false       1764
+wrttyp: t:           3
+wrttyp: s: false       1765
+wrttyp: t:           3
+wrttyp: s: false       1766
+wrttyp: t:           3
+wrttyp: s: false       1767
+wrttyp: t:           3
+wrttyp: s: false       1768
+wrttyp: t:           3
+wrttyp: s: false       1769
+wrttyp: t:           3
+wrttyp: s: false       1770
+wrttyp: t:           3
+wrttyp: s: false       1771
+wrttyp: t:           3
+wrttyp: s: false       1772
+wrttyp: t:           3
+wrttyp: s: false       1773
+wrttyp: t:           3
+wrttyp: s: false       1774
+wrttyp: t:           3
+wrttyp: s: false       1775
+wrttyp: t:           3
+wrttyp: s: false       1777
+wrttyp: t:           3
+wrttyp: s: false       1778
+wrttyp: t:           3
+wrttyp: s: false       1779
+wrttyp: t:           3
+wrttyp: s: false       1780
+wrttyp: t:           3
+wrttyp: s: false       1781
+wrttyp: t:           3
+wrttyp: s: false       1782
+wrttyp: t:           3
+wrttyp: s: false       1783
+wrttyp: t:           3
+wrttyp: s: false       1784
+wrttyp: t:           3
+wrttyp: s: false       1785
+wrttyp: t:           3
+wrttyp: s: false       1786
+wrttyp: t:           3
+wrttyp: s: false       1787
+wrttyp: t:           3
+wrttyp: s: false       1788
+wrttyp: t:           3
+wrttyp: s: false       1789
+wrttyp: t:           3
+wrttyp: s: false       1790
+wrttyp: t:           3
+wrttyp: s: false       1791
+wrttyp: t:           3
+wrttyp: s: false       1792
+wrttyp: t:           3
+wrttyp: s: false       1793
+wrttyp: t:           3
+wrttyp: s: false       1794
+wrttyp: t:           3
+wrttyp: s: false       1795
+wrttyp: t:           3
+wrttyp: s: false       1796
+wrttyp: t:           3
+wrttyp: s: false       1797
+wrttyp: t:           3
+wrttyp: s: false       1798
+wrttyp: t:           3
+wrttyp: s: false       1799
+wrttyp: t:           3
+wrttyp: s: false       1800
+wrttyp: t:           3
+wrttyp: s: false       1801
+wrttyp: t:           3
+wrttyp: s: false       1802
+wrttyp: t:           3
+wrttyp: s: false       1803
+wrttyp: t:           3
+wrttyp: s: false       1804
+wrttyp: t:           3
+wrttyp: s: false       1805
+wrttyp: t:           3
+wrttyp: s: false       1806
+wrttyp: t:           3
+wrttyp: s: false       1807
+wrttyp: t:           3
+wrttyp: s: false       1808
+wrttyp: t:           3
+wrttyp: s: false       1809
+wrttyp: t:           3
+wrttyp: s: false       1810
+wrttyp: t:           3
+wrttyp: s: false       1811
+wrttyp: t:           3
+wrttyp: s: false       1812
+wrttyp: t:           3
+wrttyp: s: false       1813
+wrttyp: t:           3
+wrttyp: s: false       1814
+wrttyp: t:           3
+wrttyp: s: false       1815
+wrttyp: t:           3
+wrttyp: s: false       1816
+wrttyp: t:           3
+wrttyp: s: false       1898
+wrttyp: t:           3
+wrttyp: s: false       1899
+wrttyp: t:           3
+wrttyp: s: false       1900
+wrttyp: t:           3
+wrttyp: s: false       1901
+wrttyp: t:           3
+wrttyp: s: false       1902
+wrttyp: t:           3
+wrttyp: s: false       1903
+wrttyp: t:           3
+wrttyp: s: false       1904
+wrttyp: t:           3
+wrttyp: s: false       1905
+wrttyp: t:           3
+wrttyp: s: false       1906
+wrttyp: t:           3
+wrttyp: s: false       6118
+wrttyp: t:           3
+wrttyp: s: false          0
+wrttyp: t:           3
+wrttyp: s: false 2147483647
+wrttyp: t:           3
+wrttyp: s: false-]852516352
+var
+   ^
+*** C:\projects\PASCOMP\pparse\test.pas [48:4] System fault #42: Notify Moore/CAD (compilation aborted) *** 
+Errors this compilation: 1
+No output file was generated
+Function complete

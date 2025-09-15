@@ -1,0 +1,244 @@
+                       OVERLOAD RULES AND IMPLEMENTATION
+
+Overloading means to allow the same identifier to represent several different
+types, which are differentiated by context. In IP Pascal, only functions and
+procedures can be overloaded:
+
+procedure myproc;
+
+begin
+
+end;
+
+overload procedure myproc(i: integer);
+
+begin
+
+end;
+
+overload function myproc: integer;
+
+begin
+
+end;
+
+A procedure or function can be overloaded, but only by a procedure or function
+that is in the same scope. A procedure or function in an outter block or in
+another module cannot be overloaded.
+
+A function can overload a procedure, and a procedure can overload a function.
+
+When a procedure or function is overloaded, the keyword "overload" is used for
+all procedures or functions besides the original or overloaded function or
+procedure. The original procedure or function retains a special status as
+the "prime" function or procedure.
+
+A function or procedure can be overloaded before its actual definition appears.
+The following is valid:
+
+procedure myproc; forward;
+
+overload procedure myproc(i: integer);
+
+begin
+
+end;
+
+overload function myproc: integer;
+
+begin
+
+end;
+
+procedure myproc;
+
+begin
+
+end;
+
+The prime procedure or function must be completed by a matching prime 
+definition.
+
+Overload functions or procedures can themselves be forwarded. An overload
+forward must be completed by a an overload definition. Unlike ISO 7185 procedure
+and function declarations, forwarded overloads must allways have a complete
+parameter list and result. The final definition and the forward of an overload
+must be "congruous" in the ISO 7185 sense of procedure and functions. This is
+necessary because overload functions and procedures are distingished by their
+parameter lists and returns.
+
+Note that if a forwarded overload definition is NOT congruous with its original
+forwarded declaration, then it will be assumed that it is a new overload
+definition, and the original forward will generate an error when it is not
+resolved in the containing block. In addition, since the rules of ISO 7185
+congruousness are stricter than the rules for overload uniqueness, its also
+possible to receive an error on the overload for not being unique.
+
+When multiple overload functions appear for the same name, their return types
+must be identical. Here "identical" refers to either the same type identifier,
+or an alias of it:
+
+function mystuff: boolean;
+
+begin
+
+end;
+
+overload funcion mystuff(i: integer): boolean;
+
+begin
+
+end;
+
+This applies even if the functions are otherwise distinct, i.e., their parameter
+numbers and types differ. This rule allows the context for which a function
+result appears to be unambiguous.
+
+Calls to an overloaded function or procedure are differentiated by the following
+criteria, in order:
+
+1. Whether called as procedures or functions.
+
+2. Number of parameters.
+
+3. Type compatibility of parameters.
+
+Two parameter types are compatible according to the ISO 7185 definition of type
+compatibility. To qualify as different variants of the same overloaded function
+or procedure, two parameters must not only be of different types, but those
+types must be incompatible with each other. An invalid example would be:
+
+type mysub = 1..10;
+
+procedure myproc(i: integer);
+
+begin
+
+end;
+
+overload procedure myproc(v: mysub);
+
+begin
+
+end;
+
+These overload forms are invalid because the parameters are ISO 7185 type
+compatible, even though they are different types. There is not enough difference
+between these parameter types to allow the overload to be differentiated.
+
+Note that the VAR, VIEW or value status of a parameter DOES NOT serve to 
+differentiate two overload functions or procedures from each other. The
+following is an invalid sample:
+
+procedure myproc(i: integer);
+
+begin
+
+end;
+
+overload myproc(var i: integer);
+
+begin
+
+end;
+
+This sample is invalid because both versions of myproc are not considered
+different enough to be a valid overload.
+
+Even function parameters must be different in type. What type is a function
+parameter ? This is determined by its return type. If a function parameter
+appears in an overload, then the type of other overload parameters may not
+be compatible with the return type of that function. This is an invalid
+example:
+
+procedure myproc(function x: integer);
+
+begin
+
+end;
+
+overload myproc(i: integer);
+
+begin
+
+end;
+
+This sample is invalid because its possible to have a function:
+
+function q: integer;
+
+such that:
+
+myproc(q);
+
+is ambiguous as to which form of overload is indicated.
+
+Overloaded functions and procedures cannot be passed as procedure or function
+parameters. The following is an illegal example:
+
+program test;
+
+procedure alpha;
+
+begin
+
+end;
+
+procedure alpha(i: integer);
+
+begin
+
+end;
+
+procedure zeta(procedure tau);
+
+begin
+
+end;
+
+begin
+
+   zeta(alpha)
+
+end.
+
+It is ambiguous which copy of alpha gets passed to zeta, since the parameters to
+alpha do not appear in the call to zeta.
+
+COINING
+
+Overload labels in the output code are subject to the same coining rules as
+standard module prefix coining. In addition, overload routines are output with a
+special coining posfix:
+
+procedure myproc(i: integer; c: char);
+
+Results in:
+
+myproc_procedure_integer_char
+
+function myfunc(i: integer; c: char): boolean;
+
+Results in:
+
+myfunc_function_integer_char_boolean
+
+The posfix consists of the sequence "_procedure" (for a procedure) or
+"_function" (for a function), followed by each of the names for each parameter
+type, followed by the name of the function result, if a function. Under the
+rules of IP Pascal, parameters and function results must always be named,
+so coining is always possible.
+
+If the parameter is a procedure or function, a special sequence is output.
+
+overload procedure myfunc(i: integer; procedure x(i: integer; c: char));
+
+Is coined as:
+
+myfunc_procedure_integer_procbegin_integer_char_procend
+
+overload procedure myfunc(i: integer; function x(i: integer; c: char): integer);
+
+myfunc_procedure_integer_funcbegin_integer_char_integer_funcend
+
+Note that the last parameter that appears in the function parameter is the result.

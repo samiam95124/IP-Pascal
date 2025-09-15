@@ -1,0 +1,97 @@
+                     80386 CHECK ENCODER CALLING CONVENTION
+
+OVERVIEW
+
+This document describes the standard register based calling conventions used by
+the MOORE/CAD check encoder for 80386.
+
+IMPLEMENTATION
+
+All parameters, and the return value, are passed via the stack. All objects on
+the stack are rounded up in size to the nearest 32 bit word. This rounding
+takes place in two different ways:
+
+    Ordinals - If the object is signed, it is sign extended to be 32 bits. If
+    the object is unsigned, it is zero extended to be 32 bits.
+
+    Structures - The object occupies an even number of 32 bit words. The
+    padding value at the end of the structure is undefined. The padding
+    requirement only exists on the entire structure as passed. Any
+    substructures occupy some number of bytes as per normal memory structures.
+
+The order in which parameters are passed is right acending. That is, the
+parameters will appear on the stack starting with the rightmost, proceeding to
+the leftmost.
+If a function return is present, it must exist as a single 32 bit "dummy"
+parameter placed the stack before all the parameters. This will receive the
+return result, and remain on the stack after the called function returns.
+The format of a stack call frame is:
+
+    ~              ~
+    |              |
+    |==============|
+    | Function     |
+    | Result       |
+    |==============|
+    | Param 1      |
+    |==============|
+    | Param 2      |
+    |==============|
+    ~              ~
+    ~              ~
+    |==============|
+    | Param N      |
+    |==============|
+    | Return       |
+    | Address      |
+    |==============|
+    |              |
+    ~              ~
+
+Where Param 1 is the leftmost parameter of the call, and Param N is the
+rightmost parameter.
+
+SYSTEM CALL THUNKS
+
+By convention, Microsoft Windows 95 system calls are accessed by "thunks",
+whose label consists of the system call label with "SC_" prepended:
+
+    BeginPaint(hWnd, lpPaint);
+
+becomes:
+
+    SC_BeginPaint(hWnd, lpPaint);
+
+This allows the call to be routed to a thunk. Microsoft system calls are
+similar to the normal system call convention. The differences are:
+
+    1. Being "C" oriented, Microsoft does not allow value parameters. but this
+       just means that Pascal parameters are a superset of Microsoft
+       parameters.
+
+    2. Microsoft stacks parameters in reverse order (right to left) to allow
+       variable argument calls. This means that the "C" header call order must
+       be reversed in a Pascal list. This only means that the Pascal equivalent
+       parameters be listed in the reverse order. Obviously, we cannot perform
+       variable length argument calls, but there are no system calls that
+       require this.
+
+    3. Microsoft places the return parameter to be in the eax register on
+       return.
+
+To perform a thunk, then, all that is really required is that we place the
+result returned from a microsoft function onto the stack before returning.
+In addition, however, we also implement the call as an indirect call, as 
+required by the Windows 95 loader. So a typical function thunk routine is:
+
+    sc_mycall: call     [mycall]       ! execute system call
+               pop      ebx            ! get return address
+               push     eax            ! place return value
+               jmp      [ebx]          ! return to program
+
+And for a procedure thunk it would be:
+
+    sc_mycall: call     [mycall]       ! execute system call
+               ret                     ! exit
+
+In this case, all that the thunk is doing is performing the indirect call.

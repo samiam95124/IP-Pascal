@@ -1,0 +1,18 @@
+parse chkenc=chkenc
+ce chkenc=chkenc
+
+#
+# Windows link
+#
+
+ln runfile=/mnt/windrv/ip/windows/i80386/lib/serlib /mnt/windrv/ip/windows/i80386/lib/strlib /mnt/windrv/ip/windows/i80386/lib/extlib chkenc /mnt/windrv/ip/windows/i80386/lib/cap
+genpe ce80386=runfile /mnt/windrv/windows/system/kernel32 /mnt/windrv/windows/system/user32 /mnt/windrv/windows/system/gdi32 /mnt/windrv/windows/system/winmm -v
+rm runfile.*
+
+#
+# Linux link
+#
+
+ln runfile=/mnt/windrv/ip/linux/i80386/lib/serlib /mnt/windrv/ip/linux/i80386/lib/strlib /mnt/windrv/ip/linux/i80386/lib/extlib chkenc /mnt/windrv/ip/linux/i80386/lib/cap
+genelf ce80386=runfile -v
+rm runfile.*

@@ -1,0 +1,794 @@
+                      PASCAL SIMULATOR OPCODES
+
+OVERVIEW
+
+This file discusses the operation of, and opcodes for, the Pascal simulator
+machine language. Passim takes any number of Pascal intermediate files,
+optimized or unoptimized, and simulates them. To do this, we translate the
+intermediate codes into an internal machine language, and run them on a
+"reference" machine. This machine is designed to be optimal with Pascal
+code structures.
+
+IMPLEMENTATION
+
+The central data structure for the reference machine is the memory array. This
+is a large array of bytes, where the translated program, code, data and
+variables are stored. All Pascal data types are stored in terms of bytes in the
+array. This was deemed to be the most optimum "packing" method.
+As running, the program has the following layout, which is very similar to
+typical machine language implementations:                                 
+                                                                          
+     --------------------                                                 
+     | Program code     |                                                 
+     --------------------                                                 
+     | Constants        |                                                 
+     --------------------                                                 
+     | Display          |                                                 
+     --------------------                                                 
+     | Global variables |                                                 
+     --------------------                                                 
+     | Heap             |                                                 
+     |                  |                                                 
+     ~                  ~                                                 
+                                                                          
+     ~                  ~                                                 
+     |                  |                                                 
+     | Stack            |                                                 
+     --------------------                                                 
+                                                                          
+Where the heap grows up, and the stack grows down.                        
+The program code starts at location 0, and each module read in is stacked in
+the order specified in the command line. As in the real program, each module
+performs startup/exit chaining with the next module, ending with the program
+module.
+After the program comes the fixed constants, the display, then the global
+variables area. The heap is after that, and grows upwards.
+All parameters are passed via the stack, and locals are stored there, too.
+The format of a procedure/function frame is:
+
+       ~                  ~
+       | Function return  |
+       --------------------
+       | parameters       |
+       |                  |
+       --------------------                                                 
+       | Return address   |                                                 
+       --------------------                                                 
+       | Locals           |
+       |                  |                                                 
+ disp->--------------------
+       | Working stack    |
+       ~                  ~
+       ~                  ~
+       |                  |
+   sp->--------------------
+
+All operations are resolved on the stack. Pushes onto the stack are performed
+with 32 bits (4 bytes), which are pushed least significant to most significant.
+Operands larger than 32 bits can be placed onto the stack, but they are only
+poped by a type specific operator.
+Structures are stored on the stack in their true length (which is probally
+different from a true machine).
+Parameters to procedures/functions are formed by simply leaving operands on
+the stack. Because pushed items on the stack are in a univeral format, fetches
+of parameters must fetch in that universal format.
+
+FILES
+
+Files a represented by a single byte file number. If the file has never been
+opened before, the file nuber will be 0. This way, we can tell if the file has
+never been accessed before, and assign a temp file to it.
+
+TAGGED POINTERS
+
+General arrays are indexed by tagged pointers. The format of a tagged pointer
+is:
+
+   0-3: Address
+   4-7: Length
+
+FORMAT OF INSTRUCTIONS
+
+Each machine instruction consists of an instruction byte followed by some
+number of parameters. All parameters are 32 bit.
+
+OPERATORS
+
+stkoff <num>            - Offset stack. Adds the immediate operand to the
+                          stack pointer, which can be negative (to add stack
+                          space) or positive (to remove it). The stack should
+                          be checked for overflow, and may be checked for
+                          underflow (as an internal verify check).
+
+lodcloc <num>           - Load current local. Adds the immediate operand to the
+                          stack pointer, and uses the resulting pointer to load
+                          a 32 bit operand at that address. This is used to
+                          load "universal" operands from the current local 
+                          scope. The local beomes the new top of stack.
+
+lodaloc <addr> <num>    - Load address local. Fetches the display pointer at
+                          the first address, then adds the immediate offset to
+                          that. The result is the address of a local in the
+                          procedure/function of the display. The address
+                          becomes the new top of stack.
+
+rngchk <low> <high>     - Range check. Checks that the top of stack lies
+                          between the two immediate operands. If not, this
+                          should generate an error. The stack is unchanged.
+
+indint                  - Load immediate integer. Loads the 32 bit integer
+                          indirect from the address at stack top, and replaces
+                          the stack top with that.
+
+indrl                   - Load immediate real. Loads the 64 bit real indirect
+                          from the address at stack top, and replaces the stack
+                          top with that. Note that this creates a "fat" stack
+                          entry.
+
+indsrl                  - Load immediate short real. Loads the 32 bit real
+                          indirect from the address at stack top, and replaces
+                          the stack top with that. The short real is extended
+                          to a 64 bit real on the stack. Note that this creates
+                          a "fat" stack entry.
+
+indset                  - Load immediate set. Loads the 256 bit (32 byte) set
+                          indirect from the address at stack top, and replaces
+                          the stack top with that. Note that this creates a 
+                          "fat" stack entry.
+
+indchr                  - Load immediate character. Loads the 8 bit character
+                          indirect from the address at stack top, and replaces
+                          the stack top with that. The character is zero
+                          extended to be 32 bits. This operator is also used
+                          to load booleans.
+
+indstr <size>           - Load indirect structure. Loads the structure, whose
+                          address is on the stack, and length is immediate,
+                          onto the stack. Note that this creates a "fat" stack
+                          entry.
+
+lodiint <num>           - Load immediate integer. Loads the immediate integer
+                          to the top of stack.
+
+lodiirl <num>           - Load immediate real. Loads the immediate 64 bit real
+                          to the top of stack. Note that this creates a "fat"
+                          stack entry.
+
+lodins                  - Load immediate null set. Places 32 bytes of zero onto
+                          the stack (a "null" set). Note that this creates a 
+                          "fat" stack entry.
+
+notint                  - Not integer. Inverts all bits of the 32 bit operand
+                          on the stack.
+
+notbol                  - Not boolean. Expects a 32 boolean on the stack. If
+                          the value is 0, it is replaced with 1, else it is
+                          replaced with 0.
+
+setsin                  - Set single element. Expects a 32 bit integer on the
+                          stack top, and a 32 byte set below that. The bit
+                          corresponding to the integer is set. If the bit is
+                          beyond 255, an error is processed. The integer is
+                          removed.
+
+setrng                  - Set range of elements. Expects a two 32 bit integers
+                          on the stack, with a 32 byte set below that. All the
+                          bits between the second value on the stack and the
+                          top value are set in the set. The two values are
+                          removed.
+
+cvtitr                  - Convert integer to real. Converts the 32 bit integer
+                          on the stack to a 64 bit real on the stack. Note that
+                          this creates a "fat" stack entry.
+
+cvtfix <size>           - Convert tagged pointer to fixed. Converts the tagged
+                          pointer on the stack to fixed by checking that the
+                          length of the object matches the immediate operand,
+                          then discarding the length portion of the pointer to
+                          leave just the address.
+
+cvttag <size>           - Convert fixed pointer to tagged. Contains the size of
+                          the fixed array. Expects a fixed pointer on the
+                          stack. The fixed pointer is replaced by a tagged
+                          pointer using the address of the fixed and the length
+                          provided.
+
+setint                  - Find set intersection. Expects two sets on the stack.
+                          Finds the intersection between them, or the 'and' of
+                          all the bits between the sets. The result replaces
+                          both sets on the stack.
+
+mltrl                   - Multiply real. Expects two 64 bit reals on the stack.
+                          The reals are multiplied, and the result replaces
+                          them both on the stack.
+
+mltint                  - Multiply integer. Expects two 32 bit integers on the
+                          stack. The integers are multipled, and the result
+                          replaces them both on the stack.
+
+divrl                   - Divide real. Expects two 64 bit reals on the stack.
+                          The second real on the stack is divided by the top
+                          real on the stack, and the result replaces them both
+                          on the stack.
+
+divint                  - Divide integer. Expects two 32 bit integers on the
+                          stack. The second integer on the stack is divided by
+                          the top integer on the stack, and the result replaces
+                          them both on the stack.
+
+modint                  - Modulo integer. Expects two 32 bit integers on the
+                          stack. The second integer on the stack is divided by
+                          the top integer on the stack, and the modulo of that
+                          division replaces them both on the stack.
+
+andint                  - 'and' integers. Expects two 32 bit integers on the
+                          stack. The two integers are 'and'ed, and the result
+                          replaces them both.
+
+negint                  - Negate integer. Negates the 32 bit integer on the
+                          stack.
+
+negrl                   - Negates the 64 bit real on the stack.
+
+setuni                  - Set union. Expects two 32 byte sets on the stack.
+                          The union of the sets is found, or the 'or' of all
+                          set bits. The result replaces them both on the stack.
+
+addrl                   - Add real. Expects two 64 bit reals on the stack. The
+                          reals are added, and the result replaces them both
+                          on the stack.
+
+addint                  - Add integer. Expects two 32 bit integers on the
+                          stack. The integers are added, and the result 
+                          replaces them both on the stack.
+
+setdif                  - Set difference. Expects two 32 byte sets on the
+                          stack. Finds the difference between the sets, or
+                          (second xor top) and second.
+
+subrl                   - Subtract real. Expects two 64 bit reals on the stack.
+                          Subtracts the top real from the second real, and the
+                          result replaces them both on the stack.
+
+subint                  - Subtract integer. Expects two 32 bit integers on the
+                          stack. Subtracts the top integer from the second
+                          integer, and the result replaces them both on the
+                          stack.
+
+orint                   - 'or' integers. Expects two 32 bit integers on the
+                          stack. The two integers are 'or'ed, and the result
+                          replaces them both.
+
+xorint                  - 'xor' integers. Expects two 32 bit integers on the
+                          stack. The two integers are 'xor'ed, and the result
+                          replaces them both.
+
+setin                   - Set inclusion. Expects a 32 byte set on the stack,
+                          and a 32 bit value below that. A test is made if the
+                          bit by the value exists in the set, and a 32 bit
+                          boolean 0 or 1 truth value replaces them both.
+
+equset                  - Set equal. Expects two 32 byte sets on the stack. The
+                          sets are compared for equality, and a 32 bit boolean
+                          value replaces them both.
+
+equrl                   - Real equal. Expects two 64 bit reals on the stack. 
+                          The reals are compared for equality, and a 32 bit 
+                          boolean value replaces them both.
+
+equstr <size>           - String equal. Contains the 32 bit size of the
+                          strings. Expects two 32 bit pointers to strings on
+                          the stack. The strings are compared for equality, and
+                          a 32 bit boolean value replaces both strings.
+
+equgst                  - General string equal. Expects two tagged pointers to 
+                          strings on the stack. If the lengths of the tags do
+                          not match, an error occurs. The strings are compared
+                          for equality, and a 32 bit boolean value replaces
+                          both strings.
+
+equint                  - Integer equal. Expects two 32 bit integers on the
+                          stack. The integers are compared for equality, and a
+                          32 bit boolean value replaces them both.
+
+ltnrl                   - Real less than. Expects two 64 bit reals on the 
+                          stack. The reals are compared for second less than
+                          top, and a 32 bit boolean value replaces them both.
+
+ltnstr <size>           - String less than. Contains the 32 bit size of the
+                          strings. Expects two 32 bit pointers to strings on
+                          the stack. The strings are compared for second less
+                          than top, and a 32 bit boolean value replaces both
+                          strings.
+
+ltngst                  - General string less than. Expects two tagged pointers
+                          to strings on the stack. If the lengths of the tags
+                          do not match, an error occurs. The strings are
+                          compared for second less than top, and a 32 bit
+                          boolean value replaces both strings.
+
+ltnint                  - Integer less than. Expects two 32 bit integers on the
+                          stack. The integers are compared for second less than
+                          top, and a 32 bit boolean value replaces them both.
+
+gtnrl                   - Real greater than. Expects two 64 bit reals on the 
+                          stack. The reals are compared for second greater than
+                          top, and a 32 bit boolean value replaces them both.
+
+gtnstr <size>           - String greater than. Contains the 32 bit size of the
+                          strings. Expects two 32 bit pointers to strings on
+                          the stack. The strings are compared for second 
+                          greater than top, and a 32 bit boolean value replaces
+                          both strings.
+
+gtngst                  - General string greater than. Expects two tagged
+                          pointers to strings on the stack. If the lengths of
+                          the tags do not match, an error occurs. The strings
+                          are compared for second greater than top, and a 32
+                          bit boolean value replaces both strings.
+
+gtnint                  - Integer greater than. Expects two 32 bit integers on
+                          the stack. The integers are compared for second
+                          greater than top, and a 32 bit boolean value replaces
+                          them both.
+
+leqset                  - Set less than or equal. Expects two 32 byte sets on 
+                          the stack. Checks if all the elements of set second
+                          are included in the top, or (second and top) = 
+                          second. A a 32 bit boolean value replaces them both.
+
+geqset                  - Set greater than or equal. Expects two 32 byte sets
+                          on the stack. Checks if all the elements of set top
+                          are included in the top, or (second and top) = top. A
+                          a 32 bit boolean value replaces them both.
+
+jmp <num>               - Jump unconditional. Contains the address of the
+                          branch location. Begins execution at the location.
+
+jpf <num>               - Jump false. Contains the address of the branch
+                          location. Expects a 32 bit boolean value on the
+                          stack. If the boolean = 0, then the branch is taken.
+
+jpt <num>               - Jump true. Contains the address of the branch
+                          location. Expects a 32 bit boolean value on the
+                          stack. If the boolean <> 0, then the branch is taken.
+
+duptop                  - Duplicate top of stack. The 32 bit operand at stack
+                          top is duplicated. Must not be used with "fat"
+                          operands.
+
+poptop                  - Remove top of stack. The 32 bit operand at stack top
+                          is discarded. Must not be used with "fat" operands.
+
+swprr                   - Swap top of stack. Swaps the top 64 bit operand on
+                          the stack with the 64 bit second on the stack.
+
+swpri                   - Swap top of stack. Swaps the top 32 bit operand on
+                          the stack with the 64 bit second on the stack.
+
+swpir                   - Swap top of stack. Swaps the top 64 bit operand on
+                          the stack with the 32 bit second on the stack.
+
+swpii                   - Swap top of stack. Swaps the top 32 bit operand on
+                          the stack with the 32 bit second on the stack.
+
+swpti                   - Swap top of stack. Swaps the top 32 bit operand on
+                          the stack with the 64 bit tagged pointer second on
+                          the stack.
+
+sucint                  - Increment integer. Increments the 32 bit integer at
+                          stack top.
+
+prdint                  - Decrement integer. Decrements the 32 bit integer at
+                          stack top.
+
+goto <addr> <addr>      - Goto procedural. Contains the address of the target
+                          procedure/function display, and the address of the
+                          target code. The stack pointer receives the address
+                          of the display, and execution continues at the
+                          specified point.
+
+call <addr>             - Call procedural. Contains the address of the target
+                          procedure/function. The address of the NEXT
+                          instruction is saved on the stack, and execution
+                          continues at the specified address.
+
+calli                   - Call procedural indirect. Expects the address of the
+                          target procedure/function as tos. The address of the
+                          NEXT instruction is saved on the stack, and execution
+                          continues at the specified address. This instruction
+                          is used for procedure/function parameters.
+
+ret                     - Return. The address on the stack is set as the
+                          execution address. The address is removed from the
+                          stack.
+
+retoff <off>            - Return and offset stack. Contains a signed offset.
+                          The return address on the stack is saved, the offset
+                          is added to the stack, and execution continues at
+                          the return address. Used to remove parameters from
+                          the stack on return.
+
+wrtfil <size>           - Write file. Contains the size of the object to be
+                          written (in bytes). Expects a pointer to the object
+                          on the stack, and a pointer to the file below that.
+                          The bytes specified are written to the file, and
+                          the object pointer removed from the stack. The file
+                          is left on the stack.
+
+wrtbol                  - Convert and write boolean to file. Expects a 32 bit
+                          boolean on stack top, and under that a pointer to a
+                          file. The boolean is converted to "true"/"false"
+                          string, and that is output. The boolean is removed,
+                          but the file left on stack.
+
+wrtgst                  - Write general string to file. Expects a tagged
+                          pointer to the general string on stack top, and under
+                          that a pointer to a file. The string is output to the
+                          file. The pointer is removed, but the file is left on
+                          stack.
+
+wrtintf                 - Convert and write integer to file with field. Expects
+                          A 32 bit field, and under that a 32 bit integer, and
+                          under that a pointer to a file. The integer is
+                          converted to ascii form and output using the 
+                          specified field. The field and integer are removed,
+                          but the file is left on stack.
+
+wrtchrf                 - Write character to file with field. Expects A 32 bit
+                          field, and under that a 32 bit character, and under
+                          that a pointer to a file. The character is output 
+                          using the specified field. The character and field
+                          are removed, but the file is left on stack.
+
+wrtbolf                 - Write boolean to file with field. Expects A 32 bit
+                          field, and under that a 32 bit boolean, and under
+                          that a pointer to a file. The boolean is converted
+                          to "true"/"false", and that string output using the
+                          field. The boolean and field are removed, but the
+                          file is left on stack.
+
+wrtrlf                  - Write real to file with field. Expects A 32 bit
+                          field, and under that a 64 bit real, and under
+                          that a pointer to a file. The real is output in fixed
+                          format using the specified field. The real and field
+                          are removed, but the file is left on stack.
+
+wrtstrf <len>           - Write string to file with field. Contains the length
+                          of the string to be written. Expects A 32 bit field,
+                          and under that a 32 pointer to a string, followed by
+                          the file pointer. The string is output using the
+                          field. The field and string are removed, but the file
+                          is left on the stack.
+
+wrtgstf                 - Write general string to file with field. Expects a
+                          32 bit field, and under that a tagged pointer to a
+                          general string, and under that a file pointer. The
+                          string is output using the field. The field and
+                          string are removed, but the file is left on the
+                          stack.
+
+wrtrlff                 - Write real to file with field and fraction. Expects
+                          A 32 bit fraction on the stack top, followed by a 32
+                          bit field, followed by a 64 bit real, followed by the
+                          file pointer. The real is written in floating point
+                          format, using the field and fraction. The field,
+                          fraction and real are removed, but the file pointer
+                          is left on the stack.
+
+wrtfsrl                 - Write short real direct to file. Expects a 64 bit
+                          real on stack top, followed by a file pointer. A
+                          short real is written to the file in binary. The
+                          short real is removed, but the file is left on stack.
+
+wrtfrl                  - Write real direct to file. Expects a 64 bit real on
+                          stack top, followed by a file pointer. The real is
+                          written to the file in binary. The real is removed,
+                          but the file is left on stack.
+
+wrtfset                 - Write set direct to file. Expects a 32 byte set on
+                          stack top, followed by a file pointer. The set is
+                          written to the file in binary. The set is removed,
+                          but the file is left on stack.
+
+wrtfchr                 - Write character direct to file. Expects a 32 bit
+                          character on stack top, followed by a file pointer.
+                          The character is written to the file in binary (one
+                          byte only). The character is removed,but the file is
+                          left on stack. Note that this is used to write
+                          booleans as well.
+
+wrtfint                 - Write integer direct to file. Expects a 32 bit
+                          integer on stack top, followed by a file pointer. The
+                          set is written to the file in binary. The set is 
+                          removed, but the file is left on stack.
+
+wrteoln                 - Write end of line to file. Expects a file pointer on
+                          the stack top. The end of line sequence is written to
+                          the file. The file is left on stack.
+
+rdfil <size>            - Read file structure. Contains the byte size of the
+                          operand to be written. Expects the address of the
+                          structure to be read, followed by a pointer to the
+                          file on the stack. The bytes in the structure are
+                          read from the file. The structure pointer is removed,
+                          but the file is left on stack.
+
+rdint                   - Read and convert integer from file. Expects a pointer
+                          to the integer on stack top, and a pointer to the
+                          file under that. Any blanks or newlines in the file
+                          are skipped, and an integer, if it exists, read and
+                          converted from ascii to binary form, then stored to
+                          the result. The integer pointer is removed from the
+                          stack, but the file is left.
+
+rdchr                   - Read character from file. Expects a pointer to the
+                          character on stack top, and a pointer to the file
+                          under that. The next character is read from the file
+                          and stored at the result. If the next character is
+                          the end of line, a blank is returned. The character
+                          pointer is removed from the stack, but the file is
+                          left.
+
+rdrl                    - Read and convert real from file. Expects a pointer
+                          to the real on stack top, and a pointer to the
+                          file under that. Any blanks or newlines in the file
+                          are skipped, and a real, if it exists, read and
+                          converted from ascii to binary form, then stored to
+                          the result. The real pointer is removed from the
+                          stack, but the file is left.
+
+rdsrl                   - Read and convert short real from file. Expects a
+                          pointer to the short real on stack top, and a pointer
+                          to the file under that. Any blanks or newlines in the
+                          file are skipped, and a short real, if it exists,
+                          read and converted from ascii to binary form, then
+                          stored to the result. The short real pointer is
+                          removed from the stack, but the file is left.
+
+rdeoln                  - Read eoln from file. Expects a pointer to the file
+                          on stack. Any characters are skipped up to and
+                          including the eoln. The file is left on stack.
+
+absrl                   - Find absolute real. Expects a 64 bit real on the
+                          stack. Finds the absolute value of the real, and
+                          that replaces the real on stack.
+
+absint                  - Find absolute integer. Expects a 32 bit integer on
+                          the stack. Finds the absolute value of the integer,
+                          and that replaces the integer on stack.
+
+sqrrl                   - Find square of real. Expects a 64 bit real on the
+                          stack. Finds the square of the real, and that 
+                          replaces the real on stack.
+
+sqrint                  - Find square of integer. Expects a 32 bit integer on
+                          the stack. Finds the square of the integer, and that
+                          replaces the integer on stack.
+
+atnrl                   - Find arctan of real. Expects a 64 bit real on the
+                          stack. Finds the arctan of the real, and that 
+                          replaces the real on stack.
+
+cosrl                   - Find cosine of real. Expects a 64 bit real on the
+                          stack. Finds the cosine of the real, and that 
+                          replaces the real on stack.
+
+exprl                   - Find exponent of real. Expects a 64 bit real on the
+                          stack. Finds the exponent of the real, and that 
+                          replaces the real on stack.
+
+lnrl                    - Find natural log of real. Expects a 64 bit real on
+                          the stack. Finds the natural log of the real, and
+                          that replaces the real on stack.
+
+sinrl                   - Find sine of real. Expects a 64 bit real on the
+                          stack. Finds the sine of the real, and that 
+                          replaces the real on stack.
+
+sqtrl                   - Find square root of real. Expects a 64 bit real on
+                          the stack. Finds the square root of the real, and
+                          that replaces the real on stack.
+
+eoln                    - Check eoln of file. Expects a 32 bit pointer to a
+                          file on stack. A boolean 32 bit representing the
+                          eoln status of the file replaces the file.
+
+eof                     - Check eof of file. Expects a 32 bit pointer to a
+                          file on stack. A boolean 32 bit representing the
+                          eof status of the file replaces the file.
+
+odd                     - Check integer odd. Expects a 32 bit integer on stack
+                          top. Replaces that with a 32 bit boolean that is true
+                          if the integer is odd, ie., clears all bits in the
+                          integer but bit 0.
+
+rnd                     - Round to integer. Expects a 64 bit real on the stack.
+                          The real is converted to integer by rounding, and
+                          replaces the real on the stack.
+
+trc                     - Truncate to integer. Expects a 64 bit real on the
+                          stack. The real is converted to integer by
+                          truncation, and replaces the real on the stack.
+
+exist                   - Check file existance. Expects a tagged pointer to 
+                          the file string on stack. The file is checked for 
+                          existance, and a 32 bit boolean value replaces the
+                          string on stack.
+
+len                     - Check file length. Expects a 32 bit file pointer on
+                          stack. Replaces that with the 32 bit length of the
+                          file.
+
+loc                     - Check file location. Expects a 32 bit file pointer on
+                          stack. Replaces that with the 32 bit location of the
+                          file, which will be 1 - length.
+
+get                     - Get file next. Expects a 32 bit file pointer on the
+                          stack. The next element in the file is set active.
+                          Removes the file pointer.
+
+gett                    - Get text file next. Expects a 32 bit file pointer on
+                          the stack. The next element in the file is set 
+                          active. Removes the file pointer.
+                          This call is the same as for get, but allows special
+                          processing to be performed on a text file.
+
+put                     - Put file next. Expects a 32 bit file pointer on the
+                          stack. Writes the contents of the file buffer
+                          variable to the file. Removes the file pointer.
+
+lodafbuf                - Load address of file buffer. Expects a 32 bit file
+                          pointer on the stack. Loads the address of the file's
+                          buffer variable, and that replaces the file pointer
+                          on stack. This is also an opportunity to process
+                          "lazy I/O" on a read mode file.
+
+lodafbuft               - Load address of text file buffer. Expects a 32 bit
+                          file pointer on the stack. Loads the address of the
+                          file's buffer variable, and that replaces the file
+                          pointer on stack. This is also an opportunity to
+                          process "lazy I/O" on a read mode file.
+                          This call is the same as for lodafbuf, but allows
+                          special processing to be performed on a text file.
+
+reset <size>            - Reset file. Contains the record size for the file.
+                          Expects a 32 bit file pointer on the stack. If the
+                          file has never been accessed before (the pointer is
+                          0), then the file is given a temp name, otherwise the
+                          previous assign name is used. The record size is
+                          given to the file. The file is opened in read mode.
+                          The file pointer is removed.
+
+resett <size>           - Identical to reset, except that the use of a text
+                          file is denoted. This allows the creation of a text
+                          only mode file.
+
+rewrite <size>          - Rewrite file. Contains the record size for the file.
+                          Expects a 32 bit file pointer on the stack. If the
+                          file has never been accessed before (the pointer is
+                          0), then the file is given a temp name, otherwise the
+                          previous assign name is used. The record size is
+                          given to the file. The file is opened in write mode,
+                          and any contents cleared. The file pointer is
+                          removed.
+
+rewritet <size>         - Identical to rewrite, except that the use of a text
+                          file is denoted. This allows the creation of a text
+                          only mode file.
+
+close                   - Close file. Expects a 32 bit file pointer on the
+                          stack. The file is closed. The file is removed from
+                          the stack.
+
+page                    - Page file. Expects a 32 bit file pointer on the
+                          stack. A form feed is sent to the file. The file is
+                          removed from the stack.
+
+assign                  - Assign name to file. Expects a tagged pointer to a
+                          string on stack top, followed by a 32 bit file
+                          pointer below that. The name is given to the file,
+                          which must not be open or previously assigned. The
+                          string and file pointers are removed.
+
+pos                     - Position file. Expects the 32 bit position (1-N) on
+                          the stack, followed by a 32 bit file pointer. The
+                          file is positioned. Both the position and the file
+                          are removed.
+
+del                     - Delete file. Contains the size of a string. Expects
+                          a tagged string pointer on stack. The file by that
+                          name is removed. The string pointer is removed from
+                          the stack.
+
+chg                     - Change filename. Expects a tagged pointer to the
+                          source name on stack top, followed by a tagged
+                          pointer to the destination name. The file by the
+                          name of the source is changed to the destination name.
+
+stosrl                  - Store short real. Expects a 32 bit short real on
+                          stack, followed by a 32 bit variable address. The
+                          short real is stored to the address. Both operands
+                          are removed.
+
+stosrl                  - Store short real. Expects a 32 bit short real on
+                          stack, followed by a 32 bit variable address. The
+                          short real is stored to the address. Both operands
+                          are removed.
+
+storl                   - Store real. Expects a 64 bit real on stack, followed
+                          by a 32 bit variable address. The real is stored to
+                          the address. Both operands are removed.
+
+stoi                    - Store integer. Expects a 32 bit integer on stack, 
+                          followed by a 32 bit variable address. The integer
+                          is stored to the address. Both operands are removed.
+
+stochr                  - Store character. Expects a 32 bit character on stack, 
+                          followed by a 32 bit variable address. The character
+                          is stored to the address. Both operands are removed.
+
+stoset                  - Store set. Expects a 32 byte set on stack, followed
+                          by a 32 bit variable address. The set is stored to
+                          the address. Both operands are removed.
+
+stostr <size>           - Store structure. Contains the structure size. Expects
+                          a pointer to a structure on stack, followed by a 32
+                          bit variable address. The structure is copied to the
+                          address. Both operands are removed.
+
+stogar <size>           - Store general array. Contains the size of the base
+                          array element. Expects the source array as a tagged
+                          pointer at stack top, and the destination array as
+                          a tagged pointer under that. If the array sizes do
+                          not match, an error is indicated. All of the elements
+                          in the source are copied to the destination.
+
+stotgp                  - Store tagged pointer. Expects a tagged pointer at
+                          stack top, and a 32 bit pointer to the destination
+                          under that. The tagged pointer is placed at the
+                          destination address.
+
+stostk <addr>           - Store stack pointer. Contains the address to store
+                          the stack to. The current stack pointer is stored
+                          to the address given. The stack is unchanged.
+
+new <size>              - Allocate dynamic variable. Contains the variable
+                          size. Expects the 32 bit address of a pointer
+                          variable on stack. A variable of the given size is
+                          allocated, and the address placed at the address.
+                          The variable address is removed.
+
+disp <size>             - Free dynamic variable. Contains the variable
+                          size. Expects the 32 bit pointer to the variable
+                          on stack. The variable is freed. The variable is
+                          removed.
+
+
+newgar <size>           - Allocate general array. Contains the size of the base
+                          element. Expects the number of elements on stack top,
+                          followed by a (simple) pointer to the location of a
+                          tagged pointer to be allocated. The number of
+                          elements is verified to lie within 1..maxint, then
+                          elements*size bytes allocated. The address of the
+                          tagged pointer is set to the base allocation, and
+                          the length receives the number of elements.
+                          The length and pointer are removed from the stack.
+                          
+dspgar <size>           - Deallocate general array. Contains the size of the
+                          base element. Expects a tagged pointer on stack top.
+                          The object indexed by the pointer is freed. The size
+                          of the object can be found by elements*size. The
+                          tagged pointer is removed from the stack.
+
+arfgar <size>           - General array reference. Contains the size of the
+                          general array base element. Expects the index for the
+                          array on stack top, followed by the tagged pointer to
+                          the general array. The index is verified to lie
+                          within 1 and the tag length, and an error results if
+                          not. Then, the index is adjusted to 0, multiplied by
+                          the base element size, and offset by the array base.
+                          This element address then replaces both operands on
+                          the stack.
+
+exit                    - Exit simulation. Causes the simulation to halt.

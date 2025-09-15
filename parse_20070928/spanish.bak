@@ -1,0 +1,96 @@
+Spanish-English-French Pascal word equivalencies
+
+Keywords:
+
+English          Espanol       Francis
+===================================================================
+and              yy
+array            vector         tablequ
+begin            inicio         debut
+case             caso           cas
+const            const          const
+div              div
+do               haz
+downto           baja
+else             sino           sinon
+end              fin            fin
+file             archivo        fichier
+for              para           pour
+function         funcion        fonction
+goto             vesa           allera
+if               si             si
+in               en
+label            etiqueta       etiquette
+mod              res
+nil              nulo           nil
+not              no
+of               de             de
+or               oo
+packed           empaquetado    paquet
+procedure        procedimiento  procedure
+program          programa       programme
+record           registro       article
+repeat           repite         repeter
+set              poner          ensemble
+then             entonces       alors
+to               hasta
+type             tipo           type
+until            hastaque       jusqua
+var              var            var
+while            mientras       tantque
+with             con
+
+Standard types:
+
+English          Espanol        Francis
+===================================================================
+integer          entero         entier
+char             char           car
+text             texto          texte
+real                            reel
+boolean          booleano       booleen
+
+Standard functions/procedures:
+
+English          Espanol        Francis
+===================================================================
+write            escribe        ecrire
+writeln          escribeln      ecrireln
+read             lee            lire
+readln           leeln          lireln
+new              nuevo          allouer
+dispose          libera
+pack             empaquetar
+unpack           desempaquetar
+ord
+chr                             carac
+eoln                            fdln
+eof                             fdf
+get                             prendre
+put                             mettre
+reset                           relire
+rewrite                         recrire
+
+Standard constants:
+
+English          Espanol        Francis
+===================================================================
+true             verdad         vrai
+false            falso          faux
+
+Standard directives:
+
+English          Espanol        Francis
+===================================================================
+external         externo
+
+Other:
+
+English          Espanol        Francis
+===================================================================
+input                           entree
+output                          sortie
+
+
+
+Thanks to Adrian and Joseph.

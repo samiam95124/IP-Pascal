@@ -1,0 +1,4 @@
+                                Conlib notes
+
+1. In \pascal\user_programs, the final "page" at the bottom of the program does
+not appear to be clearing the screen.

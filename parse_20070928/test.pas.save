@@ -1,0 +1,25 @@
+module gralib;
+
+function sc_wndprocadr(function wndproc(hwnd, imsg, wparam, lparam: integer)
+   : integer): integer; external;
+
+type ss_pp = ^integer;
+
+procedure createdummy(function wndproc(hwnd, imsg, wparam, lparam: integer)
+                      : integer);
+
+var i : integer;
+
+begin
+
+   i := sc_wndprocadr(wndproc);
+
+end;
+
+begin
+
+end;
+
+begin
+
+end.

@@ -1,0 +1,13 @@
+@echo off
+rem @echo off
+rem
+rem Compile a program for use with the serial level library
+rem
+parse %1=%1 %2 %3 %4 %5 %6 %7 %8 %9 #u=.,\pascomp\lib\ #nrf
+ce %1=%1
+ln runfile=c:\pascomp\lib\serlib %1 c:\pascomp\lib\cap
+genpe %1=runfile c:\windows\system\kernel32 c:\windows\system\user32 /v
+del runfile.*
+del %1.int
+del %1.obj
+del %1.sym

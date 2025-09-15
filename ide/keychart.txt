@@ -1,0 +1,68 @@
+******************************* EDITOR KEY CHART *******************************
+
+                                IBM-PC/DOS/Windows
+
+Key                 Std ?  Function
+================================================================================
+up arrow            Y      cursor up one line 
+down arrow          Y      down one line 
+left arrow          Y      left one character 
+right arrow         Y      right one character 
+cntrl-left arrow    Y      left one word 
+cntrl-right arrow   Y      right one word 
+cntrl-home          Y      home of document 
+shift-home          Y      home of screen 
+home                Y      home of line 
+cntrl-end           Y      end of document 
+shift-end           Y      end of screen 
+end                 Y      end of line 
+shift-left arrow    Y      scroll left one character 
+shift-right arrow   Y      scroll right one character 
+cntrl-up arrow      Y      scroll up one line 
+cntrl-down arrow    Y      scroll down one line 
+page down           Y      page down 
+page up             Y      page up 
+tab                 Y      tab 
+enter               Y      enter line 
+cntrl-insert        Y      insert block 
+shift-insert        Y      insert line 
+insert              Y      insert toggle 
+cntrl-del           Y      delete block 
+shift-del           Y      delete line 
+del                 Y      delete character forward 
+backspace           Y      delete character backward 
+cntrl-f1            Y      copy block 
+shift-f1            Y      copy line 
+esc                 Y      cancel current operation 
+cntrl-s             Y      stop current operation 
+cntrl-q             Y      continue current operation 
+shift-f2            Y      print document
+cntrl-f2            Y      print block
+cntrl-f3            Y      print screen 
+f1                  N      Save file under current name
+f2                  N      Load file from status line specified name
+f3                  N      Search status specified string
+f4                  N      Search again
+f5                  N      Replace
+f6                  N      Replace again
+f7                  N      Record macro start/stop
+f8                  N      Playback macro
+f9                  N      Undo last change or motion
+f10                 N      Next buffer to selected window
+f11                 N      Split window in specified direction
+f12                 N      Close splitter window in specified direction
+alt                 Y      display menu 
+cntrl-c             Y      terminate program 
+
+Notes:
+
+1. Delete forward and delete backward character will delete over line start/end.
+
+2. F1-F12 can be reassigned to any function. Shown are the default assignments.
+
+3. Tabs are converted to spaces.
+
+4. Spaces at end of line, and blank lines at end of document are automatically
+removed. The editor is a "virtual space" editor.
+
+5. Keyboard functions are CUA where possible.

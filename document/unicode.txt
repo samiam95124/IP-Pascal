@@ -1,0 +1,163 @@
+                                UCS SUPPORT
+
+OVERVIEW
+
+IP Pascal will directly support UCS (Universal Character Set) in various forms.
+UCS defines two formats, UCS-2 and UCS-4, which are 16 and 32 bit character
+formats, of which UCS-2 is a parallel standard to Unicode.
+IP Pascal uses the UCS-2 and UCS-4 formats internally, and supplements these
+by two new formats, UCS-1 and UCS-2, which are simply obvious derviations of
+the UCS format. These are translated on input and output to the format UTF-8.
+UTF-8 allows all of UCS-1 through UCS-4 to be represented in a file, is
+completely upward compatible with ASCII, and is widely supported.
+
+NOTE: UCS-1 is our terminology for 8 bit ISO 8859-1. The ISO only defines
+UCS-2, and UCS-4 as official terms. 
+
+UCS-1
+
+UCS-1 takes 8 bits per character, with a "set of char" occupying 32 bytes.
+UCS-1 is completely compatible with ASCII both in memory and in text files.
+The values in the ASCII range, 0-127, are left entirely alone by UCS-1.
+
+The values 128-255 are Latin-1, as described by ISO 8859-1. The Latin-1
+codeset describes some of the most used characters in addition to ASCII,
+that allow European languages to be represented.
+
+When UCS-1 is input from a "text" type file, it is translated from UTF-8.
+ASCII codes in the 0-127 range are left as is, but all UCS formats are decoded
+from the file. Then, codes with values > 255 are changed to the "no code"
+character, which is an ASCII '.' (period). Codes in the range 128-255 are
+passed though as UCS-1 codes.
+
+When UCS-1 is output to a "text" type file, it is translated to UTF-8 without
+loss. The ASCII codes in the 0-127 range are passed through as is, but Latin-1
+characters in the range 128-255 are translated to their UTF-8 equivalents.
+
+If it is needed to output files that can be read with both UTF-8 and ASCII
+only programs, then only ASCII values should be output. Specifically, this
+means that direct encoding to Latin-1 characters without UTF-8 formatting
+is not possible.
+
+When UCS-1 is received from the operating system, and it can be determined
+that the character received is not in the UCS-1 character set (which could
+occur for several reasons), it is replaced with the "no code" character ('.').
+
+WHen UCS-1 is sent to the operating system, and the character to be sent is
+invalid for that operating system, then it is replaced with the "no code"
+character ('.').
+
+UCS-2
+
+UCS-2 features 16 bit characters, with "set of char" occupying 8192 bytes.
+The endian mode of characters is the same as the host machine.
+
+Any program that uses UCS-1 can be recompiled at any time to 16 bit character
+mode. There are no special types, functions or other support needed to utilize
+16 bit characters. In particular, this means that (unlike other languages),
+there is no support for mixing 8 and 16 bit character sets in the same program.
+
+UCS-3 AND UCS-4
+
+UCS serves as a "clearing house" of characters used from around the world,
+and it is known that UCS-2 will be exceeded before all the worlds languages
+are adequately represented. UCS-3 and UCS-4 modes exist in IP Pascal, but
+are not commonly supported at present in operating systems.
+
+UCS-3 makes data of type char occupy 3 bytes and "set of char" occupies
+2,097,152 bytes.
+
+UCS-4 makes data of type char occupy 4 bytes and "set of char" occupies
+536,870,912 bytes.
+
+Because sets of UCS-3 and UCS-4 are clearly impractical, it is important to only
+use sets of interesting subranges of these character sets.
+
+As for the case when UCS-2 is not supported by the operating system, characters
+received from the OS are zero extended to become UCS-3 or UCS-4 characters
+on receipt, and characters greater than 65536 are translated to the "no code"
+character before sending to the OS.
+
+USE WITHIN PROGRAM
+
+A 16 bit character program uses 16 bit representations for all characters
+internally. If the native operating system supports UCS-2, then all calls
+are made using UCS-2 characters in the endian mode of the host. If the
+operating system does not support UCS-2, characters received by IP Pascal
+are zero extended on receipt from the OS. Before sending to the OS, characters
+in the range 128-65535 are replaced with a operating system defined "no code"
+character, which indicates lack of local code display for that character.
+In ASCII, this is the '.' (period) character, but where possible, a special
+character may be used, commonly a small, outlined box.
+
+IP Pascal assumes Normalization Form C or NFC representations. This means
+that the use of combining sequence characters is not supported, and the
+rule exists that each 16 bit character code has a corresponding character
+cell. This greatly simplifies internal processing of UCS-2.
+
+IP Pascal does not at this time support character code pathing, that is,
+characters that appear right to left, or up and down, etc. This means that
+the program is responsible for correctly pathing and formatting such
+characters.
+
+Escapes to 16 bit characters work exactly as in 8 bit mode. Ie., \6025
+is a valid UCS-2 character.
+
+Because UCS-2 uses much more space to store "set of char", applications
+that don't arbitrarily use the entire character set will be rewarded with
+less space used. Sets that work with ASCII relations (like '0'..'9' or
+'a'..'z' will not be any larger than their 8 bit character set equivalences.
+
+I/O TO AND FROM TEXT FILES
+
+UCS-2 is represented within a text file in the UTF-8 format. UTF-8 is completely
+upward compatible with ASCII in the 0-127 value range. UTF-8 is the input
+and output format for all IP Pascal application packages, including the
+compiler (which is why 128-255 character representations cannot appear
+directly in string constants, but must be escaped).
+
+In 16 bit character mode, the libraries automatically both decode and encode
+from and to UTF-8 to the internal 16 bit character representation (this is
+called "hard convertion"). This occurs whenever characters are input and output
+to text files. This only occurs on "text" files. "file of char" becomes a
+literal series of 16 bit UCS-2 values, whose endian mode is that of the host,
+with no line end or other special processing.
+
+No BOM (Byte Order Marker) is allowed in a UTF-8 file, and the values in
+the BOM are invalid. In addition, it is possible to have invalid codes in
+in the UTF-8 format. These codes are converted on input to the "no code"
+character, which is the outline box character in UCS-2.
+
+Although UTF-8 supports encoding of the formats UCS-2, UCS-3, and UCS-4,
+any characters in the range 65536-4294967296 are considered invalid, and
+are converted on input to the "no code" character.
+
+UTF-8 is further complicated by the line ending format. As in 8 bit mode,
+IP Pascal will accept any of the four line ending formats (cr, lf, cr/lf,
+lf/cr), but generate only the native format for the host machine (lf on Unix
+machines, cr/lf on all others).
+
+
+IP PASCAL TOOLSET AND UTF-8
+
+The standard compiled form for IP PASCAL and assocated tools is UCS-2, with
+any line ending mode. Source language files must be in ASCII, but > 127
+valued characters can appear in string constants, character constants and
+comments. As usual with ASCII encoding, all characters at or below value 32
+(space) have interpretation only as separators.
+
+Graphical editors in IP Pascal, and gralib implementations, are capable
+of reproducing UCS-2 characters, but may not have the font capabilities to
+to so. If a character does not have a corresponding character in an existing
+font, it is printed in the "no code" character (small outlined box).
+
+Terminal mode editors and the trmlib implementation are ASCII only, and
+allways show characters > 127 in the "no code" character.
+	   
+LIBRARIES
+
+To encode for UCS modes efficiently, each support module must be compiled
+separately with the option set for that UCS mode. This leads to four sets
+of libraries for each of the UCS-1, UCS-2, UCS3 and UCS-4 modes. Modules
+that have been compiled for a particular UCS mode MUST be linked to other
+modules compiled for that same mode.

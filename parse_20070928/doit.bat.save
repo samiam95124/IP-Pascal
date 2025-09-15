@@ -1,0 +1,1 @@
+ln runfile=c:\ip\windows\i80386\lib\serlib c:\ip\windows\i80386\lib\strlib c:\ip\windows\i80386\lib\extlib xltlib common parsesvs scanner symbol parser c:\ip\windows\i80386\lib\main reglock parse c:\ip\windows\i80386\lib\cap/nu/ll/lv/lm/lx/ps=$401000/vs=$46c000 > parse.lst

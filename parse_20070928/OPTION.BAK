@@ -1,0 +1,1538 @@
+unit parserot;
+
+interface
+
+uses {$U parsedef.j} parsedef,
+     {$U common.j} common,
+     {$U basicio.j} basicio;
+
+function lcase(c : char { character to convert })
+               : char; { converted character}
+function labequ(a, b: labl): boolean;
+function labgtr(a, b: labl): boolean;
+procedure addext(var fn: filnam; { filename to extend }
+                 e: ext;         { filename extention }
+                 ovr: boolean);  { overwrite flag }
+procedure prtfil(var f: text; var fn: filnam);
+procedure prtlab(var f: text; var n: labl);
+procedure prtstr(var f: text; var s: stringt);
+procedure error(e: errcod;   { error code }
+                a: boolean); { abort flag }
+procedure opnsrc(var fn: filnam); { file to open }
+procedure clssrc;
+procedure getlin;
+function endlin: boolean;
+function startlin: boolean;
+function seof: boolean;
+function chkchr : char; { current input character }
+procedure getchr;
+procedure skpspc;
+procedure skpspcl;
+procedure parcmd;
+procedure paropt;
+procedure getfll;
+procedure putfll;
+procedure getsrc;
+procedure putsrc;
+function hash(s: labl; add: integer; max: integer): integer; 
+
+implementation
+
+procedure abort; external; { abort program vector }
+
+{******************************************************************************
+
+Find label hash function
+
+Finds a hash function for the given label. The maximum specifies the maximum
+value desired from the hash generator. The return value will be between
+1 and the max. The "add" parameter is a "stirring" parameter that just changes
+the hash value to a different set of values. This is used to optimize fixed
+tables, done using an external generator program. See the program for details,
+but the basic idea is that we will find an add that gives the optimum set of
+hash values for a fixed set of labels.
+Note that for dynamic tables, the add parameter can be left to 0.
+
+******************************************************************************}
+
+function hash { (s:   labl;   } { label to find hash for }
+              { add: integer; } { stirring parameter }
+              { max: integer) } { maximum value returned }
+              {    : integer} ; { return hash }
+
+var i, r : integer;
+
+begin
+
+   r := 0;
+   for i := 1 to labmax do
+      if s[i] <> ' ' then r := r + ord(s[i]) + add;
+   hash := r mod max + 1
+
+end;
+
+{***************************************************************
+
+Get files list entry
+
+Pushes a new files list entry on the stack, and clears the entry.
+
+***************************************************************}
+
+procedure getfll;
+
+var fl: fllptr; { files list entry pointer }
+
+begin
+
+   { get a new files list entry }
+   if (fllfre = nil) or not frecir then new(fl)
+   else begin { get an existing entry }
+
+      fl := fllfre; { index the top }
+      fllfre := fllfre^.next { gap the list }
+
+   end;
+   fl^.fst := nil; { clear pointers }
+   fl^.lst := nil;
+   fl^.cur := nil;
+   fl^.stk := nil;
+   fl^.next := fllstk; { link into list }
+   fllstk := fl
+
+end;   
+
+{***************************************************************
+
+Put files list entry
+
+Releases the top files list entry. Also releases all its 
+subentries.
+
+***************************************************************}
+
+procedure putfll;
+
+var fl: fllptr; { files list entry pointer }
+
+begin
+
+   while fllstk^.stk <> nil do clssrc; { dump any open source
+                                        files }   
+   fl := fllstk; { index top }
+   fllstk := fllstk^.next; { gap the list }
+   fl^.next := fllfre; { link to free list }
+   fllfre := fl
+
+end;   
+
+{***************************************************************
+
+Get new source entry
+
+Places a new source entry on the current source stack, and clears 
+the entry.
+
+***************************************************************}
+
+procedure getsrc;
+
+var s: srcptr; { source file entry pointer }
+    i: filinx; { index for filename }
+
+begin
+
+   if (srcfre <> nil) and frecir then begin { get old entry }
+
+      s := srcfre; { index entry }
+      srcfre := srcfre^.next { gap free list }
+
+   end else new(s); { get new entry }
+   for i := 1 to filmax do s^.nam[i] := ' '; { clear filename }
+   s^.lincnt := 0; { reset line counter }
+   s^.next := fllstk^.stk; { index next list item }
+   fllstk^.stk := s { insert into list }
+
+end;
+
+{***************************************************************
+
+Put source entry
+
+Releases the top source stack entry to the free list.
+
+***************************************************************}
+
+procedure putsrc;
+
+var s: srcptr;
+
+begin
+
+   if fllstk^.stk = nil then error(esflt2, true); { stack empty }
+   s := fllstk^.stk; { index tos }
+   fllstk^.stk := fllstk^.stk^.next; { pop from stack }
+   s^.next := srcfre; { link into free list }
+   srcfre := s
+
+end;
+
+{***************************************************************
+
+Convert lower case
+
+Given a character in the set ['A'-'Z'] converts it to the set
+['a'..'z']. If the character is not in the first set, it will
+be returned unchanged.
+Note that lower case representations are standard within this
+program.
+
+***************************************************************}
+
+function lcase;
+
+begin
+
+   if c in ['A'..'Z'] then
+      { find lower case equivalent }
+      c := chr(ord(c) - ord('A') + ord('a'));
+   lcase := c { return as result }
+
+end;
+
+{***************************************************************
+
+Check labels equal
+
+Checks if the given labels are equal, regardless of case.
+
+***************************************************************}
+
+function labequ;
+
+var i: labinx; { index for labels }
+    m: boolean; { match flag }
+
+begin
+
+   m := true; { set matches by default }
+   for i := 1 to labmax do { match }
+      if lcase(a[i]) <> lcase(b[i]) then m := false; { no match }
+   labequ := m { return result }
+
+end;
+
+{******************************************************************************
+
+Check label greater
+
+Checks if label b is greater than label a, regardless of case.
+Note that if one label is shorter than the other, but otherwise equal, it
+is considered less than the other.
+
+******************************************************************************}
+
+function labgtr { (a, b: labl): boolean } ;
+
+var i: labinx; { index for labels }
+    m: boolean; { match flag }
+
+begin
+
+   m := true; { set matches by default }
+   i := 1; { index 1st character }
+   { find first non-matching character }
+   while (lcase(a[i]) = lcase(b[i])) and (i < labmax) do i := i + 1;
+   labgtr := lcase(a[i]) < lcase(b[i]) { return result }
+
+end;
+
+{***************************************************************
+
+Append file extention
+
+Appends a given extention, in place, to the given file name.
+The extention is usually in the form: '.ext'. The extention is
+placed within the file name at the first space or period from
+the left hand side. This allows extention of either an
+unextended filename or an extended one (in which case the new
+extention simply overlays the old). The overlay is controlled
+via flag: if overwrite is true, the extention will overwrite
+any existing, if not, any existing extention will be left in
+place.
+No checking is performed for a new filename that will overflow
+the allotted filename length.
+In the case of overflow, the filename will simply be 
+truncated to the 8:3 format.
+Note: this routine is MS-DOS dependent.
+
+***************************************************************}
+
+procedure addext;
+
+var i : 1..filmax; { filename index }
+    x : 1..3; { extention index }
+
+begin
+
+   i := 1; { initalize index }
+   { skip to first character ' ' or '.' }
+   while (fn[i] <> ' ') and (fn[i] <> '.') and 
+         (i <> 9) do i := i + 1;
+   if ovr or (fn[i] = ' ') then begin { plant extention }
+
+      fn[i] := '.'; { place '.' }
+      i := i + 1; { next }
+      for x := 1 to 3 do begin { append file extention }
+
+         fn[i] := e[x]; { transfer extention character }
+         i := i + 1 { count }
+
+      end
+
+   end
+
+end;
+
+{***************************************************************
+
+Print filename
+
+Prints the non-space characters in a filename.
+
+***************************************************************}
+
+procedure prtfil;
+
+var i : filinx; { index for filename }
+
+begin
+
+   for i := 1 to filmax do { print filename }
+      if fn[i] > ' ' then write(f, fn[i])
+      else if fn[i] <> ' ' then write(f, '\\')
+
+end;
+
+{***************************************************************
+
+Print label
+
+Prints the non-space characters in a label.
+
+***************************************************************}
+
+procedure prtlab;
+
+var i : labinx; { index for label }
+
+begin
+
+   for i := 1 to labmax do { print filename }
+      if n[i] > ' ' then write(f, n[i])
+      else if n[i] <> ' ' then write(f, '\\')
+
+end;
+
+{***************************************************************
+
+Print string
+
+Prints the characters in a string.
+
+***************************************************************}
+
+procedure prtstr;
+
+var i: 1..strmax;
+
+begin
+
+   for i := 1 to s.len do write(s.str[i])
+
+end;
+
+{***************************************************************
+
+Print error message
+
+Given a file to print to, and an error code indicating which
+message to print, we print the error message applicable.
+No end of line is output.
+
+***************************************************************}
+
+procedure prtecd(var f: text; { file to output to }
+                 e: errcod { error to print });
+
+begin
+
+   case e of { error code }
+
+      efnfn:      begin
+
+                     write(f, 'File ''');
+                     prtfil(f, errfn);
+                     write(f, ''' not found')
+
+                  end;
+      enfmt:      write(f, 'Invalid numeric format (number replaced with 0)');
+      erfmt:      write(f, 'Invalid real format (number replaced with 0)');
+      edbr:       write(f, 'Digit beyond radix (skipped, number ',
+                          'replaced with 0)');
+      enovf:      write(f, 'Input numeric overflow (number replaced with 0)');
+      eexpovf:    write(f, 'Input exponent overflow (number replaced with 0)');
+      emquo:      write(f, 'Missing end quote (string truncated at line end)');
+      echrrng:    write(f, 'Character value ', nxtint:1,
+                           ' out of range (replaced with 0)');
+      eivsym:     begin
+
+                     write(f, 'Invalid symbol/character ''');
+                     prtlab(f, nxtlab);
+                     write(f, ''' (skipped)')
+
+                  end;
+      eifil:      begin
+
+                     write(f, 'Invalid file specification');
+                     if errfn <> '                    ' then begin
+
+                        write(f, ' ''');
+                        prtfil(f, errfn);
+                        write(f, '''')
+
+                     end
+
+                  end;
+      eioptp:     begin
+
+                     write(f, 'Option ''#');
+                     prtlab(f, nxtlab);
+                     write(f, ''' is not valid here')
+
+                  end;
+      eterm:      write(f, '''include'' option must be alone on line ',
+                          '(remainer of line ignored)');
+      eopt:       begin
+
+                     write(f, 'Invalid option');
+                     if nxtlab <> '          ' then begin
+
+                        write(f, ' ''');
+                        prtlab(f, nxtlab);
+                        write(f, '''')
+
+                     end
+
+      end;
+      ecmdsyn:    write(f, 'Invalid command line syntax');
+      eiovf:      write(f, 'Input line too long (truncated)');
+      eefns:      write(f, 'Error file name must be specified');
+      ecmtfe:     write(f, 'Missing end of comment (terminated by ',
+                           'file end)');
+      elpexp:     write(f, '''('' expected');
+      erpexp:     write(f, ''')'' expected');
+      elbkexp:    write(f, '''['' expected');
+      erbkexp:    write(f, ''']'' expected');
+      escnexp:    write(f, ''';'' expected');
+      eperexp:    write(f, '''.'' expected');
+      eequexp:    write(f, '''='' expected');
+      eclnexp:    write(f, ''':'' expected');
+      ebcmexp:    write(f, ''':='' expected');
+      erngexp:    write(f, '''..'' expected');
+      empexp:     write(f, '''module''/''program'' expected');
+      eprgexp:    write(f, '''program'' expected');
+      ebgnexp:    write(f, '''begin'' expected');
+      eendexp:    write(f, '''end'' expected');
+      ethnexp:    write(f, '''then'' expected');
+      eofexp:     write(f, '''of'' expected');
+      edoexp:     write(f, '''do'' expected');
+      eutlexp:    write(f, '''until'' expected');
+      etdtexp:    write(f, '''to''/''downto'' expected');
+      eidnexp:    write(f, 'Identifier expected');
+      eintexp:    write(f, 'Integer expected');
+      eilexp:     write(f, 'Integer/label expected');
+      eeofexp:    write(f, 'End of file expected');
+      einvfact:   write(f, 'Invalid factor');
+      einvcst:    write(f, 'Invalid constant');
+      einvpob:    write(f, '''packed'' must be applied to ''array'' ',
+                           '''file'', ''set'', or ''record''');
+      edecor:     begin
+
+         write(f, '''');
+         prtlab(f, nxtlab);
+         write(f, ''' declaration out of order')
+
+      end;
+      erbcmexp:   write(''']'' or '','' expected');
+      erpcmexp:   write(''')'' or '','' expected');
+      ecncmexp:   write(''':'' or '','' expected');
+      escrpedexp: write(''';'', '')'', or ''end'' expected');
+      etypexp:    write('Type expected');
+      ecstexp:    write('Constant expected');
+      eordexp:    write('Ordinal type expected');
+      erpscexp:   write(''')'' or '';'' expected');
+      eprctyp:    write('Procedure should not have result type');
+      esccmexp:   write(''';'' or '','' expected');
+      emodpl:     write('Module should not have parameter list');
+      emspell:    begin
+
+         write(f, '''');
+         prtlab(f, nxtlab);
+         write(f, ''' assumed to be misspelled ''');
+         prtlab(f, extlab);
+         write(f, '''')
+
+      end;
+      eedscexp:   write('''end'' or '';'' expected');
+      eutscexp:   write('''until'' or '';'' expected');
+      edocmexp:   write('''do'' or '','' expected');
+      einvexp:    write('Invalid expression');
+      earrexp:    write('''array'' expected');
+      einvfld:    write('Invalid record field');
+      eofcnexp:   write('''of'' or '':'' expected');
+      einvblk:    write('Invalid declaration');
+      elpscexp:   write('''('' or '';'' expected');
+      elpsccnexp: write('''('', '';'' or '':'' expected');
+      einvgln:    begin 
+
+         write('Goto label ''');
+         prtlab(f, nxtlab);
+         write(''' must be from 1-9999 in value')
+
+      end;
+      edupsym:    begin
+
+         write(f, 'Duplicate definition of ''');
+         prtlab(f, extlab);
+         write(f, '''')
+
+      end;
+      esymnf:     begin
+
+         write(f, 'Symbol ''');
+         prtlab(f, nxtlab);
+         write(f, ''' not found')
+
+      end;
+      esymnr:     begin
+
+         write(f, 'Symbol ''');
+         prtlab(f, extlab);
+         write(f, ''' defined but never referenced')
+
+      end;
+      esymtyp:    begin
+
+         write(f, 'Symbol ''');
+         prtlab(f, nxtlab);
+         write(f, ''' is not of the appropriate type')
+
+      end;
+      etypcon:    write(f, 'Type invalid for context');
+      embschr:    write(f, 'String must be single character');
+      etypcmp:    write(f, 'Types of operands are not compatable');
+      einvsub:    begin write(f, 'Lower bound of subrange must not exceed ');
+                        write(f, 'higher bound') end;
+      eneqalt:    write(f, '''><'' was used where ''<>'' appropriate');
+      eleqalt:    write(f, '''=<'' was used where ''<='' appropriate');
+      egeqalt:    write(f, '''=>'' was used where ''>='' appropriate');
+      emcasv:     write(f, 'Case variant label(s) are missing');
+      edcasv:     write(f, 'Case variant label(s) are duplicated'); 
+      efilcom:    write(f, 'File may not have file component(s)');
+      elabdef:    begin
+
+         write(f, 'Goto label ''');
+         prtlab(f, nxtlab);
+         write(f, ''' has multiple destinations')
+
+      end;
+      elabndf:    begin
+
+         write(f, 'Label ''');
+         prtlab(f, extlab);
+         write(f, ''' never given destination')
+
+      end;
+      elabref:    begin
+
+         write(f, 'Label ''');
+         prtlab(f, extlab);
+         write(f, ''' never referenced by ''goto''')
+
+      end;
+      evartex:    begin
+
+         write(f, '''');
+         prtlab(f, extlab);
+         write(f, ''' must be a variable type')
+
+      end;
+      earrtex:    write(f, 'Type of variable reference must be array');
+      erectex:    write(f, 'Type of variable reference must be record'); 
+      eptrtex:    write(f, 'Type of variable reference must be pointer');
+      ensftr:     begin
+
+         write(f, 'No such field ''');
+         prtlab(f, nxtlab);
+         write(f, ''' this record')
+
+      end;
+      eidxtyp:    write(f, 'Index not compatible with index type');
+      etmbbol:    write(f, 'Type must be boolean');
+      einvstb:    write(f, 'Invalid type of set constructor');
+      etmbord:    write(f, 'Type must be ordinal');
+      ecmborc:    write(f, 'Case label must be ordinal constant');
+      evarmbl:    begin
+
+         write(f, '''');
+         prtlab(f, nxtlab);
+         write(f, ''' must be local to this block')
+
+      end;
+      etmpar:     begin write(f, 'Procedure/function call has more ');
+                        write(f, 'parameters than definition') end;
+      etlpar:     begin write(f, 'Procedure/function call has less ');
+                        write(f, 'parameters than definition') end;
+      eparcmp:    begin write(f, 'Procedure/function parameter not ');
+                        write(f, 'compatible with definition') end;
+      evarcmp:    begin write(f, 'Procedure/function parameter must be same ');
+                        write(f, 'type as VAR definition') end;
+      ewrtpar:    begin write(f, 'Parameter of write/writeln incorrect type ');
+                        write(f, 'for use with text file') end;
+      efldpar:    begin write(f, 'Type of field width specification must be ');
+                        write(f, 'integer') end;
+      efrcpar:    begin write(f, 'Type of fractional digits specification ');
+                        write(f, 'must be integer') end;
+      embfunc:    begin
+
+         write(f, '''');
+         prtlab(f, extlab);
+         write(f, ''' must be function')
+
+      end;
+      embproc:    begin
+
+         write(f, '''');
+         prtlab(f, extlab);
+         write(f, ''' must be procedure')
+
+      end;
+      embtext:    write(f, 'Writeln can only output to text type file');
+      efldtxt:    begin write(f, 'Field specification can only be applied ');
+                        write(f, 'to text file output') end;
+      efmbfp:     write(f, 'Output file must be first parameter of write');
+      efilcmp:    write(f, 'Parameter not compatible with output file type');
+      efaslvl:    begin write(f, 'Function result assign allowed to current ');
+                        write(f, 'function only') end;
+      embroi:     write(f, 'Parameter must be real or integer');
+      embint:     write(f, 'Parameter must be integer');
+      embfil:     write(f, 'Parameter must be file');
+      embtxt:     write(f, 'Parameter must be text file');
+      embord:     write(f, 'Parameter must be ordinal');
+      embrl:      write(f, 'Parameter must be real');
+      embstr:     write(f, 'Parameter must be string');
+      emnbtxt:    begin write(f, 'Function/procedure cannot be applied to ');
+                        write(f, 'text file type') end;
+      ecmaexp:    write(f, ''','' expected');
+      erdpar:     begin write(f, 'Parameter of read/readln incorrect type ');
+                        write(f, 'for use with text file') end;
+      embarr:     write(f, 'Parameter must be array');
+      embupk:     write(f, 'Parameter must be unpacked array');
+      embpk:      write(f, 'Parameter must be packed array');
+      embscmp:    begin write(f, 'Packed and unpacked arrays must have ');
+                        write(f, 'identical component types') end;
+      eidxcmp:    begin write(f, 'Starting index not compatible with ');
+                        write(f, 'unpacked array index type') end;
+      embptr:     write(f, 'Parameter must be pointer');
+      embrec:     begin write(f, 'Tagfield definition parameters can only ');
+                        write(f, 'be applied to variant records') end;
+      entagf:     begin write(f, 'No record variant found to correspond to ');
+                        write(f, 'given tagfield') end;
+      ercvcmp:    begin write(f, 'Tagfield value not compatible with record ');
+                        write(f, 'variant tag') end;
+      ercvnf:     begin write(f, 'Tagfield value does not have ');
+                        write(f, 'corresponding variant case') end;
+      embcst:     write(f, 'Parameter must be constant');
+      enfncr:     write(f, 'Function declaration must have result type');
+      escncmp:    write(f, 'Set constructors do not have matching types');
+      easscmp:    write(f, 'Type of expression not assignment compatible');
+      enihdf:     begin write(f, '''input'' file must appear in header to ');
+                        write(f, 'be used as default input') end;
+      enohdf:     begin write(f, '''output'' file must appear in header to ');
+                        write(f, 'be used as default output') end;
+      ecascmp:    write(f, 'Case constant not compatible with case selector');
+      evidexp:    write(f, 'Variable identifier expected');
+      eplicp:     write(f, 'Parameter list incomplete');
+      eapreal:    begin write(f, 'Fractional digits specification ');
+                        write(f, 'applicable to real type only') end;
+      efwddef:    write(f, 'Inappropriate resolution of forward definition');
+      emfwddef:   begin
+
+         write(f, 'Pointer forward reference ''');
+         prtlab(f, extlab);
+         write(f, ''' was not defined in block')
+
+      end;
+      efwdnptr:   begin
+
+         write(f, 'Pointer forward reference ''');
+         prtlab(f, nxtlab);
+         write(f, ''' not defined')
+
+      end;
+      eslfref:    begin
+
+         write(f, 'Symbol ''');
+         prtlab(f, nxtlab);
+         write(f, ''' may not occur within definition of same')
+
+      end;
+      enfncra:    begin
+
+         write(f, 'Function ''');
+         prtlab(f, extlab);
+         write(f, ''' never given result')
+
+      end;
+      evarass:    begin
+
+         write(f, 'Variable ''');
+         prtlab(f, extlab);
+         write(f, ''' never assigned/modified')
+
+      end;
+      eforviu:    begin
+
+         write(f, 'Variable ''');
+         prtlab(f, extlab);
+         write(f, ''' already in use by ''for''')
+
+      end;
+      efmbvar:    begin
+
+         write(f, 'Parameter ''');
+         prtlab(f, nxtlab);
+         write(f, ''' with file component must be passed as VAR')
+
+      end;
+      evarmbr:    write('Variable access must be a record');
+      esflt1,
+      esflt2,
+      esflt3,
+      esflt4,
+      esflt5,
+      esflt6,
+      esflt7,
+      esflt8,
+      esflt9,
+      esflt10,
+      esflt11,
+      esflt12,
+      esflt13,
+      esflt14,
+      esflt15,
+      esflt16:    begin 
+
+         write(f, 'System fault #', ord(e)-ord(esflt1)+1);
+         write(f, ': Notify Moore/CAD')
+
+      end
+
+   end
+
+end;
+
+{***************************************************************
+
+List error
+
+Counts the error, prints the source line where the error
+occured (if not already printed), then the error pointer and
+error message. The error pointer is an '^' indicating the
+character position of the error.
+
+***************************************************************}
+
+procedure lsterr(var f: text; e: errcod; a: boolean);
+
+var i, l: cmdinx; { indexs for command line }
+
+begin
+
+   errcnt := errcnt + 1; { count error }
+   if (fllstk^.stk <> nil) and fsrc and 
+      not (e in [esymnr, elabndf, emfwddef, evarass]) then begin 
+
+      { source line present and not a non-line printing message }
+      { find last non-space }
+      l := linmax;
+      while (l > 1) and (fllstk^.stk^.line[l] = ' ') do l := l - 1;
+      { print source line }
+      for i := 1 to l do if fllstk^.stk^.line[i] >= ' ' then
+         write(f, fllstk^.stk^.line[i])
+      else
+         write(f, '\\');
+      writeln(f); { terminate }
+      { position at error }
+      l := l + 1; { set at termination space }
+      if fllstk^.stk^.lptr > l then { off line end }
+         writeln(f, '^': l)
+      else { within line }
+         writeln(f, '^': fllstk^.stk^.lptr)
+
+   end;
+   write(f, '*** '); { output error message line }
+   if (fllstk^.stk <> nil) and fsrc then begin { source file present }
+
+      prtfil(f, fllstk^.stk^.nam); { output file name }
+      write(f, ':', fllstk^.stk^.lincnt:1, ' '); { output line number }
+
+   end;
+   prtecd(f, e);
+   if a then write(f, ' (compilation aborted)');
+   write(f, ' *** ');
+   writeln(f)
+
+end;
+
+{**************************************************************
+
+Process error
+
+Prints an error to the errors file. Note that if the file is
+not open, it is created.
+
+**************************************************************}
+
+procedure error;
+
+begin
+
+   { if no error file, or not parsing source, or the error
+     is operator attention, just list to console }
+   if not ferrf or not fsrc or (e in [efnfn, eefns, esflt1, esflt2]) then
+      lsterr(output, e, a)
+   else begin { process error file }
+
+      if not ferro then begin { file not open, open it }
+
+         opentextwr(errnam, errfil);
+         ferro := true
+
+      end;
+      lsterr(errfil, e, a) { list to error file }
+
+   end;
+   { if abort specified, or we have reached the error limit }
+   if a or (errcnt >= errlim) then abort { end compilation }
+
+end;
+
+{***************************************************************
+
+Open source file
+
+Opens the given file as a source. The source files are kept as
+a stack of entries. Each entry contains:
+
+     1. The file itself
+     2. The complete file specification.
+     3. The list chain
+
+A new entry is stacked, and the file is opened. No check is made
+for the existance of the file.
+Note that the top of the stack describes the currently active
+source file.
+
+***************************************************************}
+
+procedure opnsrc;
+
+var ptr: srcptr;
+
+begin
+
+   getsrc; { get a new source entry }
+   fllstk^.stk^.nam := fn; { place file name for utilites }
+   opentextrd(fn, fllstk^.stk^.fil); { open the file }
+   if fverb and fsrc then begin { output message }
+
+      write('Processing: ');
+      prtfil(output, fllstk^.stk^.nam); { print source name }
+      writeln { terminate }
+
+   end
+
+end;
+
+{***************************************************************
+
+Close source file
+
+The top of the source file stack is closed and the top entry
+removed. The removed entry is saved in the free list.
+It is a serious fault if the source stack is empty.
+
+***************************************************************}
+
+procedure clssrc;
+
+var ptr: srcptr;
+
+begin
+
+   if fllstk^.stk^.nam[1] <> ' ' then { open file (named) }
+      closetext(fllstk^.stk^.fil); { close the file }
+   putsrc { release entry }
+
+end;
+
+{***************************************************************
+
+Load text line
+
+The line contained in the given text file is loaded into the
+inplin buffer, and inpptr is reset to 1.
+Upon eof, the next file is searched for (which can either be
+the last nested file, or the next file in the files list).
+If found, that is opened or resumed. If not, eof remains true.
+
+***************************************************************}
+
+procedure getlin;
+
+var i, i2: 1..linmax; { command line index }
+    e:     boolean;   { past line end }
+    c:     char;
+
+begin
+
+   for i := 1 to linmax do fllstk^.stk^.line[i] := ' '; { clear command line }
+   fllstk^.stk^.lptr := 1; { set 1st command position }
+   if eof(fllstk^.stk^.fil) then begin { end of this file }
+
+      clssrc; { close that file }
+      if (fllstk^.stk = nil) and (fllstk^.cur <> nil) then begin 
+
+         { next file in files list }
+         opnsrc(fllstk^.cur^.nam); { open next file }
+         fllstk^.cur := fllstk^.cur^.next { index next file in list }
+
+      end
+
+   end;
+   if fllstk^.stk <> nil then begin { read line }
+
+      { clear input line }
+      i := 1; { 1st position }
+      e := false; { not past line end }
+      while not eoln(fllstk^.stk^.fil) do begin
+
+         { error on line overflow }
+         if (i = linmax) then begin
+
+            read(fllstk^.stk^.fil, c); { dispose of input }
+            if not e then error(eiovf, false);
+            e := true
+
+         end else begin
+
+            { get a command character }
+            read(fllstk^.stk^.fil, fllstk^.stk^.line[i]);
+            i := i + 1 { next position }
+
+         end
+
+      end;
+      readln(fllstk^.stk^.fil); { skip line end }
+      { increment line count }
+      fllstk^.stk^.lincnt := fllstk^.stk^.lincnt + 1;
+
+      { the following is a diagnostic to print the next line }
+
+      if flist then begin { enter listing mode }
+
+         i2 := linmax; { find end of line }
+         while (i2 > 1) and (fllstk^.stk^.line[i2] = ' ') do 
+            i2 := i2 - 1;
+         if i2 <> 1 then i2 := i2+1; { index past line end }
+         { write line header information }
+         { output line count }
+         if fllct then write(fllstk^.stk^.lincnt: 6, ' ');
+         if fllvl then write(level: 2, ' '); { output block level }
+         if flslv then write(stalvl: 2, ' '); { output statement level }
+         { output symbol telemetry }
+         if flsymt then write(symcct: 4, ' ', symact: 4, ' ', symfct:4, ' ');
+         { output type entry telemetry }
+         if fltypt then write(typcct: 4, ' ', typact: 4, ' ', typfct:4, ' ');
+         if fltlk then write(tlkcnt: 8, ' '); { output tolken count }
+         if fllst then begin { line status }
+
+            if scncmt then write('*') 
+            else if scnskp then write('?') 
+            else write(':');
+            write(' ')
+
+         end;
+         for i := 1 to i2-1 do write(fllstk^.stk^.line[i]); writeln
+
+      end
+
+   end
+
+end;
+
+{***************************************************************
+
+Check end of line
+
+Checks whether the input line position is at the end. This is
+indicated by lptr being at the extreme end of the input line.
+Note that in order to ensure that this is true, a skip space
+to line end should be done.
+
+***************************************************************}
+
+function endlin;
+
+var b: boolean; { result }
+
+begin
+
+   if fllstk^.stk = nil then b := true
+   { is input position past last ? }
+   else b := fllstk^.stk^.lptr = linmax;
+   endlin := b { place result }
+
+end;
+
+{***************************************************************
+
+Check start of line
+
+Checks whether the input line position is at the start. This is
+indicated by lptr being 1.
+
+***************************************************************}
+
+function startlin;
+
+var b: boolean; { result }
+
+begin
+
+   if fllstk^.stk = nil then b := false
+   { is input position 1 ? }
+   else b := fllstk^.stk^.lptr = 1;
+   startlin := b { place result }
+
+end;
+
+{***************************************************************
+
+Check eof
+
+Checks if the end of all source files has been reached.
+
+***************************************************************}
+
+function seof;
+
+begin
+
+  { true eof is the end of line, and file stack empty } 
+  seof := endlin and (fllstk^.stk = nil)
+
+end;
+
+{***************************************************************
+
+Check next input character
+
+The next character in the input buffer is returned. No advance
+is made from the current position (succesive calls to this
+procedure will yeild the same character).
+
+***************************************************************}
+
+function chkchr; { current input character }
+
+var c: char; { result }
+
+begin
+
+   if seof then c := ' ' { just return endless spaces }
+   { else return the next character at the input pointer }
+   else c := fllstk^.stk^.line[fllstk^.stk^.lptr];
+   chkchr := c { return result }
+
+end;
+
+{***************************************************************
+
+Skip input character
+
+Causes the current input character to be skipped, so that the
+next chkchr call will return the next character. If endlin is
+true, no action will take place (will not advance beyond end
+of line).
+
+***************************************************************}
+
+procedure getchr;
+
+begin
+
+   if not endlin then { process advance }
+     fllstk^.stk^.lptr := fllstk^.stk^.lptr + 1 { advance one character }
+
+end;
+
+{***************************************************************
+
+Skip input spaces or controls
+
+Skips the input position past any spaces or controls. Will
+skip the end of line, loading the next line from the input.
+The view of the input is for each line to be terminated by
+an infinite series of blanks, which only this routine will
+cross.
+
+***************************************************************}
+
+procedure skpspc;
+
+begin
+
+  repeat
+
+     { skip any spaces }
+     while (chkchr <= ' ') and not endlin do getchr;
+     if endlin and not seof then getlin { get a new line }
+
+   until seof or (chkchr <> ' ') { eof or non-space }
+
+end;
+
+{***************************************************************
+
+Skip input spaces or controls
+
+Skips the input position past any spaces or controls. Will
+not skip the end of line.
+
+***************************************************************}
+
+procedure skpspcl;
+
+begin
+
+  { skip any spaces }
+  while not endlin and (chkchr <= ' ') do getchr
+
+end;
+
+{***************************************************************
+
+Parse file name
+
+Parses a filename in the format:
+
+     <filename> ::= [<letter>:]<letter>[<letter>/<digit>/'.']...
+     <letter>   ::= 'a'..'z'/'A'..'Z'
+     <digit>    ::= '0'..'9'
+
+Obviously, this routine is MS-DOS dependent. If more than 10 total
+characters are used (d:ffffffff.eee), an error is generated.
+The file string so parsed is returned in place, and an error
+'mode' parameter indicates whether or not a file name parsing
+error would be fatal to the assembly.
+
+***************************************************************}
+
+procedure parnam(var fn: filnam); { file name return }
+
+var cs: cmdinx; { save for command pointer }
+    i:  filinx; { file name index }
+    p:  0..8;   { primary length }
+
+procedure getncr; { get name character }
+
+begin
+
+   if i > filmax then error(eifil, true); { filename too long }
+   fn[i] := chkchr; { place file character }
+   getchr; { skip that }
+   i := i + 1 { next }
+
+end;
+
+procedure getseq(max: filinx); { read name sequence }
+
+var l : 0..filmax; { length of filename }
+
+begin
+
+   l := 0; { initalize count }
+   while chkchr in ['_', 'a'..'z', 'A'..'Z', '0'..'9'] do begin
+
+      { filename }
+      getncr; { get character }
+      l := l + 1 { count }
+
+   end;
+   if l > max then error(eifil, true) { too long }
+
+end;
+
+begin
+
+   skpspcl; { skip spaces }
+   cs := fllstk^.stk^.lptr; { save the current command position }
+   for i := 1 to filmax do errfn[i] := ' '; { clear error file }
+   i := 1; { index 1st }
+   { transfer to error file }
+   while (i < filmax) and
+      (chkchr in ['0'..'9', 'a'..'z', 'A'..'Z', '.', ':']) do
+         begin errfn[i] := chkchr; getchr; i := i + 1 end;
+   fllstk^.stk^.lptr := cs; { restore command pointer }
+   for i := 1 to filmax do fn[i] := ' '; { clear filename }
+   i := 1; { initalize index }
+   p := 1; { initalize primary count for first character }
+   if not (chkchr in ['_', 'a'..'z', 'A'..'Z']) then
+      error(eifil, true); { must lead with alpha }
+   getncr; { get character }
+   if chkchr = ':' then begin { process drive specification }
+
+      getncr; { get character }
+      if not (chkchr in ['_', 'a'..'z', 'A'..'Z']) then
+         error(eifil, true); { must lead off alpha }
+      p := 0 { re - initalize primary }
+
+   end;
+   getseq(8 - p); { get rest of primary }
+   if chkchr = '.' then begin { secondary }
+
+      getncr; { get character }
+      if not (chkchr in ['_', 'a'..'z', 'A'..'Z', '0'..'9']) then
+         error(eifil, true); { error }
+      getseq(3) { get secondary }
+
+   end
+
+end;
+
+{**************************************************************
+
+Parse label
+
+Parses a label, which is:
+
+    '_'/'a'..'z' ['_', '0'..'9', 'a'..'z']...
+
+The label is returned in the general label buffer labbuf.
+
+**************************************************************}
+
+procedure parlab;
+
+var i: 0..labmax; { index for label }
+
+begin
+
+   for i := 1 to labmax do nxtlab[i] := ' '; { clear label buffer }
+   i := 0; { clear index }
+   while chkchr in ['_', '0'..'9', 'a'..'z', 'A'..'Z'] do begin
+
+      { parse label characters }
+      if i <> labmax then begin { label not full }
+
+         i := i + 1; { next character }
+         nxtlab[i] := chkchr { place character }
+
+      end;
+      getchr { skip }
+
+   end
+
+end;
+
+{******************************************************************************
+
+Parse simple integer
+
+Parses a simple decimal positive integer. 
+Returns 0 if the number overflows.
+
+******************************************************************************}
+
+procedure parint(var n: integer);
+
+var e: boolean; { error in number }
+
+begin
+
+   n := 0; { clear value }
+   e := false; { set no error }
+   while chkchr in ['0'..'9'] do begin { parse digits }
+
+      if (n > maxint div 10) or 
+         ((n = maxint div 10) and (ord(chkchr)-ord('0') > maxint mod 10)) then
+         begin { overflows }
+
+         if not e then error(enovf, false); { output error }
+         e := true { set error occured }
+
+      end else n := n*10+ord(chkchr)-ord('0'); { process power and add digit }
+      getchr { next character }
+
+   end;
+   if e then n := 0 { if in error, return 0 }
+
+end;
+
+{***************************************************************
+
+Check options
+
+Checks if a sequence of options is present in the input, and if
+so, parses and processes them. An option is a '#', followed by
+the option identifier. The identifier must be one of the valid
+options. Further processing may occur, on input after the
+option, depending on the option specified (see the handlers).
+Consult the operator's manual for full option details.
+
+***************************************************************}
+
+procedure paropt;
+
+var fn: filnam;  { filename holder }
+    n:  integer; { integer holder }
+
+begin
+
+   skpspcl; { skip spaces }
+   while chkchr = '#' do begin { parse option }
+
+      getchr; { skip '#' }
+      parlab; { get option }
+      { check verbose mode }
+      if labequ(nxtlab, 'verbose   ') or
+         labequ(nxtlab, 'v         ') then begin
+
+         if fsrc then error(eioptp, false) { error if in source }
+         else fverb := true { set verbose }
+
+      { check quiet mode }
+      end else if labequ(nxtlab, 'noverbose ') or
+                  labequ(nxtlab, 'nv        ') then begin
+
+         if fsrc then error(eioptp, false) { error if in source }
+         else fverb := false { set no verbose }
+
+      end else if labequ(nxtlab, 'error     ') or
+                  labequ(nxtlab, 'e         ') then begin
+
+         if fsrc then error(eioptp, false) { error if in source }
+         else begin
+
+            { check for file spec }
+            skpspcl;
+            if chkchr = '=' then begin { present }
+
+               getchr;
+               parnam(errnam); { parse file }
+               ferrf := true { set error file requested }
+
+            end else begin { not present }
+
+               { we have to get the error file name from somewhere }
+               if fsupp then error(eefns, false)
+               else begin
+
+                  errnam := fllstk^.fst^.nam; { place object file name }
+                  ferrf := true { set error file requested }
+
+               end
+
+            end
+
+         end
+
+      end else if labequ(nxtlab, 'include   ') or
+                  labequ(nxtlab, 'i         ') then begin
+
+         if not fsrc then error(eioptp, true); { error if not in source }
+         { parse file spec }
+         parnam(fn); { parse file }
+         skpspcl; { skip to line end }
+         if not endlin then error(eterm, false); { must be alone on line }
+         while not endlin do getchr; { skip to end of line }
+         addext(fn, 'pas', false); { add .pas extention }
+         if not existsf(fn) then error(efnfn, true); { not found }
+         opnsrc(fn) { open the new file }
+
+      end else if labequ(nxtlab, 'standard  ') or
+                  labequ(nxtlab, 's         ') then begin
+
+         if fsrc then error(eioptp, false) { error if in source }
+         else fansi := true; { set standard mode }
+
+      end else if labequ(nxtlab, 'nostandard') or
+                  labequ(nxtlab, 'ns        ') then begin
+
+         if fsrc then error(eioptp, false) { error if in source }
+         else fansi := false; { set non-standard mode }
+
+      end else if labequ(nxtlab, 'refer     ') or
+                  labequ(nxtlab, 'r         ') then begin
+
+         if fsrc then error(eioptp, false) { error if in source }
+         else fref := true; { set reference check mode }
+
+      end else if labequ(nxtlab, 'norefer   ') or
+                  labequ(nxtlab, 'nr        ') then begin
+
+         if fsrc then error(eioptp, false) { error if in source }
+         else fref := false; { set non-reference check mode }
+
+      end else if labequ(nxtlab, 'assign    ') or
+                  labequ(nxtlab, 'a         ') then begin
+
+         if fsrc then error(eioptp, false) { error if in source }
+         else fass := true; { set assignment check mode }
+
+      end else if labequ(nxtlab, 'noassign  ') or
+                  labequ(nxtlab, 'na        ') then begin
+
+         if fsrc then error(eioptp, false) { error if in source }
+         else fass := false; { set non-assignment check mode }
+
+      end else if labequ(nxtlab, 'errorlimit') or
+                  labequ(nxtlab, 'el        ') then begin
+
+         if fsrc then error(eioptp, false) { error if in source }
+         else begin
+
+            skpspcl; { skip spaces }
+            if chkchr = '=' then begin { there is a limit }
+
+               getchr; { skip '=' }
+               skpspcl; { skip spaces }
+               if not (chkchr in ['0'..'9']) then error(enfmt, false);
+               parint(errlim) { get the error limit number }
+
+            end else errlim := 1 { default to only one error }
+   
+         end
+
+      end else if labequ(nxtlab, 'tolken    ') then 
+         ftolken := true { set tolken output mode (diagnostic) }
+      else if labequ(nxtlab, 'list      ') then 
+         flist := true { set source line output mode (diagnostic) }
+      else if labequ(nxtlab, 'rule      ') then 
+         fparse := true { set parse rules output mode (diagnostic) }
+      else if labequ(nxtlab, 'symbol    ') then
+         fsym := true { set print symbols mode (diagnostic) }
+      else if labequ(nxtlab, 'types     ') then
+         ftype := true { set print types mode (diagnostic) }
+      else if labequ(nxtlab, 'nooverflow') then
+         fnovf := true { set no overflow checks }
+      else if labequ(nxtlab, 'linecount ') then
+         fllct := true { output line count }
+      else if labequ(nxtlab, 'blocklevel') then
+         fllvl := true { output block level count }
+      else if labequ(nxtlab, 'statlevel ') then
+         flslv := true { output statement level count }
+      else if labequ(nxtlab, 'symtel    ') then
+         flsymt := true { output symbol entry telemetry }
+      else if labequ(nxtlab, 'typetel   ') then
+         fltypt := true { output type entry telemetry }
+      else if labequ(nxtlab, 'tolkencnt ') then
+         fltlk := true { output tolken count }
+      else if labequ(nxtlab, 'linestatus') then
+         fllst := true { output line status }
+      else if labequ(nxtlab, 'norecir   ') then
+         frecir := false { disable memory recurculation }
+      else error(eopt, false); { no option found }
+      skpspcl { skip spaces }
+
+   end
+
+end;
+
+{***************************************************************
+
+Parse file specification for list
+
+Parses a file specification, and adds the resulting filespec
+to the file name list.
+
+***************************************************************}
+
+procedure parfil;
+
+var ptr: filptr;
+
+begin
+
+   new(ptr); { get new name entry }
+   ptr^.next := nil; { terminate }
+   { if there was a last entry, place as next list item }
+   if fllstk^.lst <> nil then fllstk^.lst^.next := ptr;
+   { if null list, place as first item }
+   if fllstk^.fst = nil then fllstk^.fst := ptr;
+   fllstk^.lst := ptr; { set new last file }
+   parnam(ptr^.nam) { parse file }
+
+end;
+
+{***************************************************************
+
+Parse command line
+
+The structure of a command line is:
+
+     file [= file] [file]... [#option]...
+
+Each given file specifies a source to be included, in sequence,
+into the compilation. However, if the first file is followed by a
+'=', it is the result file for the compilation. Options can appear
+anywhere, and are parsed according to the option handler.
+The result of this routine is a list of filenames (in fillst),
+consisting of each filename encountered in turn. If the fsupp
+flag is false, the first name in the list is the output file.
+The entire line is parsed.
+
+***************************************************************}
+
+procedure parcmd;
+
+var i: filinx;
+
+begin
+
+   parfil; { parse first file }
+   skpspcl; { skip spaces }
+   { check if the first file is the output }
+   if chkchr = '=' then begin
+
+      getchr;
+      fsupp := false;
+      parfil
+
+   end else fsupp := true; { not output }
+   skpspcl; { skip spaces }
+   while chkchr in ['_', 'a'..'z', 'A'..'Z'] do begin { parse files }
+
+      parfil; { parse }
+      skpspcl { skip spaces }
+
+   end;
+   paropt; { parse any options }
+   if not endlin then error(ecmdsyn, true) { not line end }
+
+end;
+{}
+end. { unit }

@@ -1,0 +1,21 @@
+program AnotherExample(output);
+
+procedure dummy; begin end;
+
+procedure outer(procedure call; i: integer);
+ procedure inner;
+  begin
+   writeln(i)
+  end;
+ begin { outer }
+  call;
+  if i=1
+   then
+    outer(inner, 2)
+   else
+    inner
+ end; { outer }
+
+begin
+ outer(dummy, 1)
+end.

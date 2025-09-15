@@ -1,0 +1,144 @@
+rem
+rem Construct encode
+rem
+
+rem
+rem Compile with reverse engineering counter-measures enabled
+rem
+copy revengcm_on.pas revengcm.pas
+
+rem
+rem Use this to compile from the new parser only.
+rem
+
+rem ..\pparse\parse revengcm=revengcm/nrf /u=.,\ip\windows\i80386\lib
+rem ..\pparse\parse sepsgn=sepsgn/nrf /u=.,\ip\windows\i80386\lib
+rem ..\pparse\parse encode=encode/nrf /u=.,\ip\windows\i80386\lib
+rem ..\pparse\parse optimize=optimize/nrf /u=.,\ip\windows\i80386\lib
+rem ..\pparse\parse machine=machine/nrf /u=.,\ip\windows\i80386\lib
+
+rem
+rem Use this to compile from main image.
+rem
+
+parse revengcm=revengcm/nrf /u=.,\ip\windows\i80386\lib
+parse sepsgn=sepsgn/nrf /u=.,\ip\windows\i80386\lib
+parse encode=encode/nrf /u=.,\ip\windows\i80386\lib
+parse optimize=optimize/nrf /u=.,\ip\windows\i80386\lib
+parse machine=machine/nrf /u=.,\ip\windows\i80386\lib
+
+rem
+rem This is to compile from master image
+rem
+
+ec revengcm=revengcm/noc
+ec sepsgn=sepsgn/noc
+ec encode=encode/noc
+ec optimize=optimize/noc
+ec machine=machine/noc
+
+rem ec revengcm=revengcm/noc/scxt/discm
+rem ec sepsgn=sepsgn/noc/scxt/discm
+rem ec encode=encode/noc/scxt/discm
+rem ec optimize=encode/noc/scxt/discm
+rem ec machine=machine/noc/scxt/discm
+
+rem
+rem This is to compile from local image
+rem
+
+
+rem encode revengcm=revengcm/noc
+rem encode sepsgn=sepsgn/noc
+rem encode encode=encode/noc
+rem encode optimize=optimize/noc
+rem encode machine=machine/noc
+
+rem encode revengcm=revengcm/noc/scxt/discm
+rem encode sepsgn=sepsgn/noc/scxt/discm
+rem encode encode=encode/noc/scxt/discm
+rem encode optimize=optimize/noc/scxt/discm
+rem encode machine=machine/noc/scxt/discm
+
+rem
+rem perform link for windows
+rem
+
+ln runfile=c:\ip\windows\i80386\lib\blotter c:\ip\windows\i80386\lib\serlib c:\ip\windows\i80386\lib\strlib c:\ip\windows\i80386\lib\extlib c:\ip\windows\i80386\lib\parlib sepsgn machine optimize c:\ip\windows\i80386\lib\reglock c:\ip\windows\i80386\lib\timelock c:\ip\windows\i80386\lib\main encode c:\ip\windows\i80386\lib\cap /nu
+rem ln runfile=c:\ip\windows\i80386\lib\blotter c:\ip\windows\i80386\lib\serlibx c:\ip\windows\i80386\lib\strlibx c:\ip\windows\i80386\lib\extlibx c:\ip\windows\i80386\lib\parlibx sepsgn machine optimize c:\ip\windows\i80386\lib\reglockx c:\ip\windows\i80386\lib\timelockx c:\ip\windows\i80386\lib\main encode c:\ip\windows\i80386\lib\cap /nu
+rem
+rem Symbols version
+rem
+genpe encode=runfile/v/sc
+rem genpe encode=runfile/v
+del runfile.*
+
+rem
+rem Compile with reverse engineering counter-measures disabled
+rem
+copy revengcm_off.pas revengcm.pas
+
+rem
+rem Use this to compile from the new parser only.
+rem
+
+rem ..\pparse\parse revengcm=revengcm/nrf
+rem ..\pparse\parse sepsgn=sepsgn/nrf
+rem ..\pparse\parse encode=encode/nrf
+rem ..\pparse\parse optimize=optimize/nrf
+rem ..\pparse\parse machine=machine/nrf
+
+rem
+rem Use this to compile from main image.
+rem
+
+parse revengcm=revengcm/nrf /u=.,\ip\windows\i80386\lib
+parse sepsgn=sepsgn/nrf /u=.,\ip\windows\i80386\lib
+parse encode=encode/nrf /u=.,\ip\windows\i80386\lib
+parse optimize=optimize/nrf /u=.,\ip\windows\i80386\lib
+parse machine=machine/nrf /u=.,\ip\windows\i80386\lib
+
+rem
+rem This is to compile from master image
+rem
+
+rem ec revengcm=revengcm/noc
+rem ec sepsgn=sepsgn/noc
+rem ec encode=encode/noc
+rem ec optimize=optimize/noc
+rem ec machine=machine/noc
+
+ec revengcm=revengcm/noc/scxt/discm
+ec sepsgn=sepsgn/noc/scxt/discm
+ec encode=encode/noc/scxt/discm
+ec optimize=optimize/noc/scxt/discm
+ec machine=machine/noc/scxt/discm
+
+rem
+rem This is to compile from local image
+rem
+
+rem encode revengcm=revengcm/noc
+rem encode sepsgn=sepsgn/noc
+rem encode encode=encode/noc
+rem encode optimize=optimize/noc
+rem encode machine=machine/noc
+
+rem encode revengcm=revengcm/noc/scxt/discm
+rem encode sepsgn=sepsgn/noc/scxt/discm
+rem encode encode=encode/noc/scxt/discm
+rem encode optimize=optimize/noc/scxt/discm
+rem encode machine=machine/noc/scxt/discm
+
+rem
+rem perform link for windows
+rem
+
+rem ln runfile=c:\ip\windows\i80386\lib\blotter c:\ip\windows\i80386\lib\serlib c:\ip\windows\i80386\lib\strlib c:\ip\windows\i80386\lib\extlib c:\ip\windows\i80386\lib\parlib sepsgn machine optimize c:\ip\windows\i80386\lib\reglock c:\ip\windows\i80386\lib\timelock c:\ip\windows\i80386\lib\main encode c:\ip\windows\i80386\lib\cap /nu
+ln runfile=c:\ip\windows\i80386\lib\blotter c:\ip\windows\i80386\lib\serlibx c:\ip\windows\i80386\lib\strlibx c:\ip\windows\i80386\lib\extlibx c:\ip\windows\i80386\lib\parlibx sepsgn machine optimize c:\ip\windows\i80386\lib\reglockx c:\ip\windows\i80386\lib\timelockx c:\ip\windows\i80386\lib\main encode c:\ip\windows\i80386\lib\cap /nu
+rem
+rem Symbols version
+rem
+rem genpe encode=runfile/v/sc
+genpe encodencm=runfile/v
+del runfile.*

@@ -1,0 +1,84 @@
+RECODE OF REGISTER ALLOCATION
+
+The present register allocator tracks registers from loads to stores, and 
+handles overflow issues by issuing pushes and pops according to the tree
+structure of the intermediate code.
+
+Any code generator must start with a general model and optimize it by improving
+specific cases. That is, it must be able to handle any code case, no matter how
+bad. This would create code that can handle any case, but is expensive for most
+common cases. So adding optimization for general cases "fixes" the general case.
+
+The new allocator sees loads and stores as "requests" from the code and handles
+them as asyncronous from the intermediate tree. Each register has its contents
+marked according to the cases:
+
+1. There is no content (register is free).
+
+2. There is a simple content. The register contains a simple, loadable type.
+
+3. The register contains a complex type that is only reproducable by 
+calculation.
+
+4. The register is free, but incidently contains a simple type or its address.
+
+5. There is a simple content in a register, but it is marked as "stored" or
+"done".
+
+Another possibility is that a register contains a free, but complex type. Reuse
+of such subexpressions is left to a higher level intermediate pass.
+
+The allocator processes the code without regard for the tree structure of the
+intermediate. The actions are:
+
+Load
+
+A variable, or its address, is loaded. The allocator considers all register
+contents for a previous such element. If it is found, and free, it is used.
+If it is found, but not free (in use by another intermediate), it is copied.
+If no previous contents are found, then the register allocation process is
+entered.
+
+Store
+
+The register is marked free.
+
+Mark content
+
+The Marks the contents of a register as complex.
+
+Join context
+
+Combines multiple flows into the current register context.
+
+Purge context
+
+Dump all active registers (registers with simple, storable context).
+
+When a register is allocated, we search for a free register. If there is no
+completely free register, then we choose one that is free, but contains
+content, based on the age of that entry.
+
+If none of the registers qualifies, then a storeable register is choosen.
+These are registers that were marked stored, but the store has not taken place.
+The store must be executed, then the register used.
+
+Finally, if all these steps fail, then the expression tree is sufficiently
+complex that the register set cannot contain it all. This means that a complex
+entry must be spilled to a temporary. A temp is created as a local, then the
+register is spilled to that. The code that requests that item will cause it
+to be reloaded.
+
+Processors like the x86 series are relatively unaffected by spills and reloads,
+because they can represent full loads and stores to locals without occupying
+multiple registers. However, use of push and pops may decrease the expense on
+these processors, and on processors that have potentially expensive locals
+access, push and pop processing can dramatically lower the expense.
+
+For this reason, A second pass is to look through each basic block examining
+which items can be spilled and reloaded by attaching push/pop operations to
+the code.
+
+Finally, a "load bridging" pass is completed that tries to bring old register
+contents forward by copying them to side registers.
+

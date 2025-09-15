@@ -1,0 +1,47 @@
+0x401849 <sc_registerclass>:    pushf
+0x40184a <sc_registerclass+1>:  pusha
+0x40184b <sc_registerclass+2>:  push   %eax
+0x40184c <sc_registerclass+3>:  mov    %esp,%eax
+! from wccvt macro
+0x40184e <sc_registerclass+5>:  sub    $0x28,%esp	   ! allocate new class record
+0x401851 <sc_registerclass+8>:  mov    0x0(%eax),%esi  ! get base of class record
+0x401854 <sc_registerclass+11>: mov    %esp,%edi	   ! index class record
+0x401856 <sc_registerclass+13>: mov    $0x8,%ecx	   ! set length without strings
+0x40185b <sc_registerclass+18>: repz movsl %ds:(%esi),%es:(%edi) ! move that portion of record
+0x40185d <sc_registerclass+20>: mov    %esp,%ebx	   ! index new class record
+0x40185f <sc_registerclass+22>: mov    0x0(%eax),%edi  ! get base of class record
+0x401862 <sc_registerclass+25>: mov    0x20(%edi),%esi ! get menu string address
+0x401865 <sc_registerclass+28>: mov    0x24(%edi),%ecx ! get length
+0x401868 <sc_registerclass+31>: or     %esi,%esi	   ! check null string
+0x40186a <sc_registerclass+33>: mov    %esi,%edi	   ! move to destination
+0x40186c <sc_registerclass+35>: je     0x401877 <wccvt000000101> ! yes, skip
+0x401872 <sc_registerclass+41>: call   0x401351 <sc_timrpt03> ! place menu string
+0x401877 <wccvt000000101>:      mov    %edi,0x20(%ebx) ! place string address
+0x40187a <wccvt000000101+3>:    mov    0x0(%eax),%edi  ! get base of class record
+0x40187d <wccvt000000101+6>:    mov    0x28(%edi),%esi ! get class string address
+0x401880 <wccvt000000101+9>:    mov    0x2c(%edi),%ecx ! get length
+0x401883 <wccvt000000101+12>:   or     %esi,%esi	   ! check null string
+0x401885 <wccvt000000101+14>:   mov    %esi,%edi	   ! move to destination
+0x401887 <wccvt000000101+16>:   je     0x401892 <wccvt000000102> ! yes, skip
+0x40188d <wccvt000000101+22>:   call   0x401351 <sc_timrpt03> ! place class string
+0x401892 <wccvt000000102>:      mov    %edi,0x24(%ebx) ! place string address
+0x401895 <wccvt000000102+3>:    mov    %ebx,0x0(%edx)  ! replace old with new class record
+0x401898 <wccvt000000102+6>:    push   %eax
+0x401899 <wccvt000000102+7>:    pushl  0x0(%eax)
+0x40189c <wccvt000000102+10>:   call   *0x41b5a0
+0x4018a2 <wccvt000000102+16>:   pop    %edx
+0x4018a3 <wccvt000000102+17>:   mov    %edx,%esp
+0x4018a5 <wccvt000000102+19>:   add    $0x4,%esp
+0x4018a8 <wccvt000000102+22>:   or     %eax,%eax
+0x4018aa <wccvt000000102+24>:   setne  %al
+0x4018ad <wccvt000000102+27>:   movzbl %al,%eax
+0x4018b0 <wccvt000000102+30>:   pop    %edi
+0x4018b1 <wccvt000000102+31>:   pop    %esi
+0x4018b2 <wccvt000000102+32>:   pop    %ebp
+0x4018b3 <wccvt000000102+33>:   add    $0x4,%esp
+0x4018b6 <wccvt000000102+36>:   pop    %ebx
+0x4018b7 <wccvt000000102+37>:   pop    %edx
+0x4018b8 <wccvt000000102+38>:   pop    %ecx
+0x4018b9 <wccvt000000102+39>:   add    $0x4,%esp
+0x4018bc <wccvt000000102+42>:   popf
+0x4018bd <wccvt000000102+43>:   ret

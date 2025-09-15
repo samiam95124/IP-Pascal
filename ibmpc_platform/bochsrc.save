@@ -1,0 +1,10 @@
+megs: 32
+romimage: file=$BXSHARE/BIOS-bochs-latest, address=0xf0000
+vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
+vga: extension=vbe
+floppya: 1_44=a.img, status=inserted
+boot: a
+log: bochsout.txt
+mouse: enabled=0
+ips: 15000000
+vga_update_interval: 150000

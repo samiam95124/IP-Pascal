@@ -1,0 +1,8 @@
+program test;
+
+const 
+      set_exp1 = [1..5, 10+2];
+  
+begin
+
+end.

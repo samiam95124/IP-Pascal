@@ -1,0 +1,1 @@
+gcc -ansi -pedantic -E test.c

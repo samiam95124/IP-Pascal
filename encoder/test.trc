@@ -1,0 +1,57 @@
+Dump of assembler code for function trn_end:
+0x00418a8a <trn_end+0>: nop
+0x00418a8b <trn_end+1>: jmp    0x418a90 <trn_end+6>
+0x00418a90 <trn_end+6>: enter  $0x0,$0x1
+0x00418a94 <trn_end+10>:        cld
+0x00418a95 <trn_end+11>:        mov    %ebp,0x419472
+0x00418a9b <trn_end+17>:        lea    0x419476,%ecx
+0x00418aa1 <trn_end+23>:        lea    0x418b7c,%eax
+0x00418aa7 <trn_end+29>:        mov    $0x7,%ebx
+0x00418aac <trn_end+34>:        call   0x418a25 <tr_ps_assign>
+0x00418ab1 <trn_end+39>:        lea    0x419476,%eax
+0x00418ab7 <trn_end+45>:        xor    %ebx,%ebx
+0x00418ab9 <trn_end+47>:        inc    %ebx
+0x00418aba <trn_end+48>:        call   0x418a02 <tr_ps_rwttxt>
+0x00418abf <trn_end+53>:        lea    0x419476,%ecx
+0x00418ac5 <trn_end+59>:        lea    0x418b83,%eax
+0x00418acb <trn_end+65>:        mov    $0x7,%ebx
+0x00418ad1 <trn_end+71>:        call   0x4188a3 <tr_ps_wrtstr>
+0x00418ad6 <trn_end+76>:        lea    0x419476,%eax ! index file
+0x00418adc <trn_end+82>:        push   %eax          ! save that
+0x00418add <trn_end+83>:        lea    0x419497,%esi ! index stb
+0x00418ae3 <trn_end+89>:        lea    0x4194b7,%edi ! index temp
+0x00418ae9 <trn_end+95>:        mov    $0x8,%ecx	 ! length
+0x00418aef <trn_end+101>:       push   %edi			 ! save dest
+0x00418af0 <trn_end+102>:       repz movsl %ds:(%esi),%es:(%edi) ! move it
+0x00418af2 <trn_end+104>:       pop    %ebx			 ! restore dest
+0x00418af3 <trn_end+105>:       lea    0x419477,%esi ! index sta
+0x00418af9 <trn_end+111>:       lea    0x4194d7,%edi ! index temp
+0x00418aff <trn_end+117>:       mov    $0x8,%ecx	 ! len
+0x00418b05 <trn_end+123>:       push   %edi			 ! save dest
+0x00418b06 <trn_end+124>:       repz movsl %ds:(%esi),%es:(%edi) ! move
+0x00418b08 <trn_end+126>:       pop    %edx			 ! restore dest
+0x00418b09 <trn_end+127>:       mov    $0x8,%ecx
+0x00418b0e <trn_end+132>: loop: mov    (%edx),%esi
+0x00418b10 <trn_end+134>:       and    (%ebx),%esi
+0x00418b12 <trn_end+136>:       xor    (%ebx),%esi
+0x00418b14 <trn_end+138>:       or     (%esi),%edi
+0x00418b16 <trn_end+140>:       add    $0x4,%ebx
+0x00418b19 <trn_end+143>:       add    $0x4,%edx
+0x00418b1c <trn_end+146>:       dec    %ecx
+0x00418b1d <trn_end+147>:       jne    0x418b0e <loop> <trn_end+132>
+0x00418b23 <trn_end+153>:       or     (%edi),%edi
+0x00418b25 <trn_end+155>:       sete   %al
+0x00418b28 <trn_end+158>:       movzbl %al,%eax
+0x00418b2b <trn_end+161>:       mov    %eax,%ecx
+0x00418b2d <trn_end+163>:       pop    %eax
+0x00418b2e <trn_end+164>:       mov    $0x5,%ebx
+0x00418b34 <trn_end+170>:       call   0x41886f <tr_ps_wrtblf>
+0x00418b39 <trn_end+175>:       lea    0x419476,%ecx
+0x00418b3f <trn_end+181>:       lea    0x418b8a,%eax
+0x00418b45 <trn_end+187>:       mov    $0x9,%ebx
+0x00418b4b <trn_end+193>:       call   0x4188a3 <tr_ps_wrtstr>
+0x00418b50 <trn_end+198>:       lea    0x419476,%eax
+0x00418b56 <trn_end+204>:       call   0x4188be <tr_ps_wrteol>
+0x00418b5b <trn_end+209>:       call   0x418b93 <trn_end+265>
+0x00418b60 <trn_end+214>:       leave
+0x00418b61 <trn_end+215>:       ret

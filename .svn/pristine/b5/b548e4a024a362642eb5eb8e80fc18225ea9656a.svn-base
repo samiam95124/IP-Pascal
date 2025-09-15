@@ -1,0 +1,4 @@
+rem
+rem Start bochs session
+rem
+"c:\program files\bochs-2.3\bochsdbg.exe"

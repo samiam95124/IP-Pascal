@@ -1,0 +1,32 @@
+Release 0.0.5
+- Bug fixes
+- More support for applications
+- New native ATA/ATAPI driver
+- Rearranged file system management
+
+Release 0.0.4
+- More bug fixes
+- More support for applications
+- Can run programs from the command line through the wrapper
+- Native applications using RedHat newlib
+- PS/2 mouse support
+
+Release 0.0.3
+A snapshot from the "devel" CVS branch
+- Native floppy driver
+- More support for applications
+- First basic Win32 support
+- Wrapper for segmented memory
+- Included the SmartEdit text editor
+- Included the Bash command line shell
+- Bug fixes
+
+Release 0.0.2
+- Current Directory support enabled
+- Directory entry corruption bug fixed in the FAT driver
+- More BIOSes supported by BIOSDisk
+- Random freeze at boot time fixed
+- Included GNU GRUB 0.93 (was 0.5.95)
+- Included FreeDOS kernel 1.1.30 (build 2030), from Beta9 (was 1.1.23)
+- Included FreeCom 0.82 pl 2, from FreeDOS Beta9 (was 0.82)
+- Added some test programs in the "tests" directory

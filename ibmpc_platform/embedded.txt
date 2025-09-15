@@ -1,0 +1,150 @@
+********************************************************************************
+
+                   FUTURE TRENDS FOR EMBEDDED IP PASCAL PLATFORM
+
+********************************************************************************
+
+OVERVIEW
+
+Here we cover ideas for the future for the embedded platform for IP Pascal.
+
+ISSUES
+
+There are three major ways to run an IP Pascal program in a custom environment.
+
+1. Run the program alone.
+2. Run it with our standalone stack.
+3. Run it on an RTOS custom environment.
+
+The idea of (1) is to not use any of the standard procedures, and simply perform
+all such procedures and functions internally to the program. This is very easy
+to do on the I80386, and probally other processors as well, since little or no
+external support is required, and external routine references are not generated
+unless they are actually needed.
+
+The target programmer will probally want to use at least the startup module
+(it only contains a few instructions on the I80386), and may want a machine
+package like maclib to satisfy double precision calculations.
+
+For (2), the stack satisfies all of the normal run procedures of IP Pascal, and
+becomes identical to an OS level program for the purposes of the programmer. 
+This can go to any level, for example, it can multitask, run full graphics, 
+windowing, 3d, etc, with the right packages. This mode is primarily what this
+document is about.
+
+For (3), this is covered just as any other OS installation is. There will
+be a syslib module, a wrapper for the target, etc.
+
+THE ROAD TO pSOS
+
+The current embedded support for IP Pascal on the IBMPC platform is already a
+good start to the embedded system. Although it targets the IBMPC as an embedded
+platform, it is CPU and system independent. At present, it has a file system
+(but no file system handler), serial I/O only, no tasking, no extlib, etc.
+
+The plan is for the embedded platform to gain capabilities and interfaces, along
+the standards for IP Pascal. At some point, the embedded stack will gain enough
+capabilities to be called an OS. Some believe this bar is quite low. For 
+example, eCos is called an called an operating system, even though it supports
+only one application, and that must be compiled into the code as a block.
+
+I would say that IP's embedded platform becomes an OS when it can load transient
+programs from a filesystem and run them, and when it gets a command line 
+monitor.
+
+At that time, it becomes pSOS (prononced "p sauce"), or Pascal Simple Operating
+System. If it is then upgraded to virtual memory management, it becomes pVOS,
+but even at that point it keeps most of the same structure and components as 
+pSOS. After that, VO/SO becomes the paramount operating system for IP Pascal.
+
+The side point about pSOS is that it remains modular. The user is always able
+to strip the transient capability off pSOS and use it as an embedded stack.
+Also, it will be completely configurable, and the programmer can strip out any
+unneeded packages to run with a lighter system.
+
+So now, we will discuss some of the packages to be added to the embedded stack
+on the way to pSOS.
+
+pciman
+
+PCI management is one of the fundamental modules required for the PC, and 
+nowdays many other hardware systems as well, such as the Apple computers. It is
+basically a hardware management system. Although it does not expose any 
+IP Pascal standard APIs, it is a building block for all PC device drivers.
+
+atadev
+
+Provides a driver to directly access an ATA disc.
+
+fpydev
+
+Provides a driver for the IBMPC floppy disc.
+
+usbman
+
+The next step above PCI management for the IBMPC, a USB interface is essential 
+to interfacing external USB devices.
+
+usbdev
+
+Provides a driver to access USB flash drives.
+
+vofdev
+
+Provides a driver level interface for the VO filesystem. This registers itself
+via the driver system, but actually takes a filename and translates that to 
+access to another device under control of the manager. Thus, we get a pluggable
+multiformat file system.
+
+fatdev
+
+Provides a FAT file system driver as vofman.
+
+rapman
+
+RAP is Remote Access Partition, and it provides the necessary means to run 
+multiple programs in their own partition under pSOS. An interrupt (like int 21)
+is registered, and a full series of interfaces from the IP Pascal stack is
+routed through the interrupt. Then, RAP provides a means to control memory, 
+likely by keeping a page memory map, and loading a program into a series of
+contingous pages and running it. 
+
+RAP allows the segment registers to be used to allow a zero based program to run
+with its stack and variable space (combined) run in a separate partition so that
+the program is location indenpendent.
+
+RAP loads a program by specified name, and runs it, and it provides the basis
+for the inter-program call API in extlib.
+
+A later enhancement to RAP is to create a .map file format which contains 
+relocation information. This would allow RAP to load and run programs on a CPU
+or mode that does not allow relocatable code. For example, the 64 bit mode of
+the x86 family does not allow the segment registers to be non-zero.
+
+vapman
+
+VAP is RAP upgraded to perform virtual memory management.
+
+conlib
+
+Provides the full set of terminal functions for an MDA interface on the IBMPC.
+
+gralib
+
+Provides a graphical level interface for VGA and VGA+ applications.
+
+netlib
+
+Provides internet stack access.
+
+extlib
+
+Provides the standard extention library functions.
+
+Creating pSOS or pVOS
+
+RAPMAN/VAPMAN is the final module that really switches the embedded stack into
+being its own operating system. A shim is placed as the last program in the
+embedded stack that calls "exec" and pulls a default program off the disc to 
+run. Typically this will be "pexec", and that will then be the basic CLI for the
+system.

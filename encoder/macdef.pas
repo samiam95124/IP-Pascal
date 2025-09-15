@@ -1,0 +1,77 @@
+{*******************************************************************************
+*                                                                              *
+*                         MACHINE ENCODER DEFINITIONS                          *
+*                                                                              *
+*                       Copyright (C) 1996 S. A. Moore                         *
+*                                                                              *
+*                              Written 12/96                                   *
+*                                                                              *
+* Contains definitions for the machine section of 80386.                       *
+*                                                                              *
+*******************************************************************************}
+
+module macdef;
+
+uses stddef; { standard definitions }
+
+const
+
+   maxmlt    = 94;        { number of multiplies that can be done by 10 places }
+   bytsiz    = 1;         { size of byte }
+   wrdsiz    = 2;         { size of word (on 80386 word stays at 16 bits) }
+   dwdsiz    = 4;         { size of double word }
+   qwdsiz    = 8;         { size of quad word }
+   regsiz    = 4;         { size of a register }
+   intsiz    = 4;         { size of integer in bytes }
+   lntsiz    = 8;         { size of long integer in bytes }
+   crdsiz    = 4;         { size of cardinal in bytes }
+   lcrsiz    = 8;         { size of long cardinal in bytes }
+   chrsiz    = 1;         { size of character in bytes }
+   bolsiz    = 1;         { size of boolean in bytes }
+   relsiz    = 8;         { size of real in bytes }
+   srlsiz    = 4;         { size of short real in bytes }
+   stksiz    = 4;         { size of stack element in bytes }
+   setsiz    = 32;        { size of set in bytes }
+   ptrsiz    = 4;         { size of pointer }
+   tgpsiz    = 8;         { size of tagged pointer }
+   pfpsiz    = 8;         { size of procedure/function parameter }
+   intfld    = 11;        { output width of integer }
+   blffld    = 5;         { output width of boolean false }
+   bltfld    = 6;         { output width of boolean true }
+   chrfld    = 1;         { output width of character }
+   relfld    = 22;        { output width of real }
+   bytes     = 4;         { number of bytes in an integer }
+   bits      = 32;        { number of bits in an integer }
+   toppow    = 16777216;  { maximum $01 byte in integer }
+   maxlab    = 10;        { number of characters in label }
+   maxrpr    = 6;         { maximum number of registerable parameters }
+   maxfst    = 8;         { maximum depth of FPU stack }
+   { Machine specific integer limits, which can be different from the
+     compilation limits (for a cross compiler). However, the compile machine
+     must be able to contain these numbers, which implies that the compile
+     machine must have a word size equal to or larger than the target.
+
+     Note that these are all testing values, since we can't implement true
+     overrange constants yet. }
+   mmaxint   = $7fffffff; { machine specific maxint }
+   mmaxlint  = $7fffffff; { machine specific maxlint }
+   mmaxcard  = $7fffffff; { machine specific maxcard }
+   mmaxlcard = $7fffffff; { machine specific maxlcard }
+
+   { Fpu exception mask, includes all exceptions but the precison exception,
+     which can occur during normal operations. }
+   fpuexe = $df;
+
+type
+
+   { Registers. In 386, we only  use 32 bit registers. The flags are included
+     as a register, but of course not allocated as one }
+   regt = (rgnull, rgeax, rgebx, rgecx, rgedx, rgesi, rgedi, rgflg);
+   flag = (flnull, fla, flae, flb, flbe, flc, fle, flg, flge, fll, flle, flna,
+           flnae, flnb, flnbe, flnc, flne, flng, flnge, flnl, flnle, flno, flnp,
+           flns, flnz, flo, flp, flpe, flpo, fls, flz);
+   regset = set of regt; { set of registers }
+   flgset = set of flag; { set of flags }
+
+begin
+end.

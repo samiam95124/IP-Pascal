@@ -1,0 +1,52 @@
+                             NOTES
+
+1. Automatic cancel. When we establish a "buffer task" to handle the
+front end of gralib, we can accept wm_quit messages, then set a timer,
+for say, 1 second. Then if the program does not exit, it gets shut down.
+This is warranted because it is defacto proof that the program is not
+being responsive, and anyways it is a user ordered shutdown (vs a simple
+watchdog).
+
+2. Automatic hold. An ordinary program as wrapped that prints info and
+exits will close the window before it is seen. We can refuse to exit
+unless a valid quit has been executed, but this creates a situation where
+a program that uses it's own exit method (exit yes/no ?) would be
+prevented from exiting. A rationale goes like this: A program that does not
+use the message driven exit is not "in the system" and so needs to be
+stopped on its own behalf. There is no real way to determine that a program
+has legitimately performed an exit.
+Ideally, the exit places a "terminated" message in the title bar.
+The behavior of such "inknowing" programs gets to be very similar to dos
+emulated programs.
+
+3. Should a program that gets halted by the readln quit rule get a terminated
+window ? The "no" rationale is that the user has ordered a stop, and gets
+it.
+
+4. Instead of flagging an error when the user gives graphical commands to
+an ordinary file, we could go ahead and write metagraphic commands to the
+file. This allows the user to mix and match his own formats, and gives
+a good model for creation of metafiles. It also solves the problem with
+explaining metafile non-interactivity. Since only a single output file
+is written, it is self explainitory that the file is only single sided.
+We can also add some more elements to complete this:
+
+- Sync statements. Would cause a hold for a given time. This can be relative
+to the start of the play, or to the last time mark, etc.
+
+- Stop statements. Would cause the play statement to exit. We could resume
+play, or do anything else. This could also be a sync, since we could then
+check sync. It could be a letout to perform paging (on a printer). Or other
+uses.
+
+- "metaport(file, on/off)" statement enables the creation of a portable
+metafile. This is off by default. Normally, OS specific metas are written,
+which makes them faster. The portable format creates a general purpose
+play file. One problem with os specific files is inserting a "stop"
+statement.
+
+5. For animation, we need to split the "select" statement to display
+and draw separate buffers. One way is to define "display(file, no)" and
+"draw(file, no)" statements that do this separated work. Then select
+just calls these at the same time (actually, "draw" followed by "display",
+because otherwise the drawing might continue into the displayed surface).

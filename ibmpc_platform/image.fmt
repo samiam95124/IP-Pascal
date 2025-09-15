@@ -1,0 +1,22 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                                              !
+!                      CREATE BOOTABLE TEST IMAGE FOR FLOPPY                   !
+!                                                                              !
+! Creates a basic boot image for an IBM-PC. An IBM-PC 1.44MB 3 1/4" floppy     !
+! image is created with a bootstrap to 32 bits and the test program is         !
+! restricted to the first 640kb. Doing this simplifies the bootstrap, because  !
+! it does not have to manipulate large addresses during the 16 bit BIOS boot   !
+! phase.                                                                       !
+!                                                                              !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!
+! IBM-PC 3 1/4 floppy is 2880 sectors, double sided, with a sector 0 boot
+! to $7c00 in memory (with an implied program destination of $8000).
+!
+volsize    1474560     ! 1.44MB
+blocksize  512         ! pretty much everything on the PC is 512, like Unix
+bootsize   1           ! the usual single sector boot
+bootfile   fpyboot.bin ! floppy boot image
+systemfile test.bin    ! only a single bootable image is needed
+outputfile a.img       ! generate bochs compatible image

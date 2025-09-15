@@ -1,0 +1,107 @@
+                           INTERMEDIATE OPERATORS
+
+Rules of operations:
+
+Although the intermediate has many tolkens for different purposes, each block
+marked as "code" has strict rules as to how it is constructed.
+First, the intermediate operates with the stack principle. We begin with the
+stack initially empty at the start of the block. Then, load operators will
+place operands onto the stack, and other operators will reduce the basic
+operations, and finally, store operations will empty the stack again.
+Procedure and function calls are performed by leaving the expressions that
+load the parameters on the stack, then performing a call operator. The call
+operator will remove all of the stacked parameters, and in the case of a
+function, stack the result.
+The intermediate code is arranged around the concept of an "atom", or smallest
+element of data. Atoms are integers, reals, characters, booleans, enumerated
+types, sets, and pointers. Anything else, such as arrays, records or files, are
+understood to be represented by pointers that are internal to the compiler.
+The reasons for this have to do with the language, not the actual 
+representation of the data. Pascal never allows a structure to be operated on
+in whole, with the exception of direct assignment. In this case, the source of
+the data is allways addressable, ie., a variable or a predefined constant (such
+as a constant character string). This means that we can allways consider such
+items external to the stack without worring about temporary generation.
+But of course, this leaves reals and sets as atoms. Representing them as atoms
+releives us from worring about temporaries in the intermediate, which makes
+the intermediate an abstract and not practical execution language. To execute
+set and real operations, it is understood that the reader will handle it's own
+temporary assess/assign as required. Of course, it is allways concevable that
+reals and/or sets will really fit a machine word, real or simulated.
+
+Structural statements:
+
+Structure in the intermediate is represented by "goto"s and symbols that
+represent high level structures such as if-then-else, while, etc. The parser
+outputs in high level statements, essentially outputting the code much as it
+appears in the source. The optimizer is then free to convert these constructs
+to jumps as required. Of course, the burden of changing high level structures
+to basic jumps falls to the reader.
+
+Nature of intermediate code:
+
+As output unoptimized by the parser, the intermediate code generally does
+everything the hardest way. For example, any variables loaded first have their
+address loaded, then the contents loaded via that address, vs. just loading the
+variable directly. This keeps the parser from having to do a lot of
+interpretive work to see if an address or operand is required in a given case.
+It also means that the output code of the parser is very predictable, if
+somewhat inefficient.
+The side effects of redundant parser work are twofold. First, the output of the
+parser is probally represented by the fewest intermediate tolkens (since the
+parser will use several simple tolkens when one would do). Second, many
+operators in the intermediate are never output by the parser at all, but are
+generated as sequence compactions by the optimizer.
+
+Types in intermediate operands:
+
+The intermediate code is designed to be typeless. That is, if all atoms were to
+fit in a machine word (logical or physical) it is unessary for the processor
+to specifically keep track of types of operands on the stack. Each operator
+specifically indicates what type of atom its operators are to be, and 
+structures have specific operators to take them apart externally via a pointer
+atom. To aid the reader in this, even the load and store operators specifically
+indicate what type of atom they are processing.
+Because of the commonality of scalar operations, integers, subranges and
+enumerated types are treated as simply integers.
+Real, set, pointer, character and boolean atoms have their own specific set of
+operators.
+Because of the specific nature of operators, the reader is free to assume a
+special representation of a specific atom type, such as having all reals and
+sets represented by pointers. Then, anytime such an atom is specified for an
+operation, the reader can perform any special processing required for that
+operand. Temporaries can be assigned by type on load, and released on use
+or store.
+What the intermediate tries to accomplish is to make operations self evident
+by their context in operators, in a way that admittedly bows to the typical
+real world problems with reals and sets, and on the 8086, pointers.
+However, should more be required, the detailed types of each operand can be
+tracked along with their loads. Every original reference to a variable gives
+it's complete type. This allows a highly optimizing coder to take types at
+all stages of processing into account.
+
+Convertion to graph form:
+
+A graph of an intermediate block would be an arbitrary linking of operators
+expressed as data, with variable loads as leaves, and stores as trunks.
+Our intermediate can be readily converted, typically on input, to graph form.
+This is done by creating a data node for each operator encountered, then
+keeping each operator on a running stack. As a new operator comes in that
+requires stack operands, those operand data nodes are removed from the running
+stack and linked to the new operator.
+
+Use as Unicode:
+
+For languages not significantly different than Pascal in working principal, it
+should be possible to add operators to implement them. C, Fortran, Cobol and
+Basic are such targets. The break even point would be if such support
+significantly increases the "weight" for Pascal (obviously, a pascal 
+intermediate is overkill for basic). Fortran, Cobol and Basic should be
+implementable with little or even zero additional intermediate operators.
+C, assuming that we add binary operators for integers in Pascal, would be
+translatable operator wise (shifts could be done with multiply and divide).
+The larger problem there would be the requirement to preinitalize storage, but
+this could mostly be done by generating assignments.
+
+Operators:
+

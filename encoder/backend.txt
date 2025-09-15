@@ -1,0 +1,136 @@
+						  CREATING ENCODER BACKENDS
+
+PURPOSE
+
+This document is for people who will create or modify encoder back ends.
+
+OVERVIEW
+
+The encoder module is the most important module in the IP language system
+because it must be modified for each processor supported. This fact does not
+necessarily mean that every last element of processor-general code must be
+wrung out and placed elsewhere. Copying and carry forward of routines with
+slight modification does as much to lessen the work required to generate a
+new back-end. Indeed, having a large body of different processors back-ends
+will form a virtual library that smooths each successive implementation.
+Nevertheless, the back end work should be as clean and separated as possible.
+
+LAYOUT OF BACKENDS
+
+The compiler chain consists of two programs or passes, the parser, and the
+optimizer-encoder. But the processor dependent isolation does not end at the 
+encoder. Instead, there is a module WITHIN the encoder that contains processor
+specific information. This module can be linked, not compiled, to create a full
+back-end.
+
+To understand how the encoder works, you must have a working knowledge of the
+intermediate format on which it is based. The encoders basic job is to imput
+the intermediate, create a graph structure from that, then pass that
+information to the machine module for code generation.
+
+In the intermediate, the type information, symbols and code are unified
+artificially. The encoder splits these into separate internal data structures.
+The code becomes an arbitrarily linked graph, completely losing its stack
+oriented structure. This is then given to the machine module.
+
+The type information exists as an arbitrary graph even in the intermediate,
+and that is stored in an internal, fully emmeshed format.
+
+Finally, the symbols are formed into a simple table, and output with the
+output of the symbols file.
+Each of these lists are separated by the block they belong to.
+
+Although the intermediate graph is sometimes referred to here as a "tree",
+it actually consists of an acyclic graph with expression trees. The main code
+is a linear series of chained intermediates with loops and other subblocks
+as side chains. Each operator can have up to four expression trees as
+operands. The sidechain for a loop is represented as a single, linear
+chain with its loop nature implied in the operator, not the graph. Hence,
+it is acyclic, and can be toured by a simple forward algorithim with left to
+right branch exploration.
+
+The front end of the encoder contains its own optimizer. The optimizer 
+considers each block graph and applies several optimizations on it that
+are transparent to the machine module. During this process, several new
+intermediates that did not exist in the original intermediate file are
+created, and at the same time others are removed. For this reason, the
+entire internal form of the intermediate is documented, and that must be
+used as a reference instead of the intermediate format which it came from.
+
+The code tree for each block is passed to the machine module. The type tree is
+modified and used for a reference by the machine module. Lastly, the symbols
+module is typically ignored by the machine module.
+
+The encoder works in terms of blocks. Each block is completely input, the code
+graph created, and that passed to the machine module for encoding, then the
+code entries are recycled.
+
+In the encoder, it is a policy not to keep the code graph for each block, but
+the types and symbols are kept. This is for space reasons. The optimizer does
+keep small blocks resident for inlining purposes.
+
+Each block is processed in the following phases:
+
+1. The block is input.
+
+2. A improvement pass is made over the code, including allocation of temps.
+
+3. The sizes of block variables and other structures is done.
+
+4. The locals and parameters are allocated.
+
+5. Registers are allocated for each node of the code graph, and stack
+maintenence instructions are generated.
+
+6. The code is generated for the block.
+
+Of these steps, the last four are all done by the machine module.
+
+FORMAT OF CODE GRAPHS
+
+The code graphs are designed to be as close to the original intermediate codes
+as possible. Each intermediate entry in the tree appears as:
+
+1. Next pointer. This is used to form a list of all the intermediate entries
+for a block. This list order implies nothing about execution order.
+
+2. Flow pointers. The flow pointers indicate the next node in execution order.
+There is both a "normal" flow pointer and a "branch" flow pointer, that is used
+to represent branches in the code.
+
+3. Operand pointers. There can be up to 4 operands of an intermediate node.
+These are labeled left, right, xtra and xtra2. The convention is that the
+pointers are used in order of appearance in the original program. Hence, "left"
+and "right" refer to the left and right operands in the original source.
+
+4. Registers. There are two register codes in each entry, rega and regb. This
+does not refer as much to a machine dependancy as that a "fat" or tagged
+pointer typically requires two registers. However, it turns out that other
+places in the code also may require two registers per node.
+
+5. Stack control. The stack masks are sets of the registers that tell which
+registers must be saved on the stack at each node level, and also keep track
+of what registers are needed and which are preferred during the register
+allocation phase.
+
+GRAPH TRAVERSAL
+
+Graph traversal is done is done in two levels. The block graph is toured
+with linear list processing with left to right chain exploration. Each operator
+has a "flow" linkage that gives the linear list for the complete block, and
+from 1 to 2 other sidechain linkages referred to as flow2 and flow3
+("flow" being flow 1). Each side chain is linear with zero termination, and
+thus the graph is acyclic, or without loops. The operator involved gives the
+intermediate the idea of loops or alternatives. For example, the body of
+a "for" loop is a side chain, and both the "true" and "false" blocks of an
+"if" are sidechains.
+
+The second level of the intermediate are the expression trees. These are
+walked as a tree from left to right, with N levels of subbranching. Each
+operator, whether in the main graph or in an expression tree, can have from
+one to four operand tree roots known as left, right, xtra and xtra2. The
+"left" and "right" are the ordering from the original source, for instance
+the assignment operator for a := b has a equals left and b equals right.
+However, the meaning of ordering can be changed by the optimizer.
+
+

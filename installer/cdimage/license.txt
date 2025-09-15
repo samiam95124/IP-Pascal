@@ -1,0 +1,89 @@
+MOORE/CAD IP PASCAL
+
+LICENSE AND LIMITED WARRANTY
+
+COVERAGE
+
+This license and limited warranty constitutes a legal agreement between Moore/CAD
+and you for IP Pascal. It includes the software, media, online documentation and
+written documentation for the product.
+
+AGREEMENT
+
+You, the user, accept this agreement by installing, using, copying, or otherwise
+making use of the product. If you are the original purchaser of the software,
+and you do not agree with the terms of this contract, promptly return the 
+product, along with all materials, for a full refund.
+ 
+USAGE
+
+The software contained herein is owned by Moore/CAD, and is protected by 
+copyright law and international copyright treaty.
+
+You agree to install the software on one computer only. The software may be 
+moved from one computer to another, but the original computer from which the
+software was moved must have all programs, documents, and other components of
+IP Pascal removed completely from it.
+
+You agree not to allow multiple users to access the software on a "multi-user
+system". You agree that the software is for your sole use, and is not to be
+used by others, even on the same computer.
+
+You may make one (1) copy of the software for backup purposes. You agree not to
+distribute, lend, lease, rent, either the original copy, or the backup copy you
+make, to others not a party of this agreement.
+
+You agree not to disassemble or  "reverse engineer" the software, except where
+it is permitted by applicable law.
+
+TRANSFER
+
+You may transfer the software and documentation permanently to another recipient
+provided that you retain no copies of the software or documentation, and the
+recipient is given all software, backup copies of that software, documentation, 
+including this license, and the recipient agrees to the the terms of this license.
+
+REDISTRIBUTION
+
+Moore/CAD specifically allows redistribution of certain portions of the object
+code for the case where your application contains libraries that were designed
+to be included in your application, known as a "library". These libraries can be
+distributed, in object form only, with your application without a fee. Further,
+the code which is output by IP Pascal from source code you provide is not
+covered by this licence.
+
+You agree not to distribute IP Pascal libraries separate from your application,
+You agree not to make available IP Pascal libraries for use in a non-IP Pascal
+based application. You agree to place a copyright notice on each application
+that contains IP Pascal libraries, which may be your own.
+
+LIMITED WARRANTY
+
+Moore/CAD warrants that IP Pascal will perform in accordance with the
+accompanying documentation, and that the software media will be free of defects
+in materials and workmanship for a period of ninety (90) days from original
+purchase.
+
+This warranty is void if the software is used improperly, or if updates provided
+Moore/CAD have not been applied or used.
+
+In a state which does not allow this limit on the duration of warranty, so this
+limitation may not apply to you.
+
+Moore/CAD's will replace or repair the software or documentation found to be
+defective. Alternately, we may choose to refund the full purchase price of the
+software, provided that the software, all documentation, materials and packaging
+are returned to Moore/CAD in good condition.
+
+Moore/CAD shall not be liable for damages resulting either directly or 
+indirectly from the use of this software, even if the damage results from a
+defect that existed in the software or its documentation.
+
+IP Pascal is not for use in any life support application, aircraft navigation or
+communication, weapons system, or any other application that could lead to 
+personal injury or death.
+
+GENERAL PROVISIONS
+
+If any provision of this license is found to be void or unenforceable, the 
+remainder will remain valid and enforceable.

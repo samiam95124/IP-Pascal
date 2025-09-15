@@ -1,0 +1,191 @@
+Spanish-English-French-German-Italian Pascal word equivalencies For IP Pascal.
+
+This file contains the word equivalences for words used in the parser proper.
+It does not cover library names, options or other words.
+
+This file is ISO 8859-1. The characters must be:
+
+   ç (cedilla) 
+   é (e with accent) 
+   è (e with grave accent)
+
+The equivalent form without accents or punctuation will be accepted. For
+example, «ecrire» will be accepted for «écrire», «jusqua» for «justquá».
+
+[1] Indicates a note. Typically this is only found on words that cannot be found
+in a dictionary, abbreviations or contractions.
+
+Keywords:
+
+English          Espanol        Françis         Italian     German
+===================================================================
+and              yl[16]         et                          und
+array            vector[10]     tableau                     oder
+begin            inicio         début                       begin[12]
+case             caso           cas                         fall
+const            const          const                       konst[11]
+div              div            div
+do               haz            faire
+downto           baja           basá[2]
+else             sino           sinon
+end              fin            fin
+file             archivo        fichier
+for              para           pour
+function         funcion        fonction
+goto             vesa           allerá[1]
+if               si             si
+in               en             en
+label            etiqueta       étiquette
+mod              res            mod[14]
+nil              nulo           nul
+not              no             non
+of               de             de
+or               ol[17]         ou
+packed           empaquetado    bondé
+procedure        procedimiento  procédure
+program          programa       programme                   programm
+record           registro       fiche
+repeat           repite         répéter
+set              poner          ensemble
+then             entonces       alors
+to               hasta          hautá[13]
+type             tipo           type
+until            hastaque       jusquà[15]
+var              var            var
+while            mientras       pendant
+with             con            avec
+external         externo        externe
+private          privado        priveé
+process          proceso        procés
+forward          adelante       avancer
+overload         sobrecargar    surcharger
+class            clase          classe
+override         predominar     remplacer
+module           módulo         module
+atom             átomo          atome
+is               está           est
+fixed            fijo           fixe
+uses             uso            emploi
+share            compartir      partager
+construct        construir      construire
+destruct         destruir       détruire
+view             vista          vue
+
+Standard types:
+
+English          Espanol        Francis
+===================================================================
+integer          entero         entier
+char             cará           carac[3]
+text             texto          texte
+real             real           reel
+sreal            creal          creel
+boolean          booleano       booléen
+
+Standard functions/procedures:
+
+English          Espanol        Francis
+===================================================================
+write            escribe        écrire
+writeln          escribeln      écrireln[4]
+read             lee            lire
+readln           leeln          lireln[5]
+new              nuevo          neuf
+dispose          libera         débarrasser
+pack             empaquetar     compresser
+unpack           desempaquetar  décompresser
+ord              ord            ord
+chr              car            car[6]
+eoln             fdln[18]       fdln[7]
+eof              fda[19]        fdf[8]
+get              tomar          prendre
+put              poner          mettre
+reset            releer         relire
+rewrite          reescribe      réécrire[9]
+abs              abs            abs
+arctan           arctan         arctan
+cos              cos            cos
+exp              exp            exp
+ln               ln             ln
+odd              impar          impair
+pred             ante           avant
+round            redon          arrondi
+sin              seno           sin
+sqr              cuadrado       carré
+sqrt             rcuadrado      rcarré    
+succ             succ           aprés
+truc             truncar        tronquer
+exists           existir        existant
+location         situation      doù
+length           largo          longueur
+max              max            max
+page             página         page
+close            cerrar         firmer
+position         colocar        placer
+delete           borar          effacer
+change           cambiar        changer
+halt             alto           arrêt
+refer            referir        impliquer
+update           ponera         revaloriser
+
+Standard constants:
+
+English          Espanol        Francis
+===================================================================
+true             verdad         vrai
+false            falso          faux
+maxint           maxent         maxint
+
+Other:
+
+English          Espanol        Francis
+===================================================================
+input            entrada        entrée
+output           salir          sortie
+error            error          erreur
+list             lista          liste
+
+[1] A contraction of "aller á".
+
+[2] Short for «bas á», meaning "to low".
+
+[3] Short for "caractère".
+
+[4] Short for "écrire ligne".
+
+[5] short for "lire ligne".
+
+[6] Also short for "caractère".
+
+[7] For "fin de ligne".
+
+[8] For "fin de fichier".
+
+[9] Short for "réécrire".
+
+[10] This appears to be a debatable dictionary definition.
+
+[11] Short for "konstant".
+
+[12] Short for "beginnen".
+
+[13] Short for «haut á», or "to high". The simple «á» or "to" was not preffered,
+because it is too short, and does not match «basá» or "downto".
+
+[14] Short for French «modulo».
+
+[15] Short for jusqu'á. Can't use a quote mark.
+
+[16] Short for "y lógico".
+
+[17] Short for "o lógico".
+
+[18] Short for "fin de línea".
+
+[19] Short for "fin de archivo".
+
+To do:
+
+1. Coordinate the tenses for french. Presently, it is a mix of
+adjectives and verbs. See if we can come up with regular
+combinations.

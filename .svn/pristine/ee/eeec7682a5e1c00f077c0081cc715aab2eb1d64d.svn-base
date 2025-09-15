@@ -1,0 +1,438 @@
+         11111111112222222222333333333344444444445555555555666666666677777777778
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+                        IMPLEMENTATION OF MULTIPLE DIMENSION
+                            CONTAINER ARRAYS IN PASCALINE
+
+OVERVIEW
+
+Pascaline requires both that multiple dimension arrays can be used with general,
+or container, arrays. It also requires that container arrays be able to be
+passed as value parameters. This brief gives an overview of the method used to
+implement them.
+
+SIMPLE GENERAL ARRAYS
+
+The single dimension general array specification uses the concept of a "tagged
+pointers" for its implementation. This means a pointer of the format:
+
+A -> Base address of array
+B -> Length of array
+
+These pointers allow dynamic allocation of container arrays, as well as passage
+of var or view parameters by passing a tagged pointer to the array.
+
+COMPLEX GENERAL ARRAYS
+
+For container arrays of more than one dimension, we introduce a new pointer that
+can index an array of any number of dimensions, but still occupies only two
+registers. To do this, the second parameter of the tagged pointer is a pointer
+to a template describing the array with all of its dimensions, instead of the
+length.
+
+The template is a series of length words, one for each of the dimensions in the
+target array:
+
+x[a, b, c, ... n]
+
+1. length a.
+2. length b.
+3. length c.
+...
+N. length n.
+
+So a complex tagged pointer is represented as:
+
+A -> Base address of array
+B -> Pointer to template
+
+A complex pointer is "progressive", that is, when an array indexing operation is
+completed for one index level, the template pointer is advanced to the next 
+length in the template. So, in the above example the different array indecies
+are:
+
+x[a, b, c, ... n]
+
+A -> Base address of x[a, b, c, ... n]
+B -> length a.
+
+A -> Base address of x[b, c, ... n]
+B -> length b.
+
+A -> Base address of x[c, ... n]
+B -> length c.
+
+Etc.
+
+The case of a simple tagged pointer to a simple array is kept in the new scheme.
+Thus, when the next last index is calculated, and the next array is simple, the
+next length is actually picked up from the template, and the pointer changes
+from a complex to a simple tagged pointer.
+
+TYPES OF ARRAY POINTERS
+
+The result of this is that there are actually three formats for an array 
+pointer:
+
+1. Fixed dimension.
+2. Simple container.
+3. Complex container.
+
+All of these formats are used, and all can and will be converted from and to
+each other as part of normal processing.
+
+CREATING TEMPLATES
+
+Templates need to be both created from scratch, and also passed to allow 
+existing fixed arrays to be passed as container array pointers. For each dynamic
+container reference, the template is part of the tagged pointer allocation.
+The template is filled out when the container array is created.
+
+The second kind of template occurs when a fixed array is passed via a container.
+In this case, the template is created as part of the static constants in the
+code, since it represents constant dimensions in a fixed array.
+
+CREATING, USING AND DISPOSING OF DYNAMIC CONTAINER VARIABLES
+
+Any number of dimensions can now be represented by a dynamic pointer variable.
+For the code:
+
+program test;
+
+type a = array of array of integer;
+
+var r: ^a;
+    b: integer;
+	c: integer;
+
+begin
+
+   new(r, 10, 10);
+   r^[b, c] := 1;
+   dispose(r)
+
+end.
+
+In intermediate form:
+
+!   new(r, 10, 10);
+
+lodadr     
+limint     
+limint     
+newgar     
+
+!   r^[b, c] := 1;
+
+lodadr     
+ldimgp     
+lodadr     
+ldiint     
+arfmar     
+cvtmtg     
+lodadr     
+ldiint     
+arfgar     
+limint     
+stiint     
+
+!   dispose(r)
+
+lodadr     
+ldimgp     
+dspgar     
+
+Each action will be considered. First, the format of r is:
+
+1. The base address of the space for the array.
+2. The major index length.
+3. The minor index length.
+
+The allocation of the array is done by pushing the two length specifications
+onto the stack and executing "newgar". This extends the existing intermediate
+code. The action of the newgar intermediate is to multiply the indecies, find
+the total allocation, get the space, plant the base address, and fill out the
+template with the index values. Obviously the code generated differs from the
+original meaning of newgar.
+
+The reference to starts as normal with a lodadr to r. Then, instead of a lditgp
+normally used to load the array tagged pointer, the ldimgp intermediate is used.
+Instead of loading an address/length pair, it loads the base address, then skips
+that address to index the first word of the template.
+
+After picking up the indexor (b), the next operation would normally be arfgar,
+or calculate array reference with a tagged pointer. Instead, the complex 
+operator arfmar is used. It calculates the index operation using the template,
+then replaces not only the base address with the calculated address, but also
+advances the template pointer to the next location.
+
+The interesting thing about arfmar is that, in order to find the true offset of
+the indicated element, it must know the lengths across the entire template. 
+Thus, it actually reads forward to examine the entire template, but only 
+advances the template pointer by one.
+
+Next, since this is a 2d array, the next index will be the last, and the complex
+tagged pointer can now be converted to a simple tagged pointer. THis is done via
+cvtmtg, which simply loads the length from the template pointer to replace the
+pointer.
+
+The last index calculation is then done with the familar arfgar operator.
+
+The dispose operation is done via the standard dspgar operator. The pointer is
+loaded with ldimgp, but it makes no real difference, since dspgar only looks at
+the base address of the space to be disposed.
+
+VAR AND VIEW PARAMETER PASS MODES
+
+The var and view parameter pass modes are very little changed from simple to
+complex modes. Since the complex tagged pointer occupies the same space as a
+simple pointer, the allocations for it do not change, only the way the pointer
+is constructed during the calling sequence, and the method by which it is used
+internally.
+
+program test;
+
+type a = array of array of integer;
+
+var q: array 10, 10 of integer;
+
+procedure x(var z: a);
+
+var b, c: integer;
+
+begin
+
+   z[b, c] := 1
+
+end;
+
+begin
+
+   x(q)
+
+end.
+
+Intermediate:
+
+! z[b, c] := 1
+
+lodadr 
+ldimgp 
+lodadr 
+ldiint 
+arfmar 
+cvtmtg 
+lodadr 
+ldiint 
+arfgar 
+limint 
+stiint 
+
+!   x(q)
+prcbgn     
+lodadr     
+cvtftm     
+prccal     
+
+The access to the 2d array is almost identical to the first example. The pointer
+is loaded via the var parameter as a complex by ldimgp, then the first index
+calculation occurs via arfmar. The complex pointer is converted to simple for
+the last index calculation by cvtmtg, then the last row calculation occurs using
+the standard arfgar instruction.
+
+For the call sequence, the address of the fixed array is loaded, then converted
+to a complex pointer by cvtftm. This instruction loads the B side of the tagged
+pointer to index a template in the constants area that is created by the
+compiler to describe the existing fixed array. The compiler only need do that
+for fixed arrays that are actually passed as complex arrays, although this does
+create the possibility that multiple modules may each have such a template. This
+occurs because a global array would have a template needed for each referencer.
+
+The example would be identical for a view parameter, except that assignments to
+the array would be forbidden by the nature of the parameter.
+
+VALUE MODE PARAMETERS FOR CONTAINERS
+
+New to Pascaline is the ability to pass both simple and complex containers via
+the value mode. The way this is done is to simply create a copy of the 
+parameter, then pass the address of that copy. Thus, the procedure or function
+using the parameter actually treats this identically to a var or view parameter,
+which were also handled identically under previous rules.
+
+The exact location of the copy is left undefined. What is passed as a parameter
+must be fixed length, and is the double word tagged pointer (complex or simple).
+The copy data cannot go directly in line to the stack, since that would destroy
+the fixed sense of the stack parameter frame.
+
+The copy could go to heap storage, a special side stack, or other arrangement.
+However, the full production encoder can easily look ahead to the allocated
+parameters, and place them on the stack before the parameter frame. Thus it can
+perform the copy allocation on the same stack, and reduce the runtime costs.
+
+program test;
+
+type a = array of array of integer;
+
+var q: array 10, 10 of integer;
+
+procedure x(z: a);
+
+var b, c: integer;
+
+begin
+
+   z[b, c] := 1
+
+end;
+
+begin
+
+   x(q)
+
+end.
+
+Note that this is the same program as above, but with a value mode parameter.
+
+Intermediate:
+
+! z[b, c] := 1
+
+lodadr 
+ldimgp 
+lodadr 
+ldiint 
+arfmar 
+cvtmtg 
+lodadr 
+ldiint 
+arfgar 
+limint 
+stiint 
+
+!   x(q)
+prcbgn     
+lodadr     
+cvtftm     
+cpymgp
+prccal     
+
+The code is almost identical, the difference is the insertion of the cpymgp
+instruction. This instruction takes the complex pointer and copies it to an
+"unspecified" location, then replaces the complex pointer to the real location
+with a complex pointer to the copy. Note that this does not require a new
+template. The template pointer that was used for the real parameter is simply
+used to form the new complex pointer, and only the base address of the array
+changes.
+
+The code within the procedure itself it unchanged, and it is the same as the var
+parameter case. The parameter is modified, but the modifications occur to the
+copy, which is discarded.
+
+The code for the simple container example is similar:
+
+program test;
+
+type a = array of integer;
+
+var q: array 10 of integer;
+
+procedure x(z: a);
+
+var b: integer;
+
+begin
+
+   z[b] := 1
+
+end;
+
+begin
+
+   x(q)
+
+end.
+ 
+Intermediate:
+
+!    z[b] := 1
+
+lodadr
+lditgp
+lodadr
+ldiint
+arfgar
+limint
+stiint
+
+!    x(q)
+
+prcbgn
+lodadr
+cvtftg
+cpytgp
+prccal
+
+The code in the procedure is identical to the old method using var parameters.
+The address of the parameter is loaded, and lditgp used to load the simple
+tagged pointer. The array calculation takes place with arfgar.
+
+The caller code loads the address of the actual array, then converts that to a
+tagged pointer with cvtftg. The new instruction, cpytgp, does the same thing as
+cvtmtg, but for a simple tagged pointer. The array is copied to an undefined
+location, then the base pointer is replaced. The length stays the same.
+
+The code to process the case of loading an existing complex array (not a 
+reference created to a fixed array) is:
+
+program test;
+
+type a = array of array of integer;
+
+var q: ^a;
+
+procedure x(z: a);
+
+var b, c: integer;
+
+begin
+
+   z[b, c] := 1
+
+end;
+
+begin
+
+   x(q^)
+
+end.
+
+Intermediate:
+
+! z[b, c] := 1
+
+lodadr 
+ldimgp 
+lodadr 
+ldiint 
+arfmar 
+cvtmtg 
+lodadr 
+ldiint 
+arfgar 
+limint 
+stiint 
+
+!   x(q)
+prcbgn     
+lodadr     
+ldimgp
+cpymgp
+prccal
+
+The only difference here between this and the first complex example is the use
+of ldimgp instead of cvtftm. ldimgp loads the base addres pointed to by the
+address, then sets the length template pointer to that address incremented past
+the base address.
+
+The simple container example is also trivially different, and is not shown here.     
+

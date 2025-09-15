@@ -1,0 +1,48 @@
+              THE CLIMB TO PARADIGM: GRALIB AND THE NESTED WINDOWING SYSTEM
+
+Trmlib and gralib provide a nested system of standards for access to onscreen
+display for a program. The idea is that the historical progression of line,
+character, graphical and then windowed interfaces follow in a natural
+progression of nested paradigms. This is done using only a single mode change,
+where "mode" is defined as a behavior change of the interface that is 
+implemented by a state bit in the interface. This mode change, "automatic
+wrap/scroll" mode was required to join the traditional need to keep the cursor
+on the screen to the modern "virtual" screen mode, where the screen is 
+considered to be a window on a virtual 2d plane.
+
+The original line oriented paradigm was that a series of characters could be
+output up to the limit on a single line, then a special sequence executed to
+register that line and start a new one. In Pascal, each line is automatically
+set active by the opening of a file, or the completion of the last line. A
+line is completed by an eoln.
+
+This simple paradigm fit well the existing input and output devices of the
+1940's and 1950's, punch cards, magnetic tape, and printers. Although usually
+thought of as a teletype standard, line orientation was mostly implemented
+by punch card input, and line printer output, which meant that lines were
+handled as units.
+
+Even though the paradigm was simple, it already had ambiguities in it's
+implementation. What occurred when there were more characters on a line than
+the output device could handle was the major issue. Several common
+alternatives were:
+
+1. Indicate an overflow on the line, by special character or collumn mark,
+and trucate the overflow.
+
+2. Refuse to move past the last character on the line, usually resulting in
+overprinting that character.
+
+3. Finish the current line and start another.
+
+Others are possible and were used.
+
+Option (2) might seem to be an irrational response to the problem, but many
+systems, including mechanical typewriters, did this by default.
+
+The "winning" paradigm appeared to be (3), because it conserves printing
+in the case of overflow. However, this causes issues of it's own, as we will
+see later in this paper.
+
+
+

@@ -1,0 +1,3 @@
+copy parse.exe \ip\windows\i80386\bin
+copy parse.exe \iprel\windows\i80386\bin
+copy parse \ip\linux\i80386\bin

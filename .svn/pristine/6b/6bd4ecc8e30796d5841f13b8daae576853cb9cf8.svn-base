@@ -1,0 +1,174 @@
+FreeDOS-32 release 0.0.5
+2005-06-01, alpha testing, unstable
+http://freedos-32.sourceforge.net/
+
+An updated version of this document is available at:
+  http://freedos-32.sourceforge.net/showdoc.php?page=release
+
+FreeDOS-32 release 0.0.5 features improved support for applications, and a new
+ATA/ATAPI driver for native disk access (no more need for BIOS). The file
+system part has been rearranged for better modularity, and it is now using a
+new Unicode support library and NLS manager. Please report any problem found in
+this release, and please check if the problem was present in 0.0.4 too.
+
+In the next release we plan to include the following features currently under
+development: an ATAPI CD-ROM driver, an ISO 9660 file system driver (for
+CD-ROMs), an improved brand new FAT driver, a LEAN file system driver, and
+better support for applications.
+
+AT PRESENT ALL FREEDOS-32 RELEASES ARE ALPHA RELEASES FOR TESTING PURPOSES,
+AND MAY CONTAIN SERIOUS BUGS THAT MAY CORRUPT YOUR DATA. TEST AT YOUR OWN RISK.
+
+_______________________________________________________________________________
+License and disclaimer
+----------------------
+FreeDOS-32 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+at your option) any later version.
+ 
+FreeDOS-32 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+ 
+You should have received a copy of the GNU General Public License
+along with FreeDOS-32; see the file COPYING; if not, write to
+the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+_______________________________________________________________________________
+Content of the floppy image
+---------------------------
+fd32/        contains the FreeDOS-32 kernel and modules
+grub/        contains the GNU GRUB bootloader
+             http://www.gnu.org/software/grub/
+attrib2.com  a FD32 native "attrib" utility written by Nils Labugt
+autoexec.bat used if you start FreeDOS
+command.com  the FreeDOS shell (FreeCOM) not for use in FreeDOS-32
+             http://www.freedos.org/
+command.exe  a command.com replacement by Centroid Corp.,
+             http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/command/other/centroidcnc/ (original package)
+fte.exe      the FTE text editor, the 20050108 release compiled by Hanzac Chen
+             http://fte.sourceforge.net/
+gofd32.bat   a sample batch file to start FreeDOS-32 using x.exe
+kernel.sys   the FreeDOS kernel
+             http://www.freedos.org/
+ls.exe       the "ls" command from GNU fileutils
+             http://www.delorie.com/pub/djgpp/current/v2gnu/fil41b.zip (binary)
+             http://www.delorie.com/pub/djgpp/current/v2gnu/fil41s.zip (source)
+wintest.exe  "hello world" program to check the Win32 functionality
+wrapper.com  use to load executables in a segmented memory space (see below)
+x.exe        the OSLib eXtender to start FreeDOS-32 from the real mode DOS
+             http://oslib.sourceforge.net/
+
+_______________________________________________________________________________
+How to test
+-----------
+Either use the floppy image directly with an emulator, such as Bochs, or copy
+the floppy image on a real disk and boot your system with it.
+
+Warning: Due to possible critical bugs in FreeDOS-32, if you test on real
+         hardware (not in an emulator), you may want to use a disk with no
+         valuable data, detaching any other disks.
+
+The GNU GRUB bootloader takes care of the boot process. It will show a menu
+where you can chose one of the following options. All options but the first one
+boot the FreeDOS-32 kernel, with a particular combination of modules and test
+programs.
+
+1. FreeDOS
+  Boots the real mode FreeDOS kernel and shell (FreeCom). You can start
+  FreeDOS-32 from FreeDOS using the x.exe eXtender, as with the gofd32.bat
+  batch file.
+2. FD32 + command (floppy only)
+  Loads the kernel, the native floppy driver, the clock driver, the Unicode and
+  NLS modules, the FAT driver, the PS/2 mouse driver, the keyboard driver, the
+  console driver, the DPMI driver and the command.com replacement by Centroid
+  Corp. Only floppy access is enabled. You can try some internal commands at
+  the command prompt and start applications using the wrapper (see below). The
+  shell itself need not to be loaded through the wrapper because it is
+  currently linked at a high, unused, base address (300000h), but this will not
+  be the case in the future.
+3. FD32 + command (biosdisk)
+  Like 2, but the BIOSDisk disk driver is loaded instead of the native floppy
+  driver. This will enable hard disk access (USE AT YOUR OWN RISK!). Floppy and
+  hard disk access is achieved by calling the ROM BIOS (INT 13h).
+4. FD32 + command (floppy + ata)
+  Like 2, but both the floppy driver and the ATA driver are loaded. This will
+  enable hard disk access (USE AT YOUR OWN RISK!). The ATA driver provides
+  native access to IDE disks, currently using PIO mode.
+4. FD32 + Win32 test
+  Like 2, but the wintest.exe Windows console test program is loaded. You can't
+  do much with that option... if you can read "hello world", it works. This
+  uses the winb module, providing an implementation of Win32 system calls.
+5. FD32 + command (through wrapper)
+  Like 2, but the command.com replacement is loaded through the wrapper, a
+  module to load executables in a segmented memory space. At present, it may
+  take much longer to load due to a file system issue (see below).
+
+_______________________________________________________________________________
+How to start programs
+---------------------
+At present you cannot start programs from the command line directly. This is
+because FreeDOS-32 uses a flat memory model, with no segments, while DJGPP
+executables (such as the included fte.exe or ls.exe) expect a segmented memory
+model (see FAQ 2.5 on the FreeDOS-32 web site).
+
+An exception is the attrib2.com program, that can be started directly as it is
+a native FreeDOS-32 application (don't be confused by the "com" extension,
+it's just a trick to let the shell execute it).
+
+The wrapper (that is wrapper.com, same as above regarding the "com" extension)
+is a FreeDOS-32 native application that loads an executable in a segmented
+memory space. Hence, to run a program from the command line, you have to run it
+through the wrapper. Let's say you started the boot option 2, and you want to
+start ls.exe from the command prompt. Then use (please note that an absolute
+path must be used as an argument):
+
+      A:\>wrapper a:\ls.exe
+
+You can also pass parameters to the executed programs. For example, the FTE
+text editor will not work if you don't run it with the -C parameter:
+
+      A:\>wrapper a:\fte.exe -C
+
+or you may want to change the format of the directory listing from "ls" using:
+
+      A:\>wrapper a:\ls.exe -l --colors
+
+_______________________________________________________________________________
+Known issues
+------------
+* Should you get an ABORT 64 error, please refer to FAQ 2.4 on the web site.
+* Character devices, such as con, are not supported yet. Thus, commands like
+  copy con foobar.txt will not work.
+* Disk access can be very slow on a slow computer (including emulators). A new
+  version of the FAT driver with improved access facilities is in development.
+* When running the command.com replacement the cursor shape is wrong.
+* When running in the Bochs emulator using BIOSDisk, you may get up to three
+  BIOS panics the first time you try to access the floppy. As far as we know,
+  this is a Bochs bug. Just say "continue" at each panic to continue normally.
+* Other issues may be listed in our bug tracker.
+
+_______________________________________________________________________________
+Reporting bugs
+--------------
+After trying the release and playing with it, please use our bug tracker at
+  http://sourceforge.net/tracker/?atid=113749&group_id=13749&func=browse
+to report any problem, one report per issue.
+If you don't have a SourceForge.net account, please write your e-mail address
+too, so that we can contact you.
+
+Please check the known issues first, and, when testing an application, whether
+the application behaves correctly when not run on FreeDOS-32 or it is an issue
+with the application instead. Check if the bug is reproducible and try to give
+us the smallest example to reproduce the problem.
+
+If you could do some debugging and/or prepare some patches for the reported
+bugs, that would be very helpful. Just ask in the developers' mailing list
+  http://localhost/fd32/new/mailinglists.php
+before starting to hack, because we can have some useful information.
+
+_______________________________________________________________________________
+--EOF--

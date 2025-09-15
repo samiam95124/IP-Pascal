@@ -1,0 +1,15 @@
+                               PC notes
+
+1. When having changed file b, that a depends on, but b has been
+recompiled, we are not getting a recompile of a.
+
+2. Currently generate an error on circular references, but this is keeping
+pc from recompiling our major programs. Research how pc can leave cycles
+in the code.
+
+3. There are still a lot of messages output when the /nv flag is used.
+
+4. The /dg flag no longer works.
+
+5. The /dg flag seems to be overridden by the library selected. I.e., specifying
+trmlib, then /dg, should override, but does not.

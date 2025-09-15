@@ -1,0 +1,64 @@
+To do on parser:
+
+1. After a "not found" error, a subsequent definition gets a "duplicate
+type" error, because it default defined it. Should not do this.
+
+2. The inclusion of expressions as constants must be compensated for by
+including the operator tolkens in expected sets.
+
+3. Is it necessary to define a "with" statement as a threat ? Ie., can't
+the reference defined by the "with" only be classified as threatened
+if the with statement itself includes a threatening reference ?
+
+4. Cannot have a program/module name be the same as a system defined
+symbol. This is a consequence of moving the location of this definition.
+
+5. In bug1.pas, printing out from a real in a record in a with does the wrong
+thing. Fully qualifying the reference fixes it. Odd.
+
+6. In the error:
+
+   mp^.modf := copy('''); { no filename }
+                                         ^
+*** C:\projects\PASCOMP\pparse\parse.pas [1085:250] Missing end quote (string tr
+uncated at line end) ***
+
+The character index, 250, is the end of buffer.
+
+7. In parsvs, procedure opnsrc, there appears to be a serious bug in a call
+from prcmod. The value passed string from a view parameter is getting scrambled.
+
+8. Assigning -0 to a subrange of 0..x fails with range error.
+
+9. When fixed declarations are made in one module, and referenced in another,
+they are not seen. Changing them to constants works, so it is specific to fixed.
+
+10. In bug2.pas, a Zero divide error occurs in the parser.
+
+PROPOSED EXTENTIONS/IMPROVEMENTS ===============================================
+
+1. We implement a restriction that external procedures and functions that take
+procedure or function parameters, can only be called with a global level
+procedure or function as a parameter. This allows implementation of stored
+callbacks without worrying about access to non-existant local variables.
+It is true that the module which implements the callback could violate this
+by calling itself. However, there is no standard language construct for
+creation of callback routines, so the callback implementor is already
+a specialized module, with assembly or type escapes. We could well have the
+rule that procedure and function parameters not be allowed to cross module
+lines.
+
+2. Implement readback of types in intermediate file. In order to do this,
+we need to be able to check and match the date/time on a file to determine
+if the source file has a more recent date/time than the .int file. If so,
+we would revert to the source file. This should also be a mode by "safe"
+option.
+
+3. Expression operators shr (shift right) and shl (shift left) operators.
+
+4. A general array can be useful in fixed declarations:
+
+fixed a: array of char = 'hi there bob';
+
+The actual demensions of the array are taken from the supplied data,
+and so don't have to be specified directly as now.

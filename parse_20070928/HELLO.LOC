@@ -1,0 +1,113 @@
+
+Code module linker vs. 0.1 Copyright (C) 1994 S. A. Moore
+
+Processing conlib.sym
+Processing hello.sym
+Processing cap.sym
+Processing conlib.obj
+Processing hello.obj
+Processing cap.obj
+
+Undefined symbols:
+
+_lclose            _lcreat            _llseek            _lopen             
+_lread             _lwrite            deletefilea        getcommandlinea    
+getfilesize        getstdhandle       globalalloc        globalfree         
+movefilea          
+
+Symbols listing in label acending order:
+
+_lclose            00000000 .....  _lcreat            00000000 .....  
+_llseek            00000000 .....  _lopen             00000000 .....  
+_lread             00000000 .....  _lwrite            00000000 .....  
+_pend              0040B2A8 a.gd.  _pstr              00401000 a.gd.  
+_vend              0040C457 .vgd.  _vstr              0040C000 .vgd.  
+deletefilea        00000000 .....  getcommandlinea    00000000 .....  
+getfilesize        00000000 .....  getstdhandle       00000000 .....  
+gettgp_end         00401187 a..d.  globalalloc        00000000 .....  
+globalfree         00000000 .....  movefilea          00000000 .....  
+ps_abort           004058AA a.gd.  ps_assign          0040633B a.gd.  
+ps_chkeol          004083F3 a.gd.  ps_close           00406D17 a.gd.  
+ps_eoffil          0040741D a.gd.  ps_eoftxt          00408326 a.gd.  
+ps_error           004058C8 a.gd.  ps_fillen          004075D3 a.gd.  
+ps_filloc          00407694 a.gd.  ps_getfil          004070B4 a.gd.  
+ps_gettxt          0040816F a.gd.  ps_lbafil          00406F5B a.gd.  
+ps_lbatxt          00407811 a.gd.  ps_pagtxt          00408700 a.gd.  
+ps_posfil          00407755 a.gd.  ps_putfil          00406E91 a.gd.  
+ps_rdchr           00408741 a.gd.  ps_rdeol           0040868E a.gd.  
+ps_rdfil           004072AA a.gd.  ps_rdint           0040A030 a.gd.  
+ps_rdreal          0040A67A a.gd.  ps_resfil          00406801 a.gd.  
+ps_restxt          004068AF a.gd.  ps_rwtfil          00406BBB a.gd.  
+ps_rwttxt          00406C69 a.gd.  ps_wrtblf          00408A76 a.gd.  
+ps_wrtbol          004089E8 a.gd.  ps_wrtchr          004084B9 a.gd.  
+ps_wrteol          00408627 a.gd.  ps_wrtfil          004071EB a.gd.  
+ps_wrtint          00408B55 a.gd.  ps_wrtreal         00409076 a.gd.  
+ps_wrtrlf          004099C4 a.gd.  ps_wrtstr          004087C6 a.gd.  
+rettgp             0040117E a..d.  sc__lclose         00401064 a..d.  
+sc__lcreat         0040103C a..d.  sc__llseek         00401099 a..d.  
+sc__lopen          00401014 a..d.  sc__lread          00401073 a..d.  
+sc__lwrite         00401086 a..d.  sc_deletefilea     004010BD a..d.  
+sc_getcommandlinea 0040115C a..d.  sc_getfilesize     004010AC a..d.  
+sc_getstdhandle    00401005 a..d.  sc_globalalloc     0040112A a..d.  
+sc_globalalloc01   0040113C a..d.  sc_globalfree      0040114C a..d.  
+sc_movefilea       004010E1 a..d.  ss_change          00404B20 a.gd.  
+ss_close           00403282 a.gd.  ss_delete          00404A44 a.gd.  
+ss_eof             004046AA a.gd.  ss_exists          00404C4B a.gd.  
+ss_getspace        00404DA1 a.gd.  ss_length          00404452 a.gd.  
+ss_location        004041DF a.gd.  ss_openread        00402C9C a.gd.  
+ss_openwrite       00402F8F a.gd.  ss_position        00403F82 a.gd.  
+ss_putspace        00404E48 a.gd.  ss_read            00403451 a.gd.  
+ss_write           00403CED a.gd.  wrapper_end        00401179 a..d.  
+
+Symbols listing in value acending order:
+
+_lclose            00000000 .....  _lcreat            00000000 .....  
+_llseek            00000000 .....  _lopen             00000000 .....  
+_lread             00000000 .....  _lwrite            00000000 .....  
+deletefilea        00000000 .....  getcommandlinea    00000000 .....  
+getfilesize        00000000 .....  getstdhandle       00000000 .....  
+globalalloc        00000000 .....  globalfree         00000000 .....  
+movefilea          00000000 .....  _pstr              00401000 a.gd.  
+sc_getstdhandle    00401005 a..d.  sc__lopen          00401014 a..d.  
+sc__lcreat         0040103C a..d.  sc__lclose         00401064 a..d.  
+sc__lread          00401073 a..d.  sc__lwrite         00401086 a..d.  
+sc__llseek         00401099 a..d.  sc_getfilesize     004010AC a..d.  
+sc_deletefilea     004010BD a..d.  sc_movefilea       004010E1 a..d.  
+sc_globalalloc     0040112A a..d.  sc_globalalloc01   0040113C a..d.  
+sc_globalfree      0040114C a..d.  sc_getcommandlinea 0040115C a..d.  
+wrapper_end        00401179 a..d.  rettgp             0040117E a..d.  
+gettgp_end         00401187 a..d.  ss_openread        00402C9C a.gd.  
+ss_openwrite       00402F8F a.gd.  ss_close           00403282 a.gd.  
+ss_read            00403451 a.gd.  ss_write           00403CED a.gd.  
+ss_position        00403F82 a.gd.  ss_location        004041DF a.gd.  
+ss_length          00404452 a.gd.  ss_eof             004046AA a.gd.  
+ss_delete          00404A44 a.gd.  ss_change          00404B20 a.gd.  
+ss_exists          00404C4B a.gd.  ss_getspace        00404DA1 a.gd.  
+ss_putspace        00404E48 a.gd.  ps_abort           004058AA a.gd.  
+ps_error           004058C8 a.gd.  ps_assign          0040633B a.gd.  
+ps_resfil          00406801 a.gd.  ps_restxt          004068AF a.gd.  
+ps_rwtfil          00406BBB a.gd.  ps_rwttxt          00406C69 a.gd.  
+ps_close           00406D17 a.gd.  ps_putfil          00406E91 a.gd.  
+ps_lbafil          00406F5B a.gd.  ps_getfil          004070B4 a.gd.  
+ps_wrtfil          004071EB a.gd.  ps_rdfil           004072AA a.gd.  
+ps_eoffil          0040741D a.gd.  ps_fillen          004075D3 a.gd.  
+ps_filloc          00407694 a.gd.  ps_posfil          00407755 a.gd.  
+ps_lbatxt          00407811 a.gd.  ps_gettxt          0040816F a.gd.  
+ps_eoftxt          00408326 a.gd.  ps_chkeol          004083F3 a.gd.  
+ps_wrtchr          004084B9 a.gd.  ps_wrteol          00408627 a.gd.  
+ps_rdeol           0040868E a.gd.  ps_pagtxt          00408700 a.gd.  
+ps_rdchr           00408741 a.gd.  ps_wrtstr          004087C6 a.gd.  
+ps_wrtbol          004089E8 a.gd.  ps_wrtblf          00408A76 a.gd.  
+ps_wrtint          00408B55 a.gd.  ps_wrtreal         00409076 a.gd.  
+ps_wrtrlf          004099C4 a.gd.  ps_rdint           0040A030 a.gd.  
+ps_rdreal          0040A67A a.gd.  _pend              0040B2A8 a.gd.  
+_vstr              0040C000 .vgd.  _vend              0040C457 .vgd.  
+
+Module parameter listing:
+
+runfile o 00401000-0040B2A7 0000A2A8 0040C000-0040C456 00000457
+conlib  i 00401000-0040B222 0000A223 0040C000-0040C44D 0000044E
+hello   i 0040B223-0040B2A6 00000084 0040C44E-0040C456 00000009
+cap     i 0040B2A7-0040B2A7 00000001 0040C457-******** 00000000
+
+Function complete

@@ -1,0 +1,142 @@
+Codewright CUA commands
+==========================================================================
+Document/File Commands
+
+Change output name	[Ctrl][Shift][O]
+Close document	[Ctrl][-]
+Display filename	[Ctrl][F]
+Next document	[Ctrl][N]
+Open file	[Ctrl][F12]
+Open file	[Ctrl][E]
+Previous document	[Ctrl][P]
+Read file into document	[Ctrl][Shift][F]
+Save file	[Shift][F12]
+Save file	[Ctrl][W]
+Write selection to file	[Ctrl][W]
+
+Cursor Motion/Scrolling Commands =========================================
+
+beginning of line	[Home]
+bottom of file	[Ctrl][End]
+Cursor left	[Left]
+Cursor right	[Right]
+end of line	[End]
+Go to line (prompt)	[Ctrl][Shift][L]
+Go to mark (prompt)	[Ctrl][Shift][B]
+Line down	[Down]
+Line up	[Up]
+Make bottom of win.	[Ctrl][A]
+Make top of window	[Ctrl][T]
+Make middle of win.	[Ctrl][M]
+Page down	[PgDn]
+Page up	[PgUp]
+Scroll down one line	[Ctrl][Down]
+Scroll up one line	[Ctrl][Up]
+top of file	[Ctrl][Home]
+Word left	[Ctrl][Left]
+Word right	[Ctrl][Right]
+
+Editing Commands ==========================================================
+
+Delete character	[Del]
+Delete character  left	[Backsp]
+Delete line	[Ctrl][D]
+Delete to end of line	[Ctrl][Del]
+Delete next word	[Shift][Backsp]
+Delete previous word	[Ctrl][Backsp]
+Indent block	[Tab]
+Insert line	[Ctrl][Enter]
+Insert next literally	[Ctrl][Q]
+Redo	[Alt][Ins]
+Redo	[Ctrl][Y]
+Undo	[Alt][Backsp]
+Undo	[Ctrl][U]
+Undo	[Gray *]
+Unindent block	[Shift][Tab]
+
+Scrap/Clipboard Commands ================================================
+
+Copy to 	[Ctrl][Ins]
+Copy to 	[Ctrl][C]
+Copy to 	[Gray +]
+Cut to 	[Shift][Del]
+Cut to 	[Ctrl][X]
+Cut to 	[Gray -]
+Paste from 	[Shift][Ins]
+Paste from	[Ctrl][V]
+Paste from	[Gray /]
+Toggle clipb./scrap	[Ctrl][/]
+
+Search/Replace Commands	==================================================
+
+Incremental search	[Ctrl][Shift][I]
+Brace kiss	[Ctrl][Shift][K]
+Match brace or paren	[Ctrl][ { ]
+Quick search	[Ctrl][Shift][Q]
+Replace	[Ctrl][R]
+Replace again	[Ctrl][Shift][R]
+Search	[Ctrl][S]
+Search again	[F3]
+Search again	[Ctrl][Shift][S]
+
+Selections/Marks Commands =================================================
+
+Begin sel., inclusive	[Ctrl][I]
+Begin sel., exclusive	[Ctrl][Z]
+Begin selec., column	[Ctrl][B]
+Begin selection, line	[Ctrl][L]
+Extend selection left	[Shift][Left]
+Extend selection right	[Shift][Right]
+Extend selection up	[Shift][Up]
+Extend sel. down	[Shift][Down]
+Extend sel. word left	[Ctrl][Shift][Left]
+Extend sel. word right	[Ctrl][Shift][Right]
+Extend sel. begin line	[Shift][Home]
+Extend sel. end  line	[Shift][End]
+Extend sel. beg. document	[Ctrl][Shift][Home]
+
+Extend sel. end document	[Ctrl][Shift][End]
+Close/open Selection	[Ctrl][ . ]
+Go to mark (prompt)	[Ctrl][Shift][B]
+Lower case selec.	[Ctrl][Shift][D]
+Upper case selec.	[Ctrl][Shift][U]
+Set mark	[Ctrl]n
+Slide-in prompt	[Ctrl][>]
+Slide-out prompt	[Ctrl][<]
+
+System Commands	=========================================================
+
+API interface	[F9]
+API Assistance	[Alt][F1]
+Auto indent on/off	[Ctrl][Shift][A]
+Compact Mode	[Ctrl][Shift][C]
+Compile document	[Ctrl][F10]
+Error List	[Ctrl][Shift][Up]
+Expand/Col. hidden	[Shift][Enter]
+Next error	[Ctrl][Shift][Down]
+Help	[F1]
+Hex Mode	[Ctrl][Shift][H]
+Insert mode on/off	[Ins]
+Load recording file	[Ctrl][F7]
+Make current	[Ctrl][F9]
+Playback keystrokes	[F8]
+Play stored keystrokes	[Ctrl][Shift]n
+Print version	[Ctrl][Shift][V]
+
+Quit	[Alt][F4]
+Record keys toggle	[F7]
+Routines	[Ctrl][Shift][G]
+Text Mode	[Ctrl][Shift][T]
+Wrap paragraph	[Ctrl][Shift][W]
+Write recording file	[Ctrl][F8]
+
+Window Commands	======================================================
+
+Close win. & document	[Ctrl][F4]
+Close window only	[Ctrl][Shift][-]
+Iconify window	[Ctrl][Shift][F4]
+Next window	[Ctrl][Shift][N]
+Next wind. & document	[Ctrl][F6]
+Previous window	[Ctrl][Shift][P]
+Toggle visible whspc.	[Ctrl][Shift][X]
+Zoom window	[Alt][F2]

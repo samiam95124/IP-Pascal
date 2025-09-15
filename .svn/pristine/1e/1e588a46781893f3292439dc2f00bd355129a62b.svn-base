@@ -1,0 +1,28 @@
+                           OVERLOAD/OVERRIDE ABSTRACTIONS
+
+OVERVIEW
+
+Procedures and functions in conventional Pascal are fixed, that is, the types
+of parameters, return results, and body of the code contained are fixed.
+However, it is possible to have abstractions on this principle that modify this
+relationship. The three such abstractions are overloads, overrides, and
+templates. Overrides and overloads are described here.
+
+FUNCTION
+
+Overloads and overrides for functions or procedures mean that the body of the
+function/procedure can change, or the parameters and the body. To indicate
+a procedure or function that is maliable, there must be a "root" declaration
+as follows:
+
+function x(a, b, c..): n; override;
+
+function x; overload;
+
+An override function/procedure has a fixed parameter list, but takes its body
+from another procedure/function called the "overrider". The overrider is a
+perfectly normal function with the same name as the overriden
+function/procedure.
+
+An overload function/procedure has no parameter list and no body. Both of these
+are provided by the overloader function/procedure.

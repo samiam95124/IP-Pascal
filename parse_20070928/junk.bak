@@ -1,0 +1,160 @@
+Pascal parser vs. 1.02.04 Copyright (C) 2005 S. A. Moore
+Processing: C:\PASCOMP\PPARSE\test.pas
+
+Name:  q
+Depth: 3
+
+
+chgtyp: begin
+checking: p matches: false
+checking: q matches: true
+checking: ln matches: false
+checking: abs matches: false
+checking: odd matches: false
+checking: eof matches: false
+checking: chr matches: false
+checking: get matches: false
+checking: ord matches: false
+checking: cos matches: false
+checking: max matches: false
+checking: new matches: false
+checking: sin matches: false
+checking: exp matches: false
+checking: sqr matches: false
+checking: put matches: false
+checking: read matches: false
+checking: page matches: false
+checking: char matches: false
+checking: pack matches: false
+checking: real matches: false
+checking: halt matches: false
+checking: pred matches: false
+checking: succ matches: false
+checking: eoln matches: false
+checking: test matches: false
+checking: true matches: false
+checking: text matches: false
+checking: sqrt matches: false
+checking: false matches: false
+checking: close matches: false
+checking: sreal matches: false
+checking: reset matches: false
+checking: round matches: false
+checking: write matches: false
+checking: trunc matches: false
+checking: change matches: false
+checking: delete matches: false
+checking: readln matches: false
+checking: arctan matches: false
+checking: unpack matches: false
+checking: length matches: false
+checking: assign matches: false
+checking: maxint matches: false
+checking: exists matches: false
+checking: boolean matches: false
+checking: integer matches: false
+checking: dispose matches: false
+checking: rewrite matches: false
+checking: _system matches: false
+checking: writeln matches: false
+checking: location matches: false
+checking: position matches: false
+chgtyp: end
+*** C:\PASCOMP\PPARSE\test.pas:5 Symbol 'q' defined but never referenced *** 
+
+
+Name:  p
+Depth: 2
+
+q             0 ----Å   
+
+
+     1: p: procedure, parameter start: [test]3
+     2: procedure, parameter start: nil
+     3: procedure parameter, parameter start: nil next: nil
+
+Name:  test
+Depth: 1
+
+test          1 ----ã   p             0 ---e|   
+
+
+     1: nil (pointer value)
+     2: undefined
+     3: empty set
+     4: _system: global block
+     5: boolean: boolean
+     6: false: enumerated value: 0 next: [_system]true: 7 head: [_system]boolean: 5
+     7: true: enumerated value: 1 next: nil head: [_system]boolean: 5
+     8: char: character
+     9: integer: integer
+    10: real: real
+    11: text: text
+    12: sreal: short real
+    13: maxint: integer constant: 2147483647
+    14: abs: function, parameter start: nil result: [_system]2
+    15: arctan: function, parameter start: nil result: [_system]2
+    16: chr: function, parameter start: nil result: [_system]2
+    17: cos: function, parameter start: nil result: [_system]2
+    18: eof: function, parameter start: nil result: [_system]2
+    19: eoln: function, parameter start: nil result: [_system]2
+    20: exp: function, parameter start: nil result: [_system]2
+    21: ln: function, parameter start: nil result: [_system]2
+    22: odd: function, parameter start: nil result: [_system]2
+    23: ord: function, parameter start: nil result: [_system]2
+    24: pred: function, parameter start: nil result: [_system]2
+    25: round: function, parameter start: nil result: [_system]2
+    26: sin: function, parameter start: nil result: [_system]2
+    27: sqr: function, parameter start: nil result: [_system]2
+    28: sqrt: function, parameter start: nil result: [_system]2
+    29: succ: function, parameter start: nil result: [_system]2
+    30: trunc: function, parameter start: nil result: [_system]2
+    31: exists: function, parameter start: nil result: [_system]2
+    32: location: function, parameter start: nil result: [_system]2
+    33: length: function, parameter start: nil result: [_system]2
+    34: max: function, parameter start: nil result: [_system]2
+    35: dispose: procedure, parameter start: nil
+    36: get: procedure, parameter start: nil
+    37: new: procedure, parameter start: nil
+    38: pack: procedure, parameter start: nil
+    39: page: procedure, parameter start: nil
+    40: put: procedure, parameter start: nil
+    41: read: procedure, parameter start: nil
+    42: readln: procedure, parameter start: nil
+    43: reset: procedure, parameter start: nil
+    44: rewrite: procedure, parameter start: nil
+    45: unpack: procedure, parameter start: nil
+    46: write: procedure, parameter start: nil
+    47: writeln: procedure, parameter start: nil
+    48: assign: procedure, parameter start: nil
+    49: close: procedure, parameter start: nil
+    50: position: procedure, parameter start: nil
+    51: delete: procedure, parameter start: nil
+    52: change: procedure, parameter start: nil
+    53: halt: procedure, parameter start: nil
+    54: global block
+
+Name:  _system
+Depth: 0
+
+writeln       0 ----|   write         0 ----|   unpack        0 ----|   
+trunc         0 ----}   true          0 ----o   text          0 ----à   
+succ          0 ----}   sreal         0 ----á   sqrt          0 ----}   
+sqr           0 ----}   sin           0 ----}   round         0 ----}   
+rewrite       0 ----|   reset         0 ----|   real          0 ----Ü   
+readln        0 ----|   read          0 ----|   put           0 ----|   
+pred          0 ----}   position      0 ----|   page          0 ----|   
+pack          0 ----|   ord           0 ----}   odd           0 ----}   
+new           0 ----|   maxint        0 ----d   max           0 ----}   
+location      0 ----}   ln            0 ----}   length        0 ----}   
+integer       0 ----É   halt          0 ----|   get           0 ----|   
+false         0 ----o   exp           0 ----}   exists        0 ----}   
+eoln          0 ----}   eof           0 ----}   dispose       0 ----|   
+delete        0 ----|   cos           0 ----}   close         0 ----|   
+chr           0 ----}   char          0 ----Ñ   change        0 ----|   
+boolean       0 ----Ö   assign        0 ----|   arctan        0 ----}   
+abs           0 ----}   _system       0 ----ã   
+
+Errors this compilation: 1
+No output file was generated
+Function complete

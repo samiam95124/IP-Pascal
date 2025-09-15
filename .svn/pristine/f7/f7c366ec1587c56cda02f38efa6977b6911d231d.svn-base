@@ -1,0 +1,33 @@
+                   NOTES FOR WINDOWS TERMINAL LIBRARY
+
+1. In the present scheme, we force exit IMMEDIATELY if the etterm tolken is
+seen. Is this correct ? What about if a "save file ?" dialog is to be
+put up ? What does windows do, and why do windows seem to disappear before
+the program acknowledges it ?
+All this would seem to imply that there is no real way to stop a runaway
+program from itself. That job ultimately belongs to the OS.
+
+2. Why does the editor not use the same colors as the console version ?
+
+3. Implement underline fonting.
+
+4. Try a bold font, and see if that changes character width.
+
+5. See about creating a separate thread to handle windows management. Care must
+be taken about redraws.
+
+6. See what happens when console mode is used on program.
+
+7. Make sum fun programs. A clock. The snake game. Space invaders.
+Whatever.
+
+8. Need to refuse to make a window greater than 80x25.
+
+9. Need to add scrolling controls to windows less than 80x25.
+
+10. Need to teleport the window to the current text entry point.
+
+11. Problem killing timers in windows. See bug1.pas
+
+12. Killing programs via the "close" button (upper right) causes
+programs to close but remain on the task list.

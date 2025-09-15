@@ -1,0 +1,52 @@
+                            INSTALLER PROGRAM NOTES
+
+To do:
+
+1. I have seen a mode where the /wg mode compile caused the logo to be 
+displayed corrupted. The problem occurred with "logo1.bmp", which was
+copied to "logo.bmp", then the loadpict was pointed to that. This "fixed"
+the problem. The two files compare identical. A diagnostic placed in
+the file found that the picture was being loaded as a 15x16 pixel bitmap,
+which tends to indicate it was corrupted (the right answer is 100x375).
+
+2. Make a trial CD ROM with full installation on it. Run that on
+various computers.
+
+3. Add Windows product ID to the registration codes (from the WPA key).
+
+4. Add CRC of program (.text) to registration.
+
+5 One idea that might enhance security of the install.dat file is to generate
+aribitrary/random data into the file. This can consist of tolkens that indicate
+a run of data is to be ignored.
+
+6. An idea to make the install resistant to resetting the clock for time
+limited software is to plant a registration key with the current time, 
+encyphered, then check that time does not go backwards. Each time the
+software comes up, it checks that the time now is past the encyphered
+registration time. Because the key is planted when install is done, the
+lock can call for reregistration if it finds the key missing or wrong.
+This procedure also protects against trying to move the software without
+installing it.
+
+7. Why does the add/remove dialog have a change/remove button vs.
+a "remove" button like other entries ?
+
+8. When modifying a path via the "system" dialog, it shows up in command
+shells immediately. Otherwise, it takes a reboot. See if there is anything
+that can be done about this.
+
+9. During install, the activation of the search path flashes by so fast that
+it is impossible to read.
+
+10. Install should ask, and if checked, branch a task to execute the notepad
+(from c:\windows\notepad) with the readme.txt as a parameter.
+
+11. See if there is a "license" key, like the "readme" key, to edit the
+license for the application.
+
+12. The time check seems messed up. My customer in Australia was off by one
+day and 5 hours, which is the total time difference between us. Recheck
+everything is referenced to Zulu, and that differences of a full day are
+provided for. Windows should completely null this out with timezone
+offsets. We should be using these.

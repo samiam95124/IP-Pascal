@@ -1,0 +1,55 @@
+         11111111112222222222333333333344444444445555555555666666666677777777778
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+                   REGISTER ALLOCATION HISTORY AND PERSPECTIVE
+
+The register allocator is a part of the encoder that has evolved, and will 
+continue to evolve. This document gives an overview of where the register
+allocator has been, and where it is going.
+
+THE 1982 ALGORITHIM
+-------------------
+
+The first compiler in 1980 didn't perform register allocation at all. This was
+replaced in 1982 by the first allocator, running under the Z80 compiler.
+
+The first allocator kept track of registers via an array of descriptors that
+kept track of things such as register in use, what the contents of the register
+was (as a type pointer), logical age of when it was last used, etc.
+
+Registers were allocated as needed within the code flow. If a register was 
+needed, it was allocated just before use, then released afterwards.
+
+The context within a register determined if an actual load to the register
+needed to occur, or if the previous contents could be used.
+
+There existed calls for allocation of any register, a specific register, and
+also for register pairs. The allocator worked very hard to move, copy or
+rearrange registers to make specific allocations.
+
+PROS
+
+The big advantage of the first algoritim is that it was self contained. A 
+particular operation, say add, would allocate and free registers according to 
+its needs.
+
+CONS
+
+The algoritim was short sighted, and would thrash on occasion to get registers
+in the proper arrangement. Also, with the very limited number of 16 bit Z80 
+registers, it was never possible to prove that trashing would always resolve
+of its own accord, although this was never observed to fail.
+
+FINAL ANALYSIS
+
+The 1982 algorithim is no longer in use. It was a good and simple algoritim
+which resulted in observably good code. Although it generated false moves,
+these were observed to be rare and not serious.
+
+THE 2004 ALGORITIM
+------------------
+
+With the I80386 compiler, the processing of the intermediate was based on work
+on an internal tree structure of the code. The algoritim is based on two passes
+over the internal intermediate. The first assigns registers to each 
+intermediate. The second actually generates the code.

@@ -1,0 +1,30 @@
+
+Code module linker vs. 0.1 Copyright (C) 1994 S. A. Moore
+
+Processing wrapper.sym
+
+Undefined symbols:
+
+loadicona      
+
+Symbols listing in label acending order:
+
+_pend          00000019 a.gd.  _pstr          00000000 a.gd.  
+_vend          00000019 .vgd.  _vstr          00000019 .vgd.  
+a0001n1        00000004 ...d.  a0001n10       00000004 ...d.  
+a0001n11       00000004 ...d.  a0001n12       00000004 ...d.  
+a0001n2        00000004 ...d.  a0001n3        00000004 ...d.  
+a0001n4        00000004 ...d.  a0001n5        00000004 ...d.  
+a0001n6        00000004 ...d.  a0001n7        00000004 ...d.  
+a0001n8        00000004 ...d.  a0001n9        00000004 ...d.  
+l0001n1        00000000 ...d.  l0001n10       00000000 ...d.  
+l0001n11       00000000 ...d.  l0001n12       00000000 ...d.  
+l0001n2        00000000 ...d.  l0001n3        00000000 ...d.  
+l0001n4        00000000 ...d.  l0001n5        00000000 ...d.  
+l0001n6        00000000 ...d.  l0001n7        00000000 ...d.  
+l0001n8        00000000 ...d.  l0001n9        00000000 ...d.  
+loadicona      00000000 .....  pa0001         00000000 ...d.  
+pa0001t1       00000000 ...d.  sc_loadicona_n 00000000 a..d.  
+wrapper_end    00000019 a..d.  
+
+Function complete

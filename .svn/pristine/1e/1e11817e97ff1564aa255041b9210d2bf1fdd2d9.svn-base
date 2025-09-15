@@ -1,0 +1,235 @@
+                    MULTITHREADED IP PASCAL - HOW IT WORKS
+
+See the IP Pascal manual for a complete discription of parallel tasking modules.
+
+The module types are:
+
+system
+program
+module
+process
+monitor
+share
+
+The system module is an internal accouting construction, and does not enter into
+tasking. The program and module modules don't have any tasking constructs in 
+them.
+
+The share module does not require any special consideration, and does not have
+a startup/exit block at all. It is evaluated for code only.
+
+PROCESS MODULES
+
+Process modules are a trick, and they are structured like this:
+
+   newthread(startthread, threadid);
+   call modend
+   killthread(threadid);
+   ret
+
+   startthread:
+
+   <startup code>
+   killthread(threadid);
+   jmp _
+
+The process module behaves like a normal stacking module, and calls the next
+series module, and accepts its return. However, its startup is to start a new
+thread that branches off to execute the actual, program specified startup
+block. When and if the stack unwinds back to this module, it automatically
+kills the thread. The thread will also be killed if it exits, and it is
+possible to have the thread terminate and the rest of the program stay
+running.
+
+Note that there is no limit on the number of process modules that can be
+activated this way.
+
+The threadid for the thread is kept in a global variable that is created
+just for this purpose. It is also possible to obtain the thread id by
+calling a syslib function.
+
+MONITOR MODULES
+
+Monitors behave like modules as far as the encoder is concerned, but it has the
+following special features:
+
+1. It has a global variable which contains its logical lock number.
+2. Both the startup and shutdown sections lock and unlock on entry/exit.
+3. The logical lock for the monitor is created on startup, before any user code.
+4. All procedures and functions in the monitor are locked on entry, and unlocked
+on exit using the logical lock number.
+
+For (4), each procedure or function that is globally accessable, meaning that it
+could be accessed by an external process, obtains the lock for its monitor on
+entry, and gives it up on exit.
+
+The (2) requirement is not technically necessary, since the monitor is 
+initialized on the main thread, and the user is not supposed to issue process
+modules that up call. It is done for safety, however. It would be bypassed by
+a process that starts up and accesses monitor calls before the monitor has
+initialized, but this is part of the general upcall issue.
+
+SPECIAL FUNCTIONS AND TYPES
+
+In addition to the special module handling, there are several special system
+types, procedures, and functions that will be built into the compiler.
+
+var a: semaphore;
+
+Semaphore variables can appear anywhere a standard variable can. A semaphore
+has no value and cannot be set. It can be passed as a parameter, but must be
+passed as var. One semaphore cannot be assigned to another. 
+
+Semaphores have the following system procedures that operate on them:
+
+procedure signal(sig: semaphore);
+
+Signals all waiters on a semaphore.
+
+procedure signalone(sig: semaphore);
+
+Signals just one waiter on a signal. This can be more efficient than waking up
+all tasks when only one task can use the signal, such as one unit of data only
+being available. It is possible for the underlying implementation to actually
+signal anywhere from 1 to N, where N is the total number of waiting tasks. In
+other words, it must be acceptable to the program to degenerate into the 
+signal() case. It is only for efficiency.
+
+procedure wait(sig: semaphore);
+
+Wait for a signal. The calling thread is halted until the signal is flagged by
+another thread executing signal() or signalone(). When a wait is executed, the
+last lock aquired by the thread is unlocked, then relocked after the wait is
+complete. This means that any monitor that calls wait must be prepared for data
+changed after both a wait call, or any other call that calls wait indirectly.
+Wait does not garantee that the condition that caused the signal will still be
+true, since several threads may wake up to the signal and receive whatever
+resource the signal was assocated with before the current thread arrives. For
+this reason, wait is usually executed in a loop as:
+
+while (condition) do wait(semaphore);
+
+so that the condition that the signal is for is retested each time the wait
+exits. Similarly, wait does not garantee "fair queueing", or "first come
+first serve". Wait does not garantee efficiency. The wait may be executed by a
+polling loop. Finally, wait may unlock the top lock, any number of the last
+nested locks, or all the locks held by a thread. This depends on the 
+implementation. If no locks are active, then no locks will be freed.
+
+syslib tasking functions
+
+semaphores are represented by an integer variable that contains the logical id
+of the semaphore. When a semaphore is created, it has the value 0, which 
+indicates to syslib that the semaphore is unconnected to a signal entry. If this
+is true, then a new signal entry is created, and the logical number for that is
+placed in the semaphore.
+
+Several new functions exist in syslib to support tasking:
+
+procedure ss_newthread(addr: integer; var id: integer);
+
+Creates a new thread with logical id, that begins execution at the given
+address. The logical id is 1 to N, where N is commonly a limit of 100. Thread
+1 is reserved for the main thread, and is preallocated when the program starts.
+
+procedure ss_killthread(id: integer);
+
+Removes a given logical thread from service, and releases all of its resources.
+If the thread holds any locks, they will be released.
+
+procedure ss_signal(var id: integer);
+
+Sends a signal to all of the threads awaiting the given semphore. If the
+semaphore is not active, it is created and assigned a logical number.
+
+procedure ss_signalone(var id: integer);
+
+As signal, but may only signal a single thread to execute. This is more 
+efficient than waking up all threads.
+
+procedure ss_wait(var id: integer);
+
+Waits for the signal by logical id. The most closely nested lock held by the
+thread, if one exists, is released during the wait, and reaquired after.
+
+procedure ss__newlock(var id: integer);
+
+Creates a new lock, and returns the logical id to the caller.
+
+procedure ss__displock(id: integer);
+
+Disposes of an existing lock, by logical id.
+
+procedure ss_lock(var id: integer);
+
+Performs an interprocess lock. If the logical id is 0, then a new lock is 
+created, and the logical number placed for the caller.
+
+procedure ss_unlock(var id: integer);
+
+Unlocks an existing lock.
+
+Note that all threads, signals and locks are disposed of when syslib exits.
+
+INTERACTIONS OF THREADS, SIGNALS AND MONITOR LOCKS
+
+The "official" explaination of signals is that waiting for a signal is not
+a garantee that another thread would not have grabbed the monitor lock before
+the waiting task. Nor are any of the wait or lock functions defined as fair.
+
+The cost of tolerating a possible low quality implementation of tasking is
+light in the simple case. A thread executing a wait should execute it in a loop
+that checks the case for which it went into the wait, and continues to wait
+until it is true.
+
+This solves the simple case of having another "grab" the monitor lock before
+the waiter can get it. However, it introduces higher level issues, such as
+infinite holdoff of a slow task by a faster one.
+
+To prevent such effects, there are three characteristics of a "good" IP 
+tasking implementation that are recommended, if not required. They are:
+
+1. Fair queueing.
+
+2. "heel-to-toe" waiting.
+
+3. Monitor edge signaling.
+
+All three can be implemented strictly at the low level, without high level
+compiler or application program support.
+
+FAIR QUEUEING
+
+Fair queuing means that all monitor locks and signals queue on a first come,
+first serve basis. This must be regardless of task priority.
+
+HEEL-TO-TOE WAITING
+
+When a wait call is made, logically the monitor lock is dropped, then a loop is
+entered to await the signal. This creates two "windows" for other threads to
+come in and grab the monitor lock, then presumably take the data or other event
+associated with the signal awaited. This would make the waiting task emerge from
+the wait without getting it's data, hence the wait loop.
+
+Heel-to-toe waits mean that if a task releases the monitor lock, then waits on
+the signal, then again locks, it will be given priority for the lock. There is
+effectively a wait queue, and only the task holding the monitor lock can enter
+it. When it emerges from the signal, if it does not occupy the next position in
+the wait queue, it is sent back to wait on the signal again. In this way, tasks
+that examine data state in the monitor, then wait for the data, will be queued
+fairly to get the data when it becomes available.
+
+MONITOR EDGE SIGNALING
+
+When a monitor signals a condition, it logically means that the waiters will not
+be released to handle it, but rather move from the signal queue to the monitor
+lock queue. The reason why is that the monitor lock is, by definition, held by
+the signaler, since you have to be in a monitor to signal.
+
+Most monitor routines will signal, then exit the monitor immediately. In monitor
+edge signaling, the fact that a signal is at the end of the monitor routine is
+detected, and the signal call is a special version that signals and unlocks the
+monitor as an atomic step. This both allows the waiting task to proceed directly
+through the monitor lock without stopping, and also suppresses other tasks from
+grabbing the monitor before the waiter can get to it.
+

@@ -1,0 +1,1064 @@
+00000000000i[     ] Bochs x86 Emulator 2.3
+00000000000i[     ]   Build from CVS snapshot on August 27, 2006
+00000000000i[     ] System configuration
+00000000000i[     ]   processors: 1 (cores=1, HT threads=1)
+00000000000i[     ]   A20 line support: yes
+00000000000i[     ]   APIC support: yes
+00000000000i[     ] CPU configuration
+00000000000i[     ]   level: 6
+00000000000i[     ]   paging support: yes, tlb enabled: yes
+00000000000i[     ]   SMP support: no
+00000000000i[     ]   FPU support: yes
+00000000000i[     ]   MMX support: yes
+00000000000i[     ]   SSE support: 1
+00000000000i[     ]   v8086 mode support: yes
+00000000000i[     ]   VME support: yes
+00000000000i[     ]   3dnow! support: no
+00000000000i[     ]   PAE support: yes
+00000000000i[     ]   PGE support: yes
+00000000000i[     ]   PSE support: yes
+00000000000i[     ]   x86-64 support: no
+00000000000i[     ]   SEP support: yes
+00000000000i[     ] Optimization configuration
+00000000000i[     ]   Guest2HostTLB support: yes
+00000000000i[     ]   RepeatSpeedups support: yes
+00000000000i[     ]   Icache support: yes
+00000000000i[     ]   Host Asm support: yes
+00000000000i[     ]   Fast function calls: yes
+00000000000i[     ] Devices configuration
+00000000000i[     ]   NE2000 support: yes
+00000000000i[     ]   PCI support: yes
+00000000000i[     ]   SB16 support: yes
+00000000000i[     ]   USB support: yes
+00000000000i[     ]   VGA extension support: vbe cirrus
+00000000000i[MEM0 ] allocated memory at 00E60020. after alignment, vector=00E61000
+00000000000i[MEM0 ] 32.00MB
+00000000000i[MEM0 ] rom at 0xf0000/65536 ('C:\Program Files\Bochs-2.3/BIOS-bochs-latest')
+00000000000i[MEM0 ] rom at 0xc0000/38400 ('C:\Program Files\Bochs-2.3/VGABIOS-lgpl-latest')
+00000000000i[APIC?] set APIC ID to 0
+00000000000i[APIC0] 80686
+00000000000i[APIC0] local apic in CPU apicid=00 initializing
+00000000000i[IOAP ] initializing I/O APIC
+00000000000i[IOAP ] set APIC ID to 1
+00000000000i[MEM0 ] Register memory access handlers: fec00000-fec00fff
+00000000000i[CMOS ] Using local time for initial clock
+00000000000i[CMOS ] Setting initial clock to: Wed Apr 23 16:23:44 2008 (time0=1208996624)
+00000000000i[DMA  ] channel 4 used by cascade
+00000000000i[DMA  ] channel 2 used by Floppy Drive
+00000000000i[FDD  ] fd0: 'a.img' ro=0, h=2,t=80,spt=18
+00000000000i[PCI  ] 440FX Host bridge present at device 0, function 0
+00000000000i[PCI  ] PIIX3 PCI-to-ISA bridge present at device 1, function 0
+00000000000i[MEM0 ] Register memory access handlers: 000a0000-000bffff
+00000000000i[WGUI ] Number of Mouse Buttons = 5
+00000000000i[WGUI ] IME disabled
+00000000000i[MEM0 ] Register memory access handlers: e0000000-e07fffff
+00000000000i[CLVGA] VBE Bochs Display Extension Enabled
+00000000000i[CLVGA] interval=150000
+00000000000i[     ] init_mem of 'harddrv' plugin device by virtual method
+00000000000i[     ] init_mem of 'keyboard' plugin device by virtual method
+00000000000i[     ] init_mem of 'serial' plugin device by virtual method
+00000000000i[     ] init_mem of 'parallel' plugin device by virtual method
+00000000000i[     ] init_mem of 'extfpuirq' plugin device by virtual method
+00000000000i[     ] init_mem of 'gameport' plugin device by virtual method
+00000000000i[     ] init_mem of 'speaker' plugin device by virtual method
+00000000000i[     ] init_mem of 'pci_ide' plugin device by virtual method
+00000000000i[     ] init_dev of 'harddrv' plugin device by virtual method
+00000000000i[HD   ] Using boot sequence floppy, none, none
+00000000000i[HD   ] Floppy boot signature check is enabled
+00000000000i[     ] init_dev of 'keyboard' plugin device by virtual method
+00000000000i[KBD  ] will paste characters every 1000 keyboard ticks
+00000000000i[     ] init_dev of 'serial' plugin device by virtual method
+00000000000i[SER  ] com1 at 0x03f8 irq 4
+00000000000i[     ] init_dev of 'parallel' plugin device by virtual method
+00000000000i[PAR  ] parallel port 1 at 0x0378 irq 7
+00000000000i[     ] init_dev of 'extfpuirq' plugin device by virtual method
+00000000000i[     ] init_dev of 'gameport' plugin device by virtual method
+00000000000i[     ] init_dev of 'speaker' plugin device by virtual method
+00000000000i[     ] init_dev of 'pci_ide' plugin device by virtual method
+00000000000i[PCI  ] PIIX3 PCI IDE controller present at device 1, function 1
+00000000000i[     ] register state of 'harddrv' plugin device by virtual method
+00000000000i[     ] register state of 'keyboard' plugin device by virtual method
+00000000000i[     ] register state of 'serial' plugin device by virtual method
+00000000000i[     ] register state of 'parallel' plugin device by virtual method
+00000000000i[     ] register state of 'extfpuirq' plugin device by virtual method
+00000000000i[     ] register state of 'gameport' plugin device by virtual method
+00000000000i[     ] register state of 'speaker' plugin device by virtual method
+00000000000i[     ] register state of 'pci_ide' plugin device by virtual method
+00000000000i[SYS  ] bx_pc_system_c::Reset(HARDWARE) called
+00000000000i[APIC0] local apic in CPU 0 initializing
+00000000000i[     ] reset of 'harddrv' plugin device by virtual method
+00000000000i[     ] reset of 'keyboard' plugin device by virtual method
+00000000000i[     ] reset of 'serial' plugin device by virtual method
+00000000000i[     ] reset of 'parallel' plugin device by virtual method
+00000000000i[     ] reset of 'extfpuirq' plugin device by virtual method
+00000000000i[     ] reset of 'gameport' plugin device by virtual method
+00000000000i[     ] reset of 'speaker' plugin device by virtual method
+00000000000i[     ] reset of 'pci_ide' plugin device by virtual method
+00000000000i[     ] Warning: no rc file specified.
+00000000000i[     ] set SIGINT handler to bx_debug_ctrlc_handler
+00000003867i[BIOS ] $Revision: 1.166 $ $Date: 2006/08/11 17:34:12 $
+00000322554i[KBD  ] reset-disable command received
+00000330674i[PIDE ] new BM-DMA address: 0xc000
+00000454893i[VBIOS] VGABios $Id: vgabios.c,v 1.66 2006/07/10 07:47:51 vruppert Exp $
+00000454964i[CLVGA] VBE known Display Interface b0c0
+00000454996i[CLVGA] VBE known Display Interface b0c4
+00000457921i[VBIOS] VBE Bios $Id: vbe.c,v 1.58 2006/08/19 09:39:43 vruppert Exp $
+00002250000i[WGUI ] dimension update x=720 y=400 fontheight=16 fontwidth=9 bpp=8
+00036579406i[BIOS ] int13_harddisk: function 41, unmapped device for ELDL=80
+00036584163i[BIOS ] int13_harddisk: function 08, unmapped device for ELDL=80
+00036588803i[BIOS ] *** int 15h function AX=00C0, BX=0000 not yet supported!
+00625235355i[WGUI ] GUI Beep ON (frequency=1.#J)
+00625678106i[FDD  ] controller reset in software
+02619094750i[FDD  ] controller reset in software
+02619095402i[FDD  ] io_write: config control register: 0x00
+02649494070i[FDD  ] controller reset in software
+02678289716i[FDD  ] controller reset in software
+02707085327i[FDD  ] controller reset in software
+02713977174i[FDD  ] controller reset in software
+02744429665i[FDD  ] controller reset in software
+02773225311i[FDD  ] controller reset in software
+02802020937i[FDD  ] controller reset in software
+02808953012i[FDD  ] controller reset in software
+02839365273i[FDD  ] controller reset in software
+02868160889i[FDD  ] controller reset in software
+02896956530i[FDD  ] controller reset in software
+02903891956i[FDD  ] controller reset in software
+02934300857i[FDD  ] controller reset in software
+02963096503i[FDD  ] controller reset in software
+02991892129i[FDD  ] controller reset in software
+02998830708i[FDD  ] controller reset in software
+03029236459i[FDD  ] controller reset in software
+03058032090i[FDD  ] controller reset in software
+03086827731i[FDD  ] controller reset in software
+03093769291i[FDD  ] controller reset in software
+03124172054i[FDD  ] controller reset in software
+03152967700i[FDD  ] controller reset in software
+03181763311i[FDD  ] controller reset in software
+03188707965i[FDD  ] controller reset in software
+03219107656i[FDD  ] controller reset in software
+03247903287i[FDD  ] controller reset in software
+03276698913i[FDD  ] controller reset in software
+03283646706i[FDD  ] controller reset in software
+03314043232i[FDD  ] controller reset in software
+03342838878i[FDD  ] controller reset in software
+03371634519i[FDD  ] controller reset in software
+03378585292i[FDD  ] controller reset in software
+03408978833i[FDD  ] controller reset in software
+03437774479i[FDD  ] controller reset in software
+03466570120i[FDD  ] controller reset in software
+03473524118i[FDD  ] controller reset in software
+03503914434i[FDD  ] controller reset in software
+03532710080i[FDD  ] controller reset in software
+03561505706i[FDD  ] controller reset in software
+03568419052i[FDD  ] controller reset in software
+03598850033i[FDD  ] controller reset in software
+03627645664i[FDD  ] controller reset in software
+03656441305i[FDD  ] controller reset in software
+03663331926i[FDD  ] controller reset in software
+03693785617i[FDD  ] controller reset in software
+03722581263i[FDD  ] controller reset in software
+03751376904i[FDD  ] controller reset in software
+03758356169i[FDD  ] controller reset in software
+03788721225i[FDD  ] controller reset in software
+03817516871i[FDD  ] controller reset in software
+03846312497i[FDD  ] controller reset in software
+03853203118i[FDD  ] controller reset in software
+03883656824i[FDD  ] controller reset in software
+03912452470i[FDD  ] controller reset in software
+03941248081i[FDD  ] controller reset in software
+03948209366i[FDD  ] controller reset in software
+03978592422i[FDD  ] controller reset in software
+04007388065i[FDD  ] controller reset in software
+04036183691i[FDD  ] controller reset in software
+04043080151i[FDD  ] controller reset in software
+04073528022i[FDD  ] controller reset in software
+04102323653i[FDD  ] controller reset in software
+04131119279i[FDD  ] controller reset in software
+04138072214i[FDD  ] controller reset in software
+04168463610i[FDD  ] controller reset in software
+04197259256i[FDD  ] controller reset in software
+04226054882i[FDD  ] controller reset in software
+04232955694i[FDD  ] controller reset in software
+04263399200i[FDD  ] controller reset in software
+04292194846i[FDD  ] controller reset in software
+04320990487i[FDD  ] controller reset in software
+04327945253i[FDD  ] controller reset in software
+04358334804i[FDD  ] controller reset in software
+04387130450i[FDD  ] controller reset in software
+04415926076i[FDD  ] controller reset in software
+04422831255i[FDD  ] controller reset in software
+04453270411i[FDD  ] controller reset in software
+04482066042i[FDD  ] controller reset in software
+04510861668i[FDD  ] controller reset in software
+04517816730i[FDD  ] controller reset in software
+04548205996i[FDD  ] controller reset in software
+04577001642i[FDD  ] controller reset in software
+04605797268i[FDD  ] controller reset in software
+04612706784i[FDD  ] controller reset in software
+04643141590i[FDD  ] controller reset in software
+04671937236i[FDD  ] controller reset in software
+04700732877i[FDD  ] controller reset in software
+04707687815i[FDD  ] controller reset in software
+04738077186i[FDD  ] controller reset in software
+04766872832i[FDD  ] controller reset in software
+04795668458i[FDD  ] controller reset in software
+04802582341i[FDD  ] controller reset in software
+04833012797i[FDD  ] controller reset in software
+04861808428i[FDD  ] controller reset in software
+04890604054i[FDD  ] controller reset in software
+04897559319i[FDD  ] controller reset in software
+04927948375i[FDD  ] controller reset in software
+04956744021i[FDD  ] controller reset in software
+04985539662i[FDD  ] controller reset in software
+04992457867i[FDD  ] controller reset in software
+05022883973i[FDD  ] controller reset in software
+05051679619i[FDD  ] controller reset in software
+05080475260i[FDD  ] controller reset in software
+05087440717i[FDD  ] controller reset in software
+05117819573i[FDD  ] controller reset in software
+05146615219i[FDD  ] controller reset in software
+05175410845i[FDD  ] controller reset in software
+05182335619i[FDD  ] controller reset in software
+05212755170i[FDD  ] controller reset in software
+05241550801i[FDD  ] controller reset in software
+05270346442i[FDD  ] controller reset in software
+05277303135i[FDD  ] controller reset in software
+05307690781i[FDD  ] controller reset in software
+05336486412i[FDD  ] controller reset in software
+05365282038i[FDD  ] controller reset in software
+05372211149i[FDD  ] controller reset in software
+05402626365i[FDD  ] controller reset in software
+05431422011i[FDD  ] controller reset in software
+05460217637i[FDD  ] controller reset in software
+05467174934i[FDD  ] controller reset in software
+05497561965i[FDD  ] controller reset in software
+05526357611i[FDD  ] controller reset in software
+05555153237i[FDD  ] controller reset in software
+05562086700i[FDD  ] controller reset in software
+05592497566i[FDD  ] controller reset in software
+05621293212i[FDD  ] controller reset in software
+05650088823i[FDD  ] controller reset in software
+05657046381i[FDD  ] controller reset in software
+05687433157i[FDD  ] controller reset in software
+05716228788i[FDD  ] controller reset in software
+05745024429i[FDD  ] controller reset in software
+05751962244i[FDD  ] controller reset in software
+05782368745i[FDD  ] controller reset in software
+05811164391i[FDD  ] controller reset in software
+05839960032i[FDD  ] controller reset in software
+05846917302i[FDD  ] controller reset in software
+05877304348i[FDD  ] controller reset in software
+05906099994i[FDD  ] controller reset in software
+05934895620i[FDD  ] controller reset in software
+05941837787i[FDD  ] controller reset in software
+05972239953i[FDD  ] controller reset in software
+06001035584i[FDD  ] controller reset in software
+06029831210i[FDD  ] controller reset in software
+06036789829i[FDD  ] controller reset in software
+06067175540i[FDD  ] controller reset in software
+06095971171i[FDD  ] controller reset in software
+06124766812i[FDD  ] controller reset in software
+06131713331i[FDD  ] controller reset in software
+06162111132i[FDD  ] controller reset in software
+06190906778i[FDD  ] controller reset in software
+06219702404i[FDD  ] controller reset in software
+06226681498i[FDD  ] controller reset in software
+06257046734i[FDD  ] controller reset in software
+06285842380i[FDD  ] controller reset in software
+06314638006i[FDD  ] controller reset in software
+06321593229i[FDD  ] controller reset in software
+06351982330i[FDD  ] controller reset in software
+06380777976i[FDD  ] controller reset in software
+06409573602i[FDD  ] controller reset in software
+06416527517i[FDD  ] controller reset in software
+06446917938i[FDD  ] controller reset in software
+06475713554i[FDD  ] controller reset in software
+06504509195i[FDD  ] controller reset in software
+08187187672i[FDD  ] controller reset in software
+08217549297i[FDD  ] controller reset in software
+08246344928i[FDD  ] controller reset in software
+08275140554i[FDD  ] controller reset in software
+08282030732i[FDD  ] controller reset in software
+08312484888i[FDD  ] controller reset in software
+08341280519i[FDD  ] controller reset in software
+08370076160i[FDD  ] controller reset in software
+08377150001i[FDD  ] controller reset in software
+08407570467i[FDD  ] controller reset in software
+08436366098i[FDD  ] controller reset in software
+08465161724i[FDD  ] controller reset in software
+08472124590i[FDD  ] controller reset in software
+08502506056i[FDD  ] controller reset in software
+08531301702i[FDD  ] controller reset in software
+08560097328i[FDD  ] controller reset in software
+08566986791i[FDD  ] controller reset in software
+08600291215i[FDD  ] controller reset in software
+08629086859i[FDD  ] controller reset in software
+08657882498i[FDD  ] controller reset in software
+08664952257i[FDD  ] controller reset in software
+08695376803i[FDD  ] controller reset in software
+08724172434i[FDD  ] controller reset in software
+08752968060i[FDD  ] controller reset in software
+08759858419i[FDD  ] controller reset in software
+08790312380i[FDD  ] controller reset in software
+08819108026i[FDD  ] controller reset in software
+08847903667i[FDD  ] controller reset in software
+08854793162i[FDD  ] controller reset in software
+12192096283i[FDD  ] controller reset in software
+12220891925i[FDD  ] controller reset in software
+12249687547i[FDD  ] controller reset in software
+12256581312i[FDD  ] controller reset in software
+12287031883i[FDD  ] controller reset in software
+12315827514i[FDD  ] controller reset in software
+12344623140i[FDD  ] controller reset in software
+12351547265i[FDD  ] controller reset in software
+12381967461i[FDD  ] controller reset in software
+12410763107i[FDD  ] controller reset in software
+12439558748i[FDD  ] controller reset in software
+12446447726i[FDD  ] controller reset in software
+12480202570i[FDD  ] controller reset in software
+12508998197i[FDD  ] controller reset in software
+12537793834i[FDD  ] controller reset in software
+12544686937i[FDD  ] controller reset in software
+12575138168i[FDD  ] controller reset in software
+12603933799i[FDD  ] controller reset in software
+12632729440i[FDD  ] controller reset in software
+12642016186i[FDD  ] controller reset in software
+12675772905i[FDD  ] controller reset in software
+12704568531i[FDD  ] controller reset in software
+12733364167i[FDD  ] controller reset in software
+12740254549i[FDD  ] controller reset in software
+12770708480i[FDD  ] controller reset in software
+12799504126i[FDD  ] controller reset in software
+12828299767i[FDD  ] controller reset in software
+12835190075i[FDD  ] controller reset in software
+12865644081i[FDD  ] controller reset in software
+12894439727i[FDD  ] controller reset in software
+12923235368i[FDD  ] controller reset in software
+12930124865i[FDD  ] controller reset in software
+13991973208i[FDD  ] controller reset in software
+14020768852i[FDD  ] controller reset in software
+14049564476i[FDD  ] controller reset in software
+14056456563i[FDD  ] controller reset in software
+14086908814i[FDD  ] controller reset in software
+14115704430i[FDD  ] controller reset in software
+14144500071i[FDD  ] controller reset in software
+14151424558i[FDD  ] controller reset in software
+14184693972i[FDD  ] controller reset in software
+14213489601i[FDD  ] controller reset in software
+14242285240i[FDD  ] controller reset in software
+14249176489i[FDD  ] controller reset in software
+14279629550i[FDD  ] controller reset in software
+14308425196i[FDD  ] controller reset in software
+14337220837i[FDD  ] controller reset in software
+14344110338i[FDD  ] controller reset in software
+14378614535i[FDD  ] controller reset in software
+14407410179i[FDD  ] controller reset in software
+14436205818i[FDD  ] controller reset in software
+14443096031i[FDD  ] controller reset in software
+14473550142i[FDD  ] controller reset in software
+14502345788i[FDD  ] controller reset in software
+14531141399i[FDD  ] controller reset in software
+14538174620i[FDD  ] controller reset in software
+14568635712i[FDD  ] controller reset in software
+14597431358i[FDD  ] controller reset in software
+14626226984i[FDD  ] controller reset in software
+14633263769i[FDD  ] controller reset in software
+14663721285i[FDD  ] controller reset in software
+14692516931i[FDD  ] controller reset in software
+14721312557i[FDD  ] controller reset in software
+14728208628i[FDD  ] controller reset in software
+14758656889i[FDD  ] controller reset in software
+14787452520i[FDD  ] controller reset in software
+14816248161i[FDD  ] controller reset in software
+14823146564i[FDD  ] controller reset in software
+14853592485i[FDD  ] controller reset in software
+14882388131i[FDD  ] controller reset in software
+14911183742i[FDD  ] controller reset in software
+14918082163i[FDD  ] controller reset in software
+14948528084i[FDD  ] controller reset in software
+14977323715i[FDD  ] controller reset in software
+15006119341i[FDD  ] controller reset in software
+15013088811i[FDD  ] controller reset in software
+15043463662i[FDD  ] controller reset in software
+15072259308i[FDD  ] controller reset in software
+15101054949i[FDD  ] controller reset in software
+15108112523i[FDD  ] controller reset in software
+15141548782i[FDD  ] controller reset in software
+15170344425i[FDD  ] controller reset in software
+15199140063i[FDD  ] controller reset in software
+15206138842i[FDD  ] controller reset in software
+15239483931i[FDD  ] controller reset in software
+15268279574i[FDD  ] controller reset in software
+15297075197i[FDD  ] controller reset in software
+15304082129i[FDD  ] controller reset in software
+15337419073i[FDD  ] controller reset in software
+15366214716i[FDD  ] controller reset in software
+15395010354i[FDD  ] controller reset in software
+15402021875i[FDD  ] controller reset in software
+15435354229i[FDD  ] controller reset in software
+15464149857i[FDD  ] controller reset in software
+15492945480i[FDD  ] controller reset in software
+15499961618i[FDD  ] controller reset in software
+15533289352i[FDD  ] controller reset in software
+15562084995i[FDD  ] controller reset in software
+15590880633i[FDD  ] controller reset in software
+15597901360i[FDD  ] controller reset in software
+15631224504i[FDD  ] controller reset in software
+15660020132i[FDD  ] controller reset in software
+15688815770i[FDD  ] controller reset in software
+15695841099i[FDD  ] controller reset in software
+15729159638i[FDD  ] controller reset in software
+15757955278i[FDD  ] controller reset in software
+15786750901i[FDD  ] controller reset in software
+15793780849i[FDD  ] controller reset in software
+15827094783i[FDD  ] controller reset in software
+15855890426i[FDD  ] controller reset in software
+15884686049i[FDD  ] controller reset in software
+15891720599i[FDD  ] controller reset in software
+15925179898i[FDD  ] controller reset in software
+15953975541i[FDD  ] controller reset in software
+15982771179i[FDD  ] controller reset in software
+15989810462i[FDD  ] controller reset in software
+16023265021i[FDD  ] controller reset in software
+16052060664i[FDD  ] controller reset in software
+16080856302i[FDD  ] controller reset in software
+16087900187i[FDD  ] controller reset in software
+16121500126i[FDD  ] controller reset in software
+16150295754i[FDD  ] controller reset in software
+16179091392i[FDD  ] controller reset in software
+16186139881i[FDD  ] controller reset in software
+16219735215i[FDD  ] controller reset in software
+16248530858i[FDD  ] controller reset in software
+16277326496i[FDD  ] controller reset in software
+16284379587i[FDD  ] controller reset in software
+16317970301i[FDD  ] controller reset in software
+16346765944i[FDD  ] controller reset in software
+16375561582i[FDD  ] controller reset in software
+16382619277i[FDD  ] controller reset in software
+16416205401i[FDD  ] controller reset in software
+16445001044i[FDD  ] controller reset in software
+16473796667i[FDD  ] controller reset in software
+16480858979i[FDD  ] controller reset in software
+16514440498i[FDD  ] controller reset in software
+16543236141i[FDD  ] controller reset in software
+16572031779i[FDD  ] controller reset in software
+16579098680i[FDD  ] controller reset in software
+16612675609i[FDD  ] controller reset in software
+16641471237i[FDD  ] controller reset in software
+16670266860i[FDD  ] controller reset in software
+16677338378i[FDD  ] controller reset in software
+16710910687i[FDD  ] controller reset in software
+16739706330i[FDD  ] controller reset in software
+16768501953i[FDD  ] controller reset in software
+16775578075i[FDD  ] controller reset in software
+16809145779i[FDD  ] controller reset in software
+16837941422i[FDD  ] controller reset in software
+16866737060i[FDD  ] controller reset in software
+16873817769i[FDD  ] controller reset in software
+16907380883i[FDD  ] controller reset in software
+16936176526i[FDD  ] controller reset in software
+16964972149i[FDD  ] controller reset in software
+16972057462i[FDD  ] controller reset in software
+17005615971i[FDD  ] controller reset in software
+17034411614i[FDD  ] controller reset in software
+17063207252i[FDD  ] controller reset in software
+17070297167i[FDD  ] controller reset in software
+17103851086i[FDD  ] controller reset in software
+17132646714i[FDD  ] controller reset in software
+17161442352i[FDD  ] controller reset in software
+17168546065i[FDD  ] controller reset in software
+17202086169i[FDD  ] controller reset in software
+17230881812i[FDD  ] controller reset in software
+17259677435i[FDD  ] controller reset in software
+17266794957i[FDD  ] controller reset in software
+17300321261i[FDD  ] controller reset in software
+17329116904i[FDD  ] controller reset in software
+17357912542i[FDD  ] controller reset in software
+17364896541i[FDD  ] controller reset in software
+17398406375i[FDD  ] controller reset in software
+17427202033i[FDD  ] controller reset in software
+17455997656i[FDD  ] controller reset in software
+17463105969i[FDD  ] controller reset in software
+17496641483i[FDD  ] controller reset in software
+17525437111i[FDD  ] controller reset in software
+17554232749i[FDD  ] controller reset in software
+17561225944i[FDD  ] controller reset in software
+17594726613i[FDD  ] controller reset in software
+17623522241i[FDD  ] controller reset in software
+17652317864i[FDD  ] controller reset in software
+17659412395i[FDD  ] controller reset in software
+17692961694i[FDD  ] controller reset in software
+17721757337i[FDD  ] controller reset in software
+17750552960i[FDD  ] controller reset in software
+17757652089i[FDD  ] controller reset in software
+17791196783i[FDD  ] controller reset in software
+17819992426i[FDD  ] controller reset in software
+17848788064i[FDD  ] controller reset in software
+17855776657i[FDD  ] controller reset in software
+17889281901i[FDD  ] controller reset in software
+17918077544i[FDD  ] controller reset in software
+17946873182i[FDD  ] controller reset in software
+17953870974i[FDD  ] controller reset in software
+17987367023i[FDD  ] controller reset in software
+18016162666i[FDD  ] controller reset in software
+18044958304i[FDD  ] controller reset in software
+18051960695i[FDD  ] controller reset in software
+18085452154i[FDD  ] controller reset in software
+18114247797i[FDD  ] controller reset in software
+18143043420i[FDD  ] controller reset in software
+18150050424i[FDD  ] controller reset in software
+18183537263i[FDD  ] controller reset in software
+18212332906i[FDD  ] controller reset in software
+18241128544i[FDD  ] controller reset in software
+18248140133i[FDD  ] controller reset in software
+18281622382i[FDD  ] controller reset in software
+18310418025i[FDD  ] controller reset in software
+18339213648i[FDD  ] controller reset in software
+18346229850i[FDD  ] controller reset in software
+18379707509i[FDD  ] controller reset in software
+18408503152i[FDD  ] controller reset in software
+18437298775i[FDD  ] controller reset in software
+18444319577i[FDD  ] controller reset in software
+18477792631i[FDD  ] controller reset in software
+18506588274i[FDD  ] controller reset in software
+18535383897i[FDD  ] controller reset in software
+18542409282i[FDD  ] controller reset in software
+18576027716i[FDD  ] controller reset in software
+18604823357i[FDD  ] controller reset in software
+18633618993i[FDD  ] controller reset in software
+18640648978i[FDD  ] controller reset in software
+18674262822i[FDD  ] controller reset in software
+18703058448i[FDD  ] controller reset in software
+18731854084i[FDD  ] controller reset in software
+18738888667i[FDD  ] controller reset in software
+18772647876i[FDD  ] controller reset in software
+18801443532i[FDD  ] controller reset in software
+18830239168i[FDD  ] controller reset in software
+18837278495i[FDD  ] controller reset in software
+18871032964i[FDD  ] controller reset in software
+18899828605i[FDD  ] controller reset in software
+18928624241i[FDD  ] controller reset in software
+18935668166i[FDD  ] controller reset in software
+18969418030i[FDD  ] controller reset in software
+18998213671i[FDD  ] controller reset in software
+19027009307i[FDD  ] controller reset in software
+19034057832i[FDD  ] controller reset in software
+19067803106i[FDD  ] controller reset in software
+19096598747i[FDD  ] controller reset in software
+19125394383i[FDD  ] controller reset in software
+19132447506i[FDD  ] controller reset in software
+19166188175i[FDD  ] controller reset in software
+19194983831i[FDD  ] controller reset in software
+19223779452i[FDD  ] controller reset in software
+19230837190i[FDD  ] controller reset in software
+19264573254i[FDD  ] controller reset in software
+19293368895i[FDD  ] controller reset in software
+19322164516i[FDD  ] controller reset in software
+19329227038i[FDD  ] controller reset in software
+19362958332i[FDD  ] controller reset in software
+19391753958i[FDD  ] controller reset in software
+19420549594i[FDD  ] controller reset in software
+19427616515i[FDD  ] controller reset in software
+19461343414i[FDD  ] controller reset in software
+19490139040i[FDD  ] controller reset in software
+19518934676i[FDD  ] controller reset in software
+19526005798i[FDD  ] controller reset in software
+19556428979i[FDD  ] controller reset in software
+19585224625i[FDD  ] controller reset in software
+19614020236i[FDD  ] controller reset in software
+19620909279i[FDD  ] controller reset in software
+19654664063i[FDD  ] controller reset in software
+19683459704i[FDD  ] controller reset in software
+19712255340i[FDD  ] controller reset in software
+19719336001i[FDD  ] controller reset in software
+19753049145i[FDD  ] controller reset in software
+19781844786i[FDD  ] controller reset in software
+19810640422i[FDD  ] controller reset in software
+19817725666i[FDD  ] controller reset in software
+19851434220i[FDD  ] controller reset in software
+19880229861i[FDD  ] controller reset in software
+19909025482i[FDD  ] controller reset in software
+19916115341i[FDD  ] controller reset in software
+19949819290i[FDD  ] controller reset in software
+19978614931i[FDD  ] controller reset in software
+20007410552i[FDD  ] controller reset in software
+20014514207i[FDD  ] controller reset in software
+20048204371i[FDD  ] controller reset in software
+20076999997i[FDD  ] controller reset in software
+20105795633i[FDD  ] controller reset in software
+20112913069i[FDD  ] controller reset in software
+20146589448i[FDD  ] controller reset in software
+20175385074i[FDD  ] controller reset in software
+20204180710i[FDD  ] controller reset in software
+20211164636i[FDD  ] controller reset in software
+20244824530i[FDD  ] controller reset in software
+20273620171i[FDD  ] controller reset in software
+20302415807i[FDD  ] controller reset in software
+20309524049i[FDD  ] controller reset in software
+20343209608i[FDD  ] controller reset in software
+20372005249i[FDD  ] controller reset in software
+20400800870i[FDD  ] controller reset in software
+20407794007i[FDD  ] controller reset in software
+20441594676i[FDD  ] controller reset in software
+20470390332i[FDD  ] controller reset in software
+20499185953i[FDD  ] controller reset in software
+20506280398i[FDD  ] controller reset in software
+20540129727i[FDD  ] controller reset in software
+20568925368i[FDD  ] controller reset in software
+20597721004i[FDD  ] controller reset in software
+20604820045i[FDD  ] controller reset in software
+20638664784i[FDD  ] controller reset in software
+20667460410i[FDD  ] controller reset in software
+20696256046i[FDD  ] controller reset in software
+20703244568i[FDD  ] controller reset in software
+20737049842i[FDD  ] controller reset in software
+20765845498i[FDD  ] controller reset in software
+20794641119i[FDD  ] controller reset in software
+20801638853i[FDD  ] controller reset in software
+20835434917i[FDD  ] controller reset in software
+20864230573i[FDD  ] controller reset in software
+20893026194i[FDD  ] controller reset in software
+20900028528i[FDD  ] controller reset in software
+20933820002i[FDD  ] controller reset in software
+20962615643i[FDD  ] controller reset in software
+20991411279i[FDD  ] controller reset in software
+20998418196i[FDD  ] controller reset in software
+21032205065i[FDD  ] controller reset in software
+21061000721i[FDD  ] controller reset in software
+21089796354i[FDD  ] controller reset in software
+21096807871i[FDD  ] controller reset in software
+21130590150i[FDD  ] controller reset in software
+21159385791i[FDD  ] controller reset in software
+21188181412i[FDD  ] controller reset in software
+21195197542i[FDD  ] controller reset in software
+21228975216i[FDD  ] controller reset in software
+21257770872i[FDD  ] controller reset in software
+21286566493i[FDD  ] controller reset in software
+21293587208i[FDD  ] controller reset in software
+21327360292i[FDD  ] controller reset in software
+21356155933i[FDD  ] controller reset in software
+21384951554i[FDD  ] controller reset in software
+21391976882i[FDD  ] controller reset in software
+21425745376i[FDD  ] controller reset in software
+21454541002i[FDD  ] controller reset in software
+21483336638i[FDD  ] controller reset in software
+21490366551i[FDD  ] controller reset in software
+21524130425i[FDD  ] controller reset in software
+21552926081i[FDD  ] controller reset in software
+21581721717i[FDD  ] controller reset in software
+21588756228i[FDD  ] controller reset in software
+21622665497i[FDD  ] controller reset in software
+21651461138i[FDD  ] controller reset in software
+21680256759i[FDD  ] controller reset in software
+21687296014i[FDD  ] controller reset in software
+21721200543i[FDD  ] controller reset in software
+21749996184i[FDD  ] controller reset in software
+21778791820i[FDD  ] controller reset in software
+21785835673i[FDD  ] controller reset in software
+21819735582i[FDD  ] controller reset in software
+21848531223i[FDD  ] controller reset in software
+21877326859i[FDD  ] controller reset in software
+21884375312i[FDD  ] controller reset in software
+21918270646i[FDD  ] controller reset in software
+21947066287i[FDD  ] controller reset in software
+21975861908i[FDD  ] controller reset in software
+21982914971i[FDD  ] controller reset in software
+22016805685i[FDD  ] controller reset in software
+22045601326i[FDD  ] controller reset in software
+22074396962i[FDD  ] controller reset in software
+22081454613i[FDD  ] controller reset in software
+22115340752i[FDD  ] controller reset in software
+22144136378i[FDD  ] controller reset in software
+22172932014i[FDD  ] controller reset in software
+22179994263i[FDD  ] controller reset in software
+22213875797i[FDD  ] controller reset in software
+22242671438i[FDD  ] controller reset in software
+22271467059i[FDD  ] controller reset in software
+22278533925i[FDD  ] controller reset in software
+22312410839i[FDD  ] controller reset in software
+22341206480i[FDD  ] controller reset in software
+22370002116i[FDD  ] controller reset in software
+22377114954i[FDD  ] controller reset in software
+22410945893i[FDD  ] controller reset in software
+22439741519i[FDD  ] controller reset in software
+22468537155i[FDD  ] controller reset in software
+22475608618i[FDD  ] controller reset in software
+22509480942i[FDD  ] controller reset in software
+22538276583i[FDD  ] controller reset in software
+22567072219i[FDD  ] controller reset in software
+22574152864i[FDD  ] controller reset in software
+22608015993i[FDD  ] controller reset in software
+22636811634i[FDD  ] controller reset in software
+22665607270i[FDD  ] controller reset in software
+22672692515i[FDD  ] controller reset in software
+22706551054i[FDD  ] controller reset in software
+22735346680i[FDD  ] controller reset in software
+22764142316i[FDD  ] controller reset in software
+22771232159i[FDD  ] controller reset in software
+22805086093i[FDD  ] controller reset in software
+22833881734i[FDD  ] controller reset in software
+22862677370i[FDD  ] controller reset in software
+22869781011i[FDD  ] controller reset in software
+22903621130i[FDD  ] controller reset in software
+22932416786i[FDD  ] controller reset in software
+22961212422i[FDD  ] controller reset in software
+22968329857i[FDD  ] controller reset in software
+23002156191i[FDD  ] controller reset in software
+23030951847i[FDD  ] controller reset in software
+23059747468i[FDD  ] controller reset in software
+23066731410i[FDD  ] controller reset in software
+23100541274i[FDD  ] controller reset in software
+23129336900i[FDD  ] controller reset in software
+23158132536i[FDD  ] controller reset in software
+23165240777i[FDD  ] controller reset in software
+23199076321i[FDD  ] controller reset in software
+23227871962i[FDD  ] controller reset in software
+23256667598i[FDD  ] controller reset in software
+23263660721i[FDD  ] controller reset in software
+23297461390i[FDD  ] controller reset in software
+23326257031i[FDD  ] controller reset in software
+23355052652i[FDD  ] controller reset in software
+23362147111i[FDD  ] controller reset in software
+23395996440i[FDD  ] controller reset in software
+23424792081i[FDD  ] controller reset in software
+23453587717i[FDD  ] controller reset in software
+23460686759i[FDD  ] controller reset in software
+23494531495i[FDD  ] controller reset in software
+23523327121i[FDD  ] controller reset in software
+23552122757i[FDD  ] controller reset in software
+23559111278i[FDD  ] controller reset in software
+23592916567i[FDD  ] controller reset in software
+23621712208i[FDD  ] controller reset in software
+23650507829i[FDD  ] controller reset in software
+23657505564i[FDD  ] controller reset in software
+23691301628i[FDD  ] controller reset in software
+23720097269i[FDD  ] controller reset in software
+23748892905i[FDD  ] controller reset in software
+23755895238i[FDD  ] controller reset in software
+23789686712i[FDD  ] controller reset in software
+23818482353i[FDD  ] controller reset in software
+23847277989i[FDD  ] controller reset in software
+23854284907i[FDD  ] controller reset in software
+23888071776i[FDD  ] controller reset in software
+23916867432i[FDD  ] controller reset in software
+23945663068i[FDD  ] controller reset in software
+23952674584i[FDD  ] controller reset in software
+23986456863i[FDD  ] controller reset in software
+24015252503i[FDD  ] controller reset in software
+24044048138i[FDD  ] controller reset in software
+24051064254i[FDD  ] controller reset in software
+24084841928i[FDD  ] controller reset in software
+24113637583i[FDD  ] controller reset in software
+24142433203i[FDD  ] controller reset in software
+24149453932i[FDD  ] controller reset in software
+24183227001i[FDD  ] controller reset in software
+24212022656i[FDD  ] controller reset in software
+24240818276i[FDD  ] controller reset in software
+24247843605i[FDD  ] controller reset in software
+24281612084i[FDD  ] controller reset in software
+24310407709i[FDD  ] controller reset in software
+24339203344i[FDD  ] controller reset in software
+24346233256i[FDD  ] controller reset in software
+24379997160i[FDD  ] controller reset in software
+24408792785i[FDD  ] controller reset in software
+24437588420i[FDD  ] controller reset in software
+24444622932i[FDD  ] controller reset in software
+24478532201i[FDD  ] controller reset in software
+24507327841i[FDD  ] controller reset in software
+24536123461i[FDD  ] controller reset in software
+24543162730i[FDD  ] controller reset in software
+24577067244i[FDD  ] controller reset in software
+24605862884i[FDD  ] controller reset in software
+24634658519i[FDD  ] controller reset in software
+24641702388i[FDD  ] controller reset in software
+24675602312i[FDD  ] controller reset in software
+24704397937i[FDD  ] controller reset in software
+24733193572i[FDD  ] controller reset in software
+24740242024i[FDD  ] controller reset in software
+24774137358i[FDD  ] controller reset in software
+24802932998i[FDD  ] controller reset in software
+24831728633i[FDD  ] controller reset in software
+24838781685i[FDD  ] controller reset in software
+24872672399i[FDD  ] controller reset in software
+24901468039i[FDD  ] controller reset in software
+24930263674i[FDD  ] controller reset in software
+24937321324i[FDD  ] controller reset in software
+24971207463i[FDD  ] controller reset in software
+25000003088i[FDD  ] controller reset in software
+25028798723i[FDD  ] controller reset in software
+25035860973i[FDD  ] controller reset in software
+25069742507i[FDD  ] controller reset in software
+25098538147i[FDD  ] controller reset in software
+25127333782i[FDD  ] controller reset in software
+25134400632i[FDD  ] controller reset in software
+25168277546i[FDD  ] controller reset in software
+25197073186i[FDD  ] controller reset in software
+25225868821i[FDD  ] controller reset in software
+25232981660i[FDD  ] controller reset in software
+25266812614i[FDD  ] controller reset in software
+25295608254i[FDD  ] controller reset in software
+25324403874i[FDD  ] controller reset in software
+25331475336i[FDD  ] controller reset in software
+25365347645i[FDD  ] controller reset in software
+25394143297i[FDD  ] controller reset in software
+25422938932i[FDD  ] controller reset in software
+25430019578i[FDD  ] controller reset in software
+25463882707i[FDD  ] controller reset in software
+25492678347i[FDD  ] controller reset in software
+25521473979i[FDD  ] controller reset in software
+25528559223i[FDD  ] controller reset in software
+25562417762i[FDD  ] controller reset in software
+25591213402i[FDD  ] controller reset in software
+25620009022i[FDD  ] controller reset in software
+25627098881i[FDD  ] controller reset in software
+25660952800i[FDD  ] controller reset in software
+25689748440i[FDD  ] controller reset in software
+25718544075i[FDD  ] controller reset in software
+25725647730i[FDD  ] controller reset in software
+25759487864i[FDD  ] controller reset in software
+25788283489i[FDD  ] controller reset in software
+25817079124i[FDD  ] controller reset in software
+25824196560i[FDD  ] controller reset in software
+25858022909i[FDD  ] controller reset in software
+25886818549i[FDD  ] controller reset in software
+25915614169i[FDD  ] controller reset in software
+25922598110i[FDD  ] controller reset in software
+25956407986i[FDD  ] controller reset in software
+25985203626i[FDD  ] controller reset in software
+26013999246i[FDD  ] controller reset in software
+26021107503i[FDD  ] controller reset in software
+26054943032i[FDD  ] controller reset in software
+26083738672i[FDD  ] controller reset in software
+26112534307i[FDD  ] controller reset in software
+26119527429i[FDD  ] controller reset in software
+26153328098i[FDD  ] controller reset in software
+26182123753i[FDD  ] controller reset in software
+26210919388i[FDD  ] controller reset in software
+26218013833i[FDD  ] controller reset in software
+26251863147i[FDD  ] controller reset in software
+26280658787i[FDD  ] controller reset in software
+26309454422i[FDD  ] controller reset in software
+26316553463i[FDD  ] controller reset in software
+26350398202i[FDD  ] controller reset in software
+26379193857i[FDD  ] controller reset in software
+26407989477i[FDD  ] controller reset in software
+26414978014i[FDD  ] controller reset in software
+26448783288i[FDD  ] controller reset in software
+26477578913i[FDD  ] controller reset in software
+26506374548i[FDD  ] controller reset in software
+26513372267i[FDD  ] controller reset in software
+26547168361i[FDD  ] controller reset in software
+26575963986i[FDD  ] controller reset in software
+26604759621i[FDD  ] controller reset in software
+26611761940i[FDD  ] controller reset in software
+26645553414i[FDD  ] controller reset in software
+26674349054i[FDD  ] controller reset in software
+26703144689i[FDD  ] controller reset in software
+26710151621i[FDD  ] controller reset in software
+26743938490i[FDD  ] controller reset in software
+26772734130i[FDD  ] controller reset in software
+26801529765i[FDD  ] controller reset in software
+26808541297i[FDD  ] controller reset in software
+26842323561i[FDD  ] controller reset in software
+26871119216i[FDD  ] controller reset in software
+26899914851i[FDD  ] controller reset in software
+26906930966i[FDD  ] controller reset in software
+26940708640i[FDD  ] controller reset in software
+26969504280i[FDD  ] controller reset in software
+26998299915i[FDD  ] controller reset in software
+27005320645i[FDD  ] controller reset in software
+27039093714i[FDD  ] controller reset in software
+27067889354i[FDD  ] controller reset in software
+27096684974i[FDD  ] controller reset in software
+27103710317i[FDD  ] controller reset in software
+27137478796i[FDD  ] controller reset in software
+27166274436i[FDD  ] controller reset in software
+27195070056i[FDD  ] controller reset in software
+27202099981i[FDD  ] controller reset in software
+27235863870i[FDD  ] controller reset in software
+27264659510i[FDD  ] controller reset in software
+27293455130i[FDD  ] controller reset in software
+27300489641i[FDD  ] controller reset in software
+27334398910i[FDD  ] controller reset in software
+27363194550i[FDD  ] controller reset in software
+27391990185i[FDD  ] controller reset in software
+27399029455i[FDD  ] controller reset in software
+27432933954i[FDD  ] controller reset in software
+27461729594i[FDD  ] controller reset in software
+27490525229i[FDD  ] controller reset in software
+27497569097i[FDD  ] controller reset in software
+27531618991i[FDD  ] controller reset in software
+27560414631i[FDD  ] controller reset in software
+27589210266i[FDD  ] controller reset in software
+27596258719i[FDD  ] controller reset in software
+27630304023i[FDD  ] controller reset in software
+27659099663i[FDD  ] controller reset in software
+27687895298i[FDD  ] controller reset in software
+27694948349i[FDD  ] controller reset in software
+27728989048i[FDD  ] controller reset in software
+27757784688i[FDD  ] controller reset in software
+27786580323i[FDD  ] controller reset in software
+27793637974i[FDD  ] controller reset in software
+27827674083i[FDD  ] controller reset in software
+27856469723i[FDD  ] controller reset in software
+27885265343i[FDD  ] controller reset in software
+27892327607i[FDD  ] controller reset in software
+27926359111i[FDD  ] controller reset in software
+27955154736i[FDD  ] controller reset in software
+27983950371i[FDD  ] controller reset in software
+27991017222i[FDD  ] controller reset in software
+28025044136i[FDD  ] controller reset in software
+28053839761i[FDD  ] controller reset in software
+28082635396i[FDD  ] controller reset in software
+28089748234i[FDD  ] controller reset in software
+28123729158i[FDD  ] controller reset in software
+28152524798i[FDD  ] controller reset in software
+28181320433i[FDD  ] controller reset in software
+28188391881i[FDD  ] controller reset in software
+28222414175i[FDD  ] controller reset in software
+28251209830i[FDD  ] controller reset in software
+28280005465i[FDD  ] controller reset in software
+28287086110i[FDD  ] controller reset in software
+28321099209i[FDD  ] controller reset in software
+28349894849i[FDD  ] controller reset in software
+28378690496i[FDD  ] controller reset in software
+28385775741i[FDD  ] controller reset in software
+28419784235i[FDD  ] controller reset in software
+28448579890i[FDD  ] controller reset in software
+28477375510i[FDD  ] controller reset in software
+28484465368i[FDD  ] controller reset in software
+28518469272i[FDD  ] controller reset in software
+28547264912i[FDD  ] controller reset in software
+28576060532i[FDD  ] controller reset in software
+28583164173i[FDD  ] controller reset in software
+28617154307i[FDD  ] controller reset in software
+28645949932i[FDD  ] controller reset in software
+28674745567i[FDD  ] controller reset in software
+28681863002i[FDD  ] controller reset in software
+28715839321i[FDD  ] controller reset in software
+28744634961i[FDD  ] controller reset in software
+28773430596i[FDD  ] controller reset in software
+28780414523i[FDD  ] controller reset in software
+28814374372i[FDD  ] controller reset in software
+28843170027i[FDD  ] controller reset in software
+28871965647i[FDD  ] controller reset in software
+28879073903i[FDD  ] controller reset in software
+28913059402i[FDD  ] controller reset in software
+28941855042i[FDD  ] controller reset in software
+28970650677i[FDD  ] controller reset in software
+28977643800i[FDD  ] controller reset in software
+29011594454i[FDD  ] controller reset in software
+29040390094i[FDD  ] controller reset in software
+29069185729i[FDD  ] controller reset in software
+29076280173i[FDD  ] controller reset in software
+29110279487i[FDD  ] controller reset in software
+29139075127i[FDD  ] controller reset in software
+29167870747i[FDD  ] controller reset in software
+29174969804i[FDD  ] controller reset in software
+29208964513i[FDD  ] controller reset in software
+29237760138i[FDD  ] controller reset in software
+29266555773i[FDD  ] controller reset in software
+29273544294i[FDD  ] controller reset in software
+29307499553i[FDD  ] controller reset in software
+29336295208i[FDD  ] controller reset in software
+29365090843i[FDD  ] controller reset in software
+29372088563i[FDD  ] controller reset in software
+29406034597i[FDD  ] controller reset in software
+29434830252i[FDD  ] controller reset in software
+29463625887i[FDD  ] controller reset in software
+29470628205i[FDD  ] controller reset in software
+29504569664i[FDD  ] controller reset in software
+29533365304i[FDD  ] controller reset in software
+29562160924i[FDD  ] controller reset in software
+29569167857i[FDD  ] controller reset in software
+29603104711i[FDD  ] controller reset in software
+29631900351i[FDD  ] controller reset in software
+29660695986i[FDD  ] controller reset in software
+29667707502i[FDD  ] controller reset in software
+29701639766i[FDD  ] controller reset in software
+29730435391i[FDD  ] controller reset in software
+29759231026i[FDD  ] controller reset in software
+29766247142i[FDD  ] controller reset in software
+29800174816i[FDD  ] controller reset in software
+29828970456i[FDD  ] controller reset in software
+29857766076i[FDD  ] controller reset in software
+29864786805i[FDD  ] controller reset in software
+29898709856i[FDD  ] controller reset in software
+29927505496i[FDD  ] controller reset in software
+29956301131i[FDD  ] controller reset in software
+29963326445i[FDD  ] controller reset in software
+29997244924i[FDD  ] controller reset in software
+30026040549i[FDD  ] controller reset in software
+30054836184i[FDD  ] controller reset in software
+30061866096i[FDD  ] controller reset in software
+30095779952i[FDD  ] controller reset in software
+30124575607i[FDD  ] controller reset in software
+30153371227i[FDD  ] controller reset in software
+30160405754i[FDD  ] controller reset in software
+30194464993i[FDD  ] controller reset in software
+30223260633i[FDD  ] controller reset in software
+30252056253i[FDD  ] controller reset in software
+30259095522i[FDD  ] controller reset in software
+30293150021i[FDD  ] controller reset in software
+30321945646i[FDD  ] controller reset in software
+30350741278i[FDD  ] controller reset in software
+30357785147i[FDD  ] controller reset in software
+30391835056i[FDD  ] controller reset in software
+30420630681i[FDD  ] controller reset in software
+30449426316i[FDD  ] controller reset in software
+30456474768i[FDD  ] controller reset in software
+30490520072i[FDD  ] controller reset in software
+30519315712i[FDD  ] controller reset in software
+30548111347i[FDD  ] controller reset in software
+30555164399i[FDD  ] controller reset in software
+30589205098i[FDD  ] controller reset in software
+30618000738i[FDD  ] controller reset in software
+30646796373i[FDD  ] controller reset in software
+30653854023i[FDD  ] controller reset in software
+30687890132i[FDD  ] controller reset in software
+30716685772i[FDD  ] controller reset in software
+30745481407i[FDD  ] controller reset in software
+30752543657i[FDD  ] controller reset in software
+30786575161i[FDD  ] controller reset in software
+30815370801i[FDD  ] controller reset in software
+30844166421i[FDD  ] controller reset in software
+30851233286i[FDD  ] controller reset in software
+30885260185i[FDD  ] controller reset in software
+30914055810i[FDD  ] controller reset in software
+30942851445i[FDD  ] controller reset in software
+30949964299i[FDD  ] controller reset in software
+30983945223i[FDD  ] controller reset in software
+31012740848i[FDD  ] controller reset in software
+31041536483i[FDD  ] controller reset in software
+31048607930i[FDD  ] controller reset in software
+31082630239i[FDD  ] controller reset in software
+31111425879i[FDD  ] controller reset in software
+31140221514i[FDD  ] controller reset in software
+31147302160i[FDD  ] controller reset in software
+31181315259i[FDD  ] controller reset in software
+31210110899i[FDD  ] controller reset in software
+31238906534i[FDD  ] controller reset in software
+31245991793i[FDD  ] controller reset in software
+31280000287i[FDD  ] controller reset in software
+31308795942i[FDD  ] controller reset in software
+31324035000p[WGUI ] >>PANIC<< Window closed, exiting!
+31324035000i[SYS  ] Last time is 1208998712
+31324035000i[CPU0 ] protected mode
+31324035000i[CPU0 ] CS.d_b = 32 bit
+31324035000i[CPU0 ] SS.d_b = 32 bit
+31324035000i[CPU0 ] | EAX=00000247  EBX=00000000  ECX=00000000  EDX=00000000
+31324035000i[CPU0 ] | ESP=00379118  EBP=00379118  ESI=00000000  EDI=00000001
+31324035000i[CPU0 ] | IOPL=0 id vip vif ac vm rf nt of df IF tf sf zf af pf cf
+31324035000i[CPU0 ] | SEG selector     base    limit G D
+31324035000i[CPU0 ] | SEG sltr(index|ti|rpl)     base    limit G D
+31324035000i[CPU0 ] |  CS:0038( 0007| 0|  0) 00000000 000fffff 1 1
+31324035000i[CPU0 ] |  DS:0030( 0006| 0|  0) 00000000 000fffff 1 1
+31324035000i[CPU0 ] |  SS:0030( 0006| 0|  0) 00000000 000fffff 1 1
+31324035000i[CPU0 ] |  ES:0030( 0006| 0|  0) 00000000 000fffff 1 1
+31324035000i[CPU0 ] |  FS:0030( 0006| 0|  0) 00000000 000fffff 1 1
+31324035000i[CPU0 ] |  GS:0030( 0006| 0|  0) 00000000 000fffff 1 1
+31324035000i[CPU0 ] | EIP=001058b7 (001058b7)
+31324035000i[CPU0 ] | CR0=0x00000033 CR1=0 CR2=0x00000000
+31324035000i[CPU0 ] | CR3=0x00000000 CR4=0x00000000
+31324035000i[CPU0 ] >> pop ebp : 5D
+31324035000i[CTRL ] quit_sim called with exit code 1

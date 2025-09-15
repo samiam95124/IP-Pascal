@@ -1,0 +1,29 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                                              !
+! This is the pc instruction file                                              !
+!                                                                              !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!
+! Declare the main library and protect it from recompiles
+!
+usespath ".,c:\ip\windows\i80386\lib"
+exclude "c:\ip\windows\i80386\lib"
+
+!
+! Declare packaged libraries
+!
+package "c:\ip\windows\i80386\lib\serlib"= \
+           "c:\ip\windows\i80386\lib\windows" \
+           "c:\ip\windows\i80386\lib\syslib" \
+           "c:\ip\windows\i80386\lib\paslib"
+
+package "c:\ip\windows\i80386\lib\trmlib"= \
+           "c:\ip\windows\i80386\lib\windows" \
+           "c:\ip\windows\i80386\lib\syslib" \
+           "c:\ip\windows\i80386\lib\paslib" \
+
+package "c:\ip\windows\i80386\lib\gralib"= \
+           "c:\ip\windows\i80386\lib\windows" \
+           "c:\ip\windows\i80386\lib\syslib" \
+           "c:\ip\windows\i80386\lib\paslib" 
