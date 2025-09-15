@@ -4,6 +4,36 @@
 
 ********************************************************************************
 
+Notes from 2025/09/14 push
+
+IP Pascal is a large system for Pascal language used from about 1993 to 2010.
+Its a very complex, but well structured and well commented compiler. It
+continued on the original compiler created in 1980, but it is written in Pascal
+itself. The language of IP Pascal started with ISO 7185 Pascal and included a
+modest number of extensions, most importantly
+
+-Modularity
+-Container arrays of any length.
+
+Based on IP Pascal, a new level of extensions for Pascal was created called
+"Pascaline". IP was partially converted to Pascaline, but it remains a 32 bit 
+x86 compiler. The language Pascaline is currently being implemented in 
+Pascal-P6, which is in another archive in this repo. The plan is that after
+Pascal-P6 implements all of Pascaline, that this more extensive compiler will
+be updated to that language as well.
+
+IP Pascal is a different kind of compiler. It outputs code directly to a binary
+file that can be linked. This is far faster than going through an assembler, but
+also much more complex.
+
+There is also an assembler and linker that goes with IP Pascal. In addition,
+IP Pascal has a lot of support programs that will end up running under Pascal-P6
+I am sure. It has a compiler integrator (pc), a graphical IDE, and a ch2ph or
+C header to Pascal header convertor that I am sure will also find its way to
+Pascal-P6.
+
+********************************************************************************
+
 ch2ph
 check_encoder
 common_headers
