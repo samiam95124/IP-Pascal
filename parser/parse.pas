@@ -157,8 +157,6 @@ begin
    uselvl  := 0; { set no uses active (level 0) }
    modhead := cundefined; { set module type }
    modcnt  := 0; { clear module ordinal }
-   langmsg := lang_english; { set english messages }
-   langkey := lang_english; { set english language keywords }
    privat  := false; { set in public declaration section }
 
    { Determine the number of bits and bytes in an integer, not including the
@@ -330,139 +328,71 @@ begin
    deftbl[ccln]        := copy(':');
    deftbl[ccmf]        := copy('^');
    deftbl[crange]      := copy('..');
-   if langkey = lang_french then begin
 
-      deftbl[cdiv]        := copy('div');
-      deftbl[cmod]        := copy('mod');
-      deftbl[cnil]        := copy('nul');
-      deftbl[cin]         := copy('en');
-      deftbl[cor]         := copy('ou');
-      deftbl[cand]        := copy('et');
-      deftbl[cxor]        := copy('xou');
-      deftbl[cnot]        := copy('non');
-      deftbl[cif]         := copy('si');
-      deftbl[cthen]       := copy('alors');
-      deftbl[celse]       := copy('sinon');
-      deftbl[ccase]       := copy('cas');
-      deftbl[cof]         := copy('de');
-      deftbl[crepeat]     := copy('répéter');
-      deftbl[cuntil]      := copy('jusquà');
-      deftbl[cwhile]      := copy('pendant');
-      deftbl[cdo]         := copy('faire');
-      deftbl[cfor]        := copy('for');
-      deftbl[cto]         := copy('hautà');
-      deftbl[cdownto]     := copy('basà');
-      deftbl[cbegin]      := copy('début');
-      deftbl[cend]        := copy('fin');
-      deftbl[cwith]       := copy('avec');
-      deftbl[cgoto]       := copy('allerà');
-      deftbl[cconst]      := copy('const');
-      deftbl[cvar]        := copy('var');
-      deftbl[ctype]       := copy('type');
-      deftbl[carray]      := copy('tableau');
-      deftbl[crecord]     := copy('fiche');
-      deftbl[cset]        := copy('ensemble');
-      deftbl[cfile]       := copy('fichier');
-      deftbl[cfunction]   := copy('fonction');
-      deftbl[cprocedure]  := copy('procédure');
-      deftbl[clabel]      := copy('étiquette');
-      deftbl[cpacked]     := copy('bondé');
-      deftbl[cprogram]    := copy('programme');
-      deftbl[cforward]    := copy('avancer');
-      deftbl[cmodule]     := copy('module');
-      deftbl[cuses]       := copy('emploi');
-      deftbl[cprivate]    := copy('privé');
-      deftbl[cextern]     := copy('externe');
-      deftbl[cview]       := copy('vue');
-      deftbl[cfixed]      := copy('fixe');
-      deftbl[cprocess]    := copy('procés');
-      deftbl[cmonitor]    := copy('moniteur');
-      deftbl[cshare]      := copy('partager');
-      deftbl[cclass]      := copy('classe');
-      deftbl[cis]         := copy('est');
-      deftbl[catom]       := copy('atome');
-      deftbl[coverload]   := copy('surcharger');
-      deftbl[coverride]   := copy('remplacer');
-      deftbl[creference]  := copy('référence');
-      deftbl[cthread]     := copy('fil');
-      deftbl[cjoins]      := copy('joindre');
-      deftbl[cstatic]     := copy('statique');
-      deftbl[cinherited]  := copy('herité');
-      deftbl[cself]       := copy('cellci');
-      deftbl[cvirtual]    := copy('virtuel');
-      deftbl[ctry]        := copy('essai');
-      deftbl[cexcept]     := copy('excepter');
-      deftbl[cextends]    := copy('prolonger');
-      deftbl[cresult]     := copy('résultat');
-      deftbl[con]         := copy('sur');
-
-   end else begin { english }
-
-      deftbl[cdiv]        := copy('div');
-      deftbl[cmod]        := copy('mod');
-      deftbl[cnil]        := copy('nil');
-      deftbl[cin]         := copy('in');
-      deftbl[cor]         := copy('or');
-      deftbl[cand]        := copy('and');
-      deftbl[cxor]        := copy('xor');
-      deftbl[cnot]        := copy('not');
-      deftbl[cif]         := copy('if');
-      deftbl[cthen]       := copy('then');
-      deftbl[celse]       := copy('else');
-      deftbl[ccase]       := copy('case');
-      deftbl[cof]         := copy('of');
-      deftbl[crepeat]     := copy('repeat');
-      deftbl[cuntil]      := copy('until');
-      deftbl[cwhile]      := copy('while');
-      deftbl[cdo]         := copy('do');
-      deftbl[cfor]        := copy('for');
-      deftbl[cto]         := copy('to');
-      deftbl[cdownto]     := copy('downto');
-      deftbl[cbegin]      := copy('begin');
-      deftbl[cend]        := copy('end');
-      deftbl[cwith]       := copy('with');
-      deftbl[cgoto]       := copy('goto');
-      deftbl[cconst]      := copy('const');
-      deftbl[cvar]        := copy('var');
-      deftbl[ctype]       := copy('type');
-      deftbl[carray]      := copy('array');
-      deftbl[crecord]     := copy('record');
-      deftbl[cset]        := copy('set');
-      deftbl[cfile]       := copy('file');
-      deftbl[cfunction]   := copy('function');
-      deftbl[cprocedure]  := copy('procedure');
-      deftbl[clabel]      := copy('label');
-      deftbl[cpacked]     := copy('packed');
-      deftbl[cprogram]    := copy('program');
-      deftbl[cforward]    := copy('forward');
-      deftbl[cmodule]     := copy('module');
-      deftbl[cuses]       := copy('uses');
-      deftbl[cprivate]    := copy('private');
-      deftbl[cextern]     := copy('external');
-      deftbl[cview]       := copy('view');
-      deftbl[cfixed]      := copy('fixed');
-      deftbl[cprocess]    := copy('process');
-      deftbl[cmonitor]    := copy('monitor');
-      deftbl[cshare]      := copy('share');
-      deftbl[cclass]      := copy('class');
-      deftbl[cis]         := copy('is');
-      deftbl[catom]       := copy('atom');
-      deftbl[coverload]   := copy('overload');
-      deftbl[coverride]   := copy('override');
-      deftbl[creference]  := copy('reference');
-      deftbl[cthread]     := copy('thread');
-      deftbl[cjoins]      := copy('joins');
-      deftbl[cstatic]     := copy('static');
-      deftbl[cinherited]  := copy('inherited');
-      deftbl[cself]       := copy('self');
-      deftbl[cvirtual]    := copy('virtual');
-      deftbl[ctry]        := copy('try');
-      deftbl[cexcept]     := copy('except');
-      deftbl[cextends]    := copy('extends');
-      deftbl[cresult]     := copy('result');
-      deftbl[con]         := copy('on');
-     
-   end;
+   deftbl[cdiv]        := copy('div');
+   deftbl[cmod]        := copy('mod');
+   deftbl[cnil]        := copy('nil');
+   deftbl[cin]         := copy('in');
+   deftbl[cor]         := copy('or');
+   deftbl[cand]        := copy('and');
+   deftbl[cxor]        := copy('xor');
+   deftbl[cnot]        := copy('not');
+   deftbl[cif]         := copy('if');
+   deftbl[cthen]       := copy('then');
+   deftbl[celse]       := copy('else');
+   deftbl[ccase]       := copy('case');
+   deftbl[cof]         := copy('of');
+   deftbl[crepeat]     := copy('repeat');
+   deftbl[cuntil]      := copy('until');
+   deftbl[cwhile]      := copy('while');
+   deftbl[cdo]         := copy('do');
+   deftbl[cfor]        := copy('for');
+   deftbl[cto]         := copy('to');
+   deftbl[cdownto]     := copy('downto');
+   deftbl[cbegin]      := copy('begin');
+   deftbl[cend]        := copy('end');
+   deftbl[cwith]       := copy('with');
+   deftbl[cgoto]       := copy('goto');
+   deftbl[cconst]      := copy('const');
+   deftbl[cvar]        := copy('var');
+   deftbl[ctype]       := copy('type');
+   deftbl[carray]      := copy('array');
+   deftbl[crecord]     := copy('record');
+   deftbl[cset]        := copy('set');
+   deftbl[cfile]       := copy('file');
+   deftbl[cfunction]   := copy('function');
+   deftbl[cprocedure]  := copy('procedure');
+   deftbl[clabel]      := copy('label');
+   deftbl[cpacked]     := copy('packed');
+   deftbl[cprogram]    := copy('program');
+   deftbl[cforward]    := copy('forward');
+   deftbl[cmodule]     := copy('module');
+   deftbl[cuses]       := copy('uses');
+   deftbl[cprivate]    := copy('private');
+   deftbl[cextern]     := copy('external');
+   deftbl[cview]       := copy('view');
+   deftbl[cfixed]      := copy('fixed');
+   deftbl[cprocess]    := copy('process');
+   deftbl[cmonitor]    := copy('monitor');
+   deftbl[cshare]      := copy('share');
+   deftbl[cclass]      := copy('class');
+   deftbl[cis]         := copy('is');
+   deftbl[catom]       := copy('atom');
+   deftbl[coverload]   := copy('overload');
+   deftbl[coverride]   := copy('override');
+   deftbl[creference]  := copy('reference');
+   deftbl[cthread]     := copy('thread');
+   deftbl[cjoins]      := copy('joins');
+   deftbl[cstatic]     := copy('static');
+   deftbl[cinherited]  := copy('inherited');
+   deftbl[cself]       := copy('self');
+   deftbl[cvirtual]    := copy('virtual');
+   deftbl[ctry]        := copy('try');
+   deftbl[cexcept]     := copy('except');
+   deftbl[cextends]    := copy('extends');
+   deftbl[cresult]     := copy('result');
+   deftbl[con]         := copy('on');
+  
    deftbl[cinteger]    := copy('');
    deftbl[cidentifier] := copy('');
    deftbl[cstring]     := copy('');
@@ -553,22 +483,19 @@ begin
    bsp^.typ := btp; { link to type }
    blkstk^.mark := btp; { fix mark type }
 
-   if langkey = lang_french then copy(nxtlab, 'booléen')
-   else copy(nxtlab, 'boolean');
+   copy(nxtlab, 'boolean');
    plcsym(nxtlab, sp);
    lsttyp(tp, tboolean); { boolean }
    sp^.typ := tp; { link to symbol }
    gblbool := tp; { place global root }
 
-   if langkey = lang_french then copy(nxtlab, 'faux')
-   else copy(nxtlab, 'false');
+   copy(nxtlab, 'false');
    plcsym(nxtlab, sp);
    lsttyp(tp1, tenme); { false }
    sp^.typ := tp1; { link to symbol }
    gblfalse := tp1; { place global root }
 
-   if langkey = lang_french then copy(nxtlab, 'vrai')
-   else copy(nxtlab, 'true');
+   copy(nxtlab, 'true');
    plcsym(nxtlab, sp);
    lsttyp(tp2, tenme); { true }
    sp^.typ := tp2; { link to symbol }
@@ -581,116 +508,100 @@ begin
    tp2^.env := 1; { place value true }
    tp2^.enx := nil; { place next true (end) }
 
-   if langkey = lang_french then copy(nxtlab, 'entier')
-   else copy(nxtlab, 'integer');
+   copy(nxtlab, 'integer');
    plcsym(nxtlab, sp);
    lsttyp(tp, tinteger); { get type }
    sp^.typ := tp; { link to symbol }
    gblint := tp; { place global root }
 
-   if langkey = lang_french then copy(nxtlab, 'lentier')
-   else copy(nxtlab, 'linteger');
+   copy(nxtlab, 'linteger');
    plcsym(nxtlab, sp);
    lsttyp(tp, tlinteger); { get type }
    sp^.typ := tp; { link to symbol }
    gbllint := tp; { place global root }
 
-   if langkey = lang_french then copy(nxtlab, 'cardinal')
-   else copy(nxtlab, 'cardinal');
+   copy(nxtlab, 'cardinal');
    plcsym(nxtlab, sp);
    lsttyp(tp, tcardinal); { get type }
    sp^.typ := tp; { link to symbol }
    gblcard := tp; { place global root }
 
-   if langkey = lang_french then copy(nxtlab, 'lcardinal')
-   else copy(nxtlab, 'lcardinal');
+   copy(nxtlab, 'lcardinal');
    plcsym(nxtlab, sp);
    lsttyp(tp, tlcardinal); { get type }
    sp^.typ := tp; { link to symbol }
    gbllcard := tp; { place global root }
 
-   if langkey = lang_french then copy(nxtlab, 'carac')
-   else copy(nxtlab, 'char');
+   copy(nxtlab, 'char');
    plcsym(nxtlab, sp);
    lsttyp(tp, tchar); { get type }
    sp^.typ := tp; { link to symbol }
    gblchr := tp; { place global root }
 
-   if langkey = lang_french then copy(nxtlab, 'maxcar')
-   else copy(nxtlab, 'maxchr');
+   copy(nxtlab, 'maxchr');
    plcsym(nxtlab, sp);
    lsttyp(tp, ticst); { maxchr }
    tp^.ival.v := 255; { place value }
    tp^.ival.s := false;
    sp^.typ := tp; { link to symbol }
 
-   if langkey = lang_french then copy(nxtlab, 'reel')
-   else copy(nxtlab, 'real');
+   copy(nxtlab, 'real');
    plcsym(nxtlab, sp);
    lsttyp(tp, treal); { get type }
    sp^.typ := tp; { link to symbol }
    gblreal := tp; { place global root }
 
-   if langkey = lang_french then copy(nxtlab, 'texte')
-   else copy(nxtlab, 'text');
+   copy(nxtlab, 'text');
    plcsym(nxtlab, sp);
    lsttyp(tp, ttext); { get type }
    sp^.typ := tp; { link to symbol }
    gbltxt := tp; { place global root }
 
-   if langkey = lang_french then copy(nxtlab, 'creal')
-   else copy(nxtlab, 'sreal');
+   copy(nxtlab, 'sreal');
    plcsym(nxtlab, sp);
    lsttyp(tp, tsreal); { get type }
    sp^.typ := tp; { link to symbol }
    gblsrl := tp; { place global root }
 
-   if langkey = lang_french then copy(nxtlab, 'maxent')
-   else copy(nxtlab, 'maxint');
+   copy(nxtlab, 'maxint');
    plcsym(nxtlab, sp);
    lsttyp(tp, ticst); { maxint }
    tp^.ival.v := maxint; { place value }
    tp^.ival.s := false;
    sp^.typ := tp; { link to symbol }
 
-   if langkey = lang_french then copy(nxtlab, 'maxlent')
-   else copy(nxtlab, 'maxlint');
+   copy(nxtlab, 'maxlint');
    plcsym(nxtlab, sp);
    lsttyp(tp, ticst); { maxlint }
    tp^.ival.v := maxint; { place value }
    tp^.ival.s := false;
    sp^.typ := tp; { link to symbol }
 
-   if langkey = lang_french then copy(nxtlab, 'maxcrd')
-   else copy(nxtlab, 'maxcrd');
+   copy(nxtlab, 'maxcrd');
    plcsym(nxtlab, sp);
    lsttyp(tp, ticst); { maxcard }
    tp^.ival.v := maxint; { place value }
    tp^.ival.s := false;
    sp^.typ := tp; { link to symbol }
 
-   if langkey = lang_french then copy(nxtlab, 'maxlcrd')
-   else copy(nxtlab, 'maxlcrd');
+   copy(nxtlab, 'maxlcrd');
    plcsym(nxtlab, sp);
    lsttyp(tp, ticst); { maxlcard }
    tp^.ival.v := maxint; { place value }
    tp^.ival.s := false;
    sp^.typ := tp; { link to symbol }
 
-   if langkey = lang_french then copy(nxtlab, 'semaphore')
-   else copy(nxtlab, 'semaphore');
+   copy(nxtlab, 'semaphore');
    plcsym(nxtlab, sp);
    lsttyp(tp, tsemaphore); { get type }
    sp^.typ := tp; { link to symbol }
 
-   if langkey = lang_french then copy(nxtlab, 'exception')
-   else copy(nxtlab, 'exception');
+   copy(nxtlab, 'exception');
    plcsym(nxtlab, sp);
    lsttyp(tp, texception); { get type }
    sp^.typ := tp; { link to symbol }
 
-   if langkey = lang_french then copy(nxtlab, 'abs')
-   else copy(nxtlab, 'abs');
+   copy(nxtlab, 'abs');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -698,8 +609,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfabs; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'arctan')
-   else copy(nxtlab, 'arctan');
+   copy(nxtlab, 'arctan');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -707,8 +617,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfarctan; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'car')
-   else copy(nxtlab, 'chr');
+   copy(nxtlab, 'chr');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -716,8 +625,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfchr; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'cos')
-   else copy(nxtlab, 'cos');
+   copy(nxtlab, 'cos');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -725,8 +633,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfcos; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'fdf')
-   else copy(nxtlab, 'eof');
+   copy(nxtlab, 'eof');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -734,8 +641,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfeof; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'fdln')
-   else copy(nxtlab, 'eoln');
+   copy(nxtlab, 'eoln');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -743,8 +649,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfeoln; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'exp')
-   else copy(nxtlab, 'exp');
+   copy(nxtlab, 'exp');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -752,8 +657,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfexp; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'ln')
-   else copy(nxtlab, 'ln');
+   copy(nxtlab, 'ln');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -761,8 +665,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfln; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'impair')
-   else copy(nxtlab, 'odd');
+   copy(nxtlab, 'odd');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -770,8 +673,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfodd; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'ord')
-   else copy(nxtlab, 'ord');
+   copy(nxtlab, 'ord');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -779,8 +681,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pford; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'avant')
-   else copy(nxtlab, 'pred');
+   copy(nxtlab, 'pred');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -788,8 +689,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfpred; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'arrondi')
-   else copy(nxtlab, 'round');
+   copy(nxtlab, 'round');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -797,8 +697,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfround; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'sin')
-   else copy(nxtlab, 'sin');
+   copy(nxtlab, 'sin');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -806,8 +705,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfsin; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'carré')
-   else copy(nxtlab, 'sqr');
+   copy(nxtlab, 'sqr');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -815,8 +713,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfsqr; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'rcarré')
-   else copy(nxtlab, 'sqrt');
+   copy(nxtlab, 'sqrt');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -824,8 +721,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfsqrt; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'aprés')
-   else copy(nxtlab, 'succ');
+   copy(nxtlab, 'succ');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -833,8 +729,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfsucc; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'tronquer')
-   else copy(nxtlab, 'trunc');
+   copy(nxtlab, 'trunc');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -842,8 +737,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pftrunc; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'existant')
-   else copy(nxtlab, 'exists');
+   copy(nxtlab, 'exists');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -851,8 +745,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfexists; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'doù')
-   else copy(nxtlab, 'location');
+   copy(nxtlab, 'location');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -860,8 +753,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pflocation; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'longueur')
-   else copy(nxtlab, 'length');
+   copy(nxtlab, 'length');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -869,8 +761,7 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pflength; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'max')
-   else copy(nxtlab, 'max');
+   copy(nxtlab, 'max');
    plcsym(nxtlab, sp);
    lsttyp(tp, tfunc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -878,216 +769,189 @@ begin
    tp^.fncr := gbludf; { clear result }
    tp^.fncd := pfmax; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'débarrasser')
-   else copy(nxtlab, 'dispose');
+   copy(nxtlab, 'dispose');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfdispose; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'prendre')
-   else copy(nxtlab, 'get');
+   copy(nxtlab, 'get');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfget; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'neuf')
-   else copy(nxtlab, 'new');
+   copy(nxtlab, 'new');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfnew; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'compresser')
-   else copy(nxtlab, 'pack');
+   copy(nxtlab, 'pack');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfpack; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'page')
-   else copy(nxtlab, 'page');
+   copy(nxtlab, 'page');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfpage; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'mettre')
-   else copy(nxtlab, 'put');
+   copy(nxtlab, 'put');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfput; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'lire')
-   else copy(nxtlab, 'read');
+   copy(nxtlab, 'read');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfread; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'lireln')
-   else copy(nxtlab, 'readln');
+   copy(nxtlab, 'readln');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfreadln; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'relire')
-   else copy(nxtlab, 'reset');
+   copy(nxtlab, 'reset');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfreset; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'réécrire')
-   else copy(nxtlab, 'rewrite');
+   copy(nxtlab, 'rewrite');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfrewrite; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'décompresser')
-   else copy(nxtlab, 'unpack');
+   copy(nxtlab, 'unpack');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfunpack; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'écrire')
-   else copy(nxtlab, 'write');
+   copy(nxtlab, 'write');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfwrite; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'écrireln')
-   else copy(nxtlab, 'writeln');
+   copy(nxtlab, 'writeln');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfwriteln; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'fixer')
-   else copy(nxtlab, 'assign');
+   copy(nxtlab, 'assign');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfassign; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'firmer')
-   else copy(nxtlab, 'close');
+   copy(nxtlab, 'close');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfclose; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'placer')
-   else copy(nxtlab, 'position');
+   copy(nxtlab, 'position');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfposition; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'effacer')
-   else copy(nxtlab, 'delete');
+   copy(nxtlab, 'delete');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfdelete; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'changer')
-   else copy(nxtlab, 'change');
+   copy(nxtlab, 'change');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfchange; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'arrêter')
-   else copy(nxtlab, 'halt');
+   copy(nxtlab, 'halt');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfhalt; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'impliquer')
-   else copy(nxtlab, 'refer');
+   copy(nxtlab, 'refer');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfrefer; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'revaloriser')
-   else copy(nxtlab, 'update');
+   copy(nxtlab, 'update');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfupdate; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'ajouter')
-   else copy(nxtlab, 'append');
+   copy(nxtlab, 'append');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfappend; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'signal')
-   else copy(nxtlab, 'signal');
+   copy(nxtlab, 'signal');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfsignal; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'signalun')
-   else copy(nxtlab, 'signalone');
+   copy(nxtlab, 'signalone');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfsignalone; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'attendre')
-   else copy(nxtlab, 'wait');
+   copy(nxtlab, 'wait');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfwait; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'jeter')
-   else copy(nxtlab, 'throw');
+   copy(nxtlab, 'throw');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
    tp^.prcp := nil; { clear parameters }
    tp^.prcd := pfthrow; { place dispatch code }
 
-   if langkey = lang_french then copy(nxtlab, 'affirmer')
-   else copy(nxtlab, 'assert');
+   copy(nxtlab, 'assert');
    plcsym(nxtlab, sp);
    lsttyp(tp, tproc); { get type }
    sp^.typ := tp; { link to symbol }
@@ -1100,17 +964,8 @@ begin
 
    if fverb and fansi then begin 
 
-      if langmsg = lang_french then begin
-
-         write('S. A. Moore Pascal se conformer à exigence de étage 0 ');
-         writeln('ISO/IEC 7185')
-
-      end else begin { english by default }
-
-         write('S. A. Moore Pascal complies with the requirements of level 0 ');
-         writeln('ISO/IEC 7185')
-
-      end
+      write('S. A. Moore Pascal complies with the requirements of level 0 ');
+      writeln('ISO/IEC 7185')
 
    end;
    fllstk^.cur := fllstk^.fst; { index 1st file }

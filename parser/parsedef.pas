@@ -632,13 +632,6 @@ type
       varp: typptr  { pointer to base entry }
 
    end;
-   { languages (not all currently supported) }
-   lang = (lang_english,     { english }
-           lang_french,      { french }
-           lang_spanish,     { spanish }
-           lang_german,      { german }
-           lang_italian,     { italian }
-           lang_portuguese); { portuguese }
    { errors }
    errcod = (enull,        { No error }
              efnfn,        { File not found }
