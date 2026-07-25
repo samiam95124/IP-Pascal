@@ -13,8 +13,8 @@
 
 program parse(output);
 
-uses strlib,   { string handling }
-     extlib,   { os extentions }
+uses strings,  { string handling }
+     services, { os extentions }
      xltlib,   { transliteration }
      demo,     { demo setup }
      parsedef, { parser definitions }
@@ -23,8 +23,6 @@ uses strlib,   { string handling }
      scanner,  { scanner }
      symbol,   { symbols manager }
      parser;   { parser }
-
-label 99; { abort parser }
 
 var
 
@@ -47,17 +45,9 @@ var
    ki:           tolken;
    ri, ri2, rf:  0..resmax; { indexs for reserved table }
 
-{ abort compilation vector }
-
-procedure abort; 
-
-begin 
-
-   goto 99 { terminate program } 
-
-end;
-
 begin
+
+   try
 
    writeln('Pascal parser vs. 1.14.0001 Copyright (C) 2005 S. A. Moore');
 
@@ -385,7 +375,7 @@ begin
       deftbl[cmodule]     := copy('module');
       deftbl[cuses]       := copy('emploi');
       deftbl[cprivate]    := copy('privé');
-      deftbl[cexternal]   := copy('externe');
+      deftbl[cextern]     := copy('externe');
       deftbl[cview]       := copy('vue');
       deftbl[cfixed]      := copy('fixe');
       deftbl[cprocess]    := copy('procés');
@@ -451,7 +441,7 @@ begin
       deftbl[cmodule]     := copy('module');
       deftbl[cuses]       := copy('uses');
       deftbl[cprivate]    := copy('private');
-      deftbl[cexternal]   := copy('external');
+      deftbl[cextern]     := copy('external');
       deftbl[cview]       := copy('view');
       deftbl[cfixed]      := copy('fixed');
       deftbl[cprocess]    := copy('process');
@@ -1208,7 +1198,7 @@ begin
    uselst := mlp^.next; { gap }
    putmlt(mlp); { release entry }
 
-   99: { error abort point }
+   on parabort except ; { compilation aborted: fall through to cleanup }
 
    while fllstk <> nil do putfll; { clean file lists stack }
    if ferro then close(errfil); { close errors file }

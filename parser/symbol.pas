@@ -885,7 +885,7 @@ begin
    sp^.ddf  := false;   { set not delayed definition }
    sp^.hld  := false;   { set not in holding }
    sp^.exp  := export;  { set export status }
-   sp^.out  := false;   { set not output to intermediate }
+   sp^.outp  := false;   { set not output to intermediate }
    sp^.ref  := 0;       { clear reference counter }
    sp^.typ  := nil;     { clear type pointer }
    sp^.lab  := nil;     { clear symbol }
@@ -5178,10 +5178,10 @@ begin
       mp1 := mp; { index top of uses list }
       fstsym(p, mp1, i); { find first symbol }
       while p <> nil do { traverse symbols chain }
-         if (p^.lvl = level) and not p^.out and not p^.dra then begin
+         if (p^.lvl = level) and not p^.outp and not p^.dra then begin
 
             wrtsym(p); { output symbol }
-            p^.out := true; { set this symbol was output }
+            p^.outp := true; { set this symbol was output }
             nxtsym(p, mp1, i) { index next symbol }
 
          end else p := nil; { stop the search }

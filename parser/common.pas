@@ -121,11 +121,11 @@ var
    curprc:   typptr; { currently active procedure }
    export:   boolean; { in exportable section }
    concon:   integer; { constant delete nesting count }
-   intout:   bytfil;  { intermediate output file }
+   intout:   fbyte;   { intermediate output file }
    uselvl:   integer; { uses file nesting level }
    modhead:  tolken; { module type save }
    usepth:   packed array [1..usemax] of char; { uses path }
-   valfch:   chrset;  { valid file characters }
+   valfch:   schar;  { valid file characters }
    casfre:   csvptr; { free case value entry list }
    casact:   integer; { active case values counter }
    casfct:   integer; { free case values counter }
