@@ -16,7 +16,6 @@ module parser(output);
 
 uses strings,  { string functions }
      services,  { operating extentions }
-     xltlib,   { transliteration }
      sepsgn,   { separated sign support }
      demo,     { demo mode enable/disable }
      parsedef, { global defines }
