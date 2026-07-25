@@ -2704,30 +2704,25 @@ var t: integer; { tag byte }
     p: integer; { power holder }
     
 { workaround for lack of true unsigned type.
-  The issue here is we are using signed types as unsigned 32 bit integers.
-  This works, but we need to directly output them into the file until we get
+  The issue here is we are using signed types as unsigned integers. This
+  works, but we need to directly output them into the file until we get
   true unsigned numbers. }
 
 procedure outnum(n: integer; t: integer);
 
-var r: record case boolean of
-
-          true:  (i: integer);
-          false: (b: packed array [1..4] of byte);
-
-       end;
+var b: packed array [1..8] of byte; { byte decomposition of n }
     i: integer;
-       
+
 begin
 
-    r.i := n;
-    i := 4;
-    while (i > 0) and (r.b[i] = 0) do begin i := i-1; t := t-1 end;
+    for i := 1 to 8 do begin b[i] := n mod 256; n := n div 256 end;
+    i := 8;
+    while (i > 0) and (b[i] = 0) do begin i := i-1; t := t-1 end;
     write(intout, t); { output finalized tagfield }
     t := (t and $1f)+1; { mask and convert t }
-    for i := t downto 1 do write(intout, r.b[i])
-    
-end; 
+    for i := t downto 1 do write(intout, b[i])
+
+end;
         
 begin
 
