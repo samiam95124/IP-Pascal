@@ -17,7 +17,6 @@ module parser(output);
 uses strings,  { string functions }
      services,  { operating extentions }
      sepsgn,   { separated sign support }
-     demo,     { demo mode enable/disable }
      parsedef, { global defines }
      common,   { global variables }
      parsesvs, { support procedures }
@@ -10062,7 +10061,7 @@ begin
    wrtstrp(mp^.modf^); { output the complete module name }
    { ???? should not need this copy, compiler bug }
    copy(fns, fn);
-   opnsrc(fns, maxint, maxint); { open the uses file }
+   opnsrc(fns); { open the uses file }
    getlin; { get 1st source line }
    gettlk; { load first tolken }
    { if we encounter errors attempting to parse the subheader, we just
@@ -10373,13 +10372,6 @@ begin
 
    end else if (nxttlk in [cmodule, cprocess, cmonitor, cshare]) and
                fansi then perror(eprgexp, [], []);  { wrong type of header }
-   if demo_mode then begin { demo mode restrict }
-
-      { don't allow demo mode to compile anything but a program }
-      if (nxttlk in [cmodule, cprocess, cmonitor, cshare]) and
-         demo_mode then error(edempgm, true)  { wrong type of header }
-
-   end;
    modhead := nxttlk; { save head tolken }
    if nxttlk in [cmodule, cprogram, cprocess, cmonitor, cshare] then
       gettlk; { skip module tolken }

@@ -15,7 +15,6 @@ module parsesvs(command, output);
 
 uses strings,  { string handling }
      services, { operating extentions }
-     demo,     { demo enable/disable }
      parsedef, { global definitions }
      common;   { global variables }
 
@@ -25,7 +24,7 @@ procedure addext(var fn: filnam; en: ext; extend: boolean); forward;
 procedure error(e: errcod; a: boolean; view s, s2: string); forward;
 overload procedure error(e: errcod; a: boolean; view s: string); forward;
 overload procedure error(e: errcod; a: boolean); forward;
-procedure opnsrc(var fn: filnam; chrlim, linlim: integer); forward;
+procedure opnsrc(var fn: filnam); forward;
 procedure clssrc; forward;
 procedure getlin; forward;
 function endlin: boolean; forward;
@@ -644,9 +643,6 @@ begin
    new(s); { get new entry }
    for i := 1 to filmax do s^.nam[i] := ' '; { clear filename }
    s^.lincnt := 0; { reset line counter }
-   s^.chrcnt := 0; { reset character counter }
-   s^.linmax := maxint; { set maximum demo line limit }
-   s^.chrmax := maxint; { set maximum demo character limit }
    s^.next := fllstk^.stk; { index next list item }
    fllstk^.stk := s { insert into list }
 
@@ -1009,10 +1005,6 @@ begin
       econovl:      write(f, 'Convergent overload parameter modes do not match');
       epfpovl:      write(f, 'Procedure/function parameter must not be overloaded');
       easprc:       write(f, 'Cannot assign function result to procedure');
-      edemlim:      write(f, 'Demo version line/character limit exceeded');
-      edempgm:      write(f, 'Demo version cannot compile non-program module');
-      edemmlf:      write(f, 'Demo version cannot compile multiple files');
-      edeminc:      write(f, 'Demo version cannot have include files');
       estrnul:      write(f, 'String/character constant must have at ',
                              'least one character');
       efncprcs:     write(f, 'Procedure/function not allowed in standard mode');
@@ -1465,10 +1457,6 @@ begin
       econovl:      write(f, 'Convergent overload parameter modes do not match');
       epfpovl:      write(f, 'Procedure/function parameter must not be overloaded');
       easprc:       write(f, 'Cannot assign function result to procedure');
-      edemlim:      write(f, 'Demo version line/character limit exceeded');
-      edempgm:      write(f, 'Demo version cannot compile non-program module');
-      edemmlf:      write(f, 'Demo version cannot compile multiple files');
-      edeminc:      write(f, 'Demo version cannot have include files');
       estrnul:      write(f, 'String/character constant must have at ',
                              'least one character');
       efncprcs:     write(f, 'Procedure/function not allowed in standard mode');
@@ -1881,8 +1869,7 @@ the main source. String was getting trashed, this is a compiler bug.
 
 *******************************************************************************}
 
-procedure opnsrc(var fn:             filnam;   { name of file }
-                 chrlim, linlim: integer); { demo limits }
+procedure opnsrc(var fn: filnam); { name of file }
 
 var fns: filnam;
 
@@ -1893,8 +1880,6 @@ begin
    fulnam(fns); { normalize filename }
    getsrc; { get a new source entry }
    fllstk^.stk^.nam := fns; { place file name for utilites }
-   fllstk^.stk^.chrmax := chrlim; { characters }
-   fllstk^.stk^.linmax := linlim; { lines }
    assign(fllstk^.stk^.fil, fns); { open the file }
    reset(fllstk^.stk^.fil); { set to read }
    srcchg; { output source change instruction }
@@ -1957,7 +1942,7 @@ begin
       if (fllstk^.stk = nil) and (fllstk^.cur <> nil) then begin 
 
          { next file in files list }
-         opnsrc(fllstk^.cur^.nam, maxint, maxint); { open next file }
+         opnsrc(fllstk^.cur^.nam); { open next file }
          fllstk^.cur := fllstk^.cur^.next { index next file in list }
 
       end
@@ -1974,13 +1959,6 @@ begin
          if (i = linmax) then begin
 
             read(fllstk^.stk^.fil, c); { dispose of input }
-            fllstk^.stk^.chrcnt := fllstk^.stk^.chrcnt+1; { count characters }
-            if demo_mode then begin { process demo mode }
-
-               if fllstk^.stk^.chrcnt > fllstk^.stk^.chrmax then 
-                  error(edemlim, true)
-
-            end;
             if not e then error(eiovf, false);
             e := true
 
@@ -1988,13 +1966,6 @@ begin
 
             { get a command character }
             read(fllstk^.stk^.fil, fllstk^.stk^.line[i]);
-            fllstk^.stk^.chrcnt := fllstk^.stk^.chrcnt+1; { count characters }
-            if demo_mode then begin { process demo mode }
-
-               if fllstk^.stk^.chrcnt > fllstk^.stk^.chrmax then 
-                  error(edemlim, true)
-
-            end;
             i := i + 1 { next position }
 
          end
@@ -2003,11 +1974,6 @@ begin
       readln(fllstk^.stk^.fil); { skip line end }
       { increment line count }
       fllstk^.stk^.lincnt := fllstk^.stk^.lincnt + 1;
-      if demo_mode then begin { process demo mode }
-
-         if fllstk^.stk^.lincnt > fllstk^.stk^.linmax then error(edemlim, true)
-
-      end;
       wrtcod(isetlin); { output line change }
       wrtnum(false, fllstk^.stk^.lincnt);
 
@@ -2392,11 +2358,6 @@ begin
                   compp(nxtlab, 'i') then begin
 
          if not fsrc then error(eioptp, true, nxtlab); { error if not in source }
-         if demo_mode then begin { demo mode limit }
-
-            error(edeminc, true) { no includes in demo }
-
-         end;
          { parse file spec }
          parnam(fn, false); { parse file }
          skpspcl; { skip to line end }
@@ -2404,7 +2365,7 @@ begin
          while not endlin do getchr; { skip to end of line }
          addext(fn, 'pas', false); { add .pas extention }
          if not exists(fn) then error(efnfn, true, errfn); { not found }
-         opnsrc(fn, maxint, maxint); { open the new file }
+         opnsrc(fn); { open the new file }
          getlin { get 1st line }
 
       end else if compp(nxtlab, 'standard') or
