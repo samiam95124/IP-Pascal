@@ -223,9 +223,6 @@ type
                fil:    text;    { file }
                nam:    filnam;  { filename }
                lincnt: integer; { line count within file }
-               chrcnt: integer; { character count within file }
-               linmax: integer; { demo line limit }
-               chrmax: integer; { demo character limit }
                line:   cmdbuf;  { buffered line }
                lptr:   cmdinx;  { pointer for buffered line }
                next:   srcptr   { next entry linkage }
@@ -871,10 +868,6 @@ type
              econovl,      { Convergent overload parameter modes do not match }
              epfpovl,      { Procedure/function parameter must not be overloaded }
              easprc,       { Cannot assign function result to procedure }
-             edemlim,      { Demo limit exceeded }
-             edempgm,      { Demo version cannot compile non-program module }
-             edemmlf,      { Demo version cannot compile multiple files }
-             edeminc,      { Demo version cannot have include files }
              estrnul,      { String/character must have at least one character }
              efncprcs,     { Procedure/function not allowed in standard mode }
              erefdec,      { Symbol referenced before declaration }

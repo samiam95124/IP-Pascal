@@ -15,7 +15,6 @@ program parse(output);
 
 uses strings,  { string handling }
      services, { os extentions }
-     demo,     { demo setup }
      parsedef, { parser definitions }
      common,   { common variables }
      parsesvs, { support routines }
@@ -36,7 +35,6 @@ var
    tp, tp1, tp2: typptr; { type entry pointer }
    ofn:          filnam; { output filename save }
    pi:           1..usemax; { index for uses path }
-   sfc:          integer; { source file counter }
    tmpfil:       filnam; { filename holder }
    mp:           modptr; { module entry pointer }
    mlp:          mltptr; { module list entry pointer }
@@ -1124,7 +1122,6 @@ begin
       fllstk^.cur := fllstk^.cur^.next; { skip to first source file }
 
    end;
-   sfc := 0; { clear source file counter }
    while fllstk^.cur <> nil do begin { process source files }
 
       addext(fllstk^.cur^.nam, 'pas', false); { add .pas extention }
@@ -1132,13 +1129,7 @@ begin
       errfn := fllstk^.cur^.nam; { place name for error processing }
       if not exists(fllstk^.cur^.nam) then 
          error(efnfn, true, errfn); { flag error }
-      sfc := sfc+1; { count source files }
       fllstk^.cur := fllstk^.cur^.next { next sequential file }
-
-   end;
-   if demo_mode then begin { demo mode restriction }
-
-      if sfc > 1 then error(edemmlf, true) { more than one source file }
 
    end;
    fllstk^.cur := fllstk^.fst; { index 1st file }
@@ -1164,15 +1155,7 @@ begin
    end;
    fsrc := true; { set source line parsing }
    { open first file (must be present) }
-   if demo_mode then begin { in demo mode }
-
-      opnsrc(fllstk^.cur^.nam, demo_chars, demo_lines)
-
-   end else begin { normal mode }
-
-      opnsrc(fllstk^.cur^.nam, maxint, maxint)
-
-   end;
+   opnsrc(fllstk^.cur^.nam); { open first source file }
    fllstk^.cur := fllstk^.cur^.next; { skip }
    { start up main parse }
    getlin; { get 1st source line }
