@@ -24,9 +24,9 @@
 
 program dpint(command, output);
 
-uses strlib, { strings }
-     extlib, { OS interface }
-     intfrm; { intermediate form }
+uses strings,  { strings }
+     services, { OS interface }
+     intfrm;   { intermediate form }
 
 label 99; { abort program }
 
@@ -52,7 +52,7 @@ type
 
 var
 
-   intfil:  bytfil;  { intermediate file }
+   intfil:  fbyte;   { intermediate file }
    intnam:  filnam;  { intermediate file name }
    cmdlin:  linbuf;  { command line buffer }
    cmdptr:  lininx;  { command line index }
@@ -285,7 +285,7 @@ begin
       p := 0 { re - initalize primary }
 
    end;
-   getseq(100 - maxfil); { get rest of primary }
+   getseq(100 - p); { get rest of primary }
    if chkchr = '.' then begin { secondary }
 
       getncr; { get character }
@@ -489,19 +489,13 @@ var t: byte;     { tag byte }
 
 procedure rdraw(var n: integer; l: integer);
 
-var r: record case boolean of
-
-          true:  (i: integer);
-          false: (b: packed array [1..4] of byte);
-
-       end;
+var b: byte;
     i: integer;
-    
+
 begin
 
-    r.i := 0;
-    for i := l downto 1 do read(intfil, r.b[i]);
-    n := r.i 
+    n := 0; { bytes arrive most significant first }
+    for i := 1 to l do begin read(intfil, b); n := n*256+b end
 
 end;
     
@@ -1320,7 +1314,7 @@ begin
          write(' base: ');
          getlnk;
          read(intfil, b); { get exists flag }
-         writeln(' exists: ', b <> 0:0)
+         writeln(' exists: ', b <> 0:5)
 
       end;
       ifcas:   begin
@@ -1340,7 +1334,7 @@ begin
          write('Variable type, base: ');
          getlnk;
          read(intfil, b); { get external flag }
-         write(' external: ', b <> 0:0);
+         write(' external: ', b <> 0:5);
          rdnum(v); { get module ordinal }
          write(' module ordinal number: ', v:1);
          write(' class type: ');
@@ -1355,7 +1349,7 @@ begin
          write(' constant fill: ');
          getlnk;
          read(intfil, b); { get external flag }
-         writeln(' external: ', b <> 0:0);
+         writeln(' external: ', b <> 0:5);
          rdnum(v); { get module ordinal }
          write(' module ordinal number: ', v:1)
 
@@ -1365,17 +1359,17 @@ begin
          write('Procedure type, parameter list: ');
          getlnk;
          read(intfil, b); { get external flag }
-         write(' external: ', b <> 0:0);
+         write(' external: ', b <> 0:5);
          rdnum(v); { get module ordinal }
          write(' module ordinal number: ', v:1);
          read(intfil, b); { get assembly flag }
-         write(' assembly: ', b <> 0:0);
+         write(' assembly: ', b <> 0:5);
          write(' overload head: ');
          getlnk;
          read(intfil, b); { get static flag }
-         write(' static: ', b <> 0:0);
+         write(' static: ', b <> 0:5);
          read(intfil, b); { get virtual flag }
-         write(' virtual: ', b <> 0:0);
+         write(' virtual: ', b <> 0:5);
          write(' overrider link: ');
          getlnk;
          write(' override head: ');
@@ -1392,17 +1386,17 @@ begin
          write(' function result: ');
          getlnk;
          read(intfil, b); { get external flag }
-         write(' external: ', b <> 0:0);
+         write(' external: ', b <> 0:5);
          rdnum(v); { get module ordinal }
          write(' module ordinal number: ', v:1);
          read(intfil, b); { get assembly flag }
-         write(' assembly: ', b <> 0:0);
+         write(' assembly: ', b <> 0:5);
          write(' overload head: ');
          getlnk;
          read(intfil, b); { get static flag }
-         write(' static: ', b <> 0:0);
+         write(' static: ', b <> 0:5);
          read(intfil, b); { get virtual flag }
-         write(' virtual: ', b <> 0:0);
+         write(' virtual: ', b <> 0:5);
          write(' overrider link: ');
          getlnk;
          write(' override head: ');
@@ -1514,7 +1508,7 @@ begin
          write(' type: ');
          getlnk;
          read(intfil, b);
-         write(' export: ', b <> 0:0);
+         write(' export: ', b <> 0:5);
          writeln
 
       end;
