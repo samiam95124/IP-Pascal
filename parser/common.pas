@@ -145,8 +145,6 @@ var
    mltfre:   mltptr; { free module listing entry }
    sysmlt:   mltptr; { system block list entry }
    curcls:   typptr; { current class entry (if there is one) }
-   langmsg:  lang; { language to use for messages }
-   langkey:  lang; { langauge to use for keywords }
    privat:   boolean; { in private/public declaration section }
    selflab:  symptr; { error label for 'self' }
    decpow:   integer; { decimal top power (digit) }
