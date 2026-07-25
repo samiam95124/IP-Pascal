@@ -15,7 +15,6 @@ module parsesvs(command, output);
 
 uses strings,  { string handling }
      services, { operating extentions }
-     xltlib,   { character transliteration }
      demo,     { demo enable/disable }
      parsedef, { global definitions }
      common;   { global variables }

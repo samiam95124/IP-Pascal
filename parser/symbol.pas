@@ -14,8 +14,7 @@
 
 module symbol(output);
 
-uses xltlib,   { character transliteration }
-     parsedef, { global definitions }
+uses parsedef, { global definitions }
      common,   { global variables }
      parsesvs, { support module }
      scanner;  { scanner module }

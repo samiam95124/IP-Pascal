@@ -15,7 +15,6 @@ program parse(output);
 
 uses strings,  { string handling }
      services, { os extentions }
-     xltlib,   { transliteration }
      demo,     { demo setup }
      parsedef, { parser definitions }
      common,   { common variables }

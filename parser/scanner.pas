@@ -12,7 +12,6 @@
 module scanner(output);
 
 uses strings,  { string handling }
-     xltlib,   { character transliteration }
      parsedef, { global definitions }
      common,   { global variables }
      parsesvs; { support module }
