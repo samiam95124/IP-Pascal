@@ -70,8 +70,7 @@
 
 module parsedef;
 
-uses stddef, { standard pascal defines }
-     sepsgn, { separated sign library }
+uses sepsgn, { separated sign library }
      intfrm; { intermediate form }
 
 const
@@ -166,7 +165,7 @@ type
              cmodule,     { module }
              cuses,       { uses }
              cprivate,    { private }
-             cexternal,   { external }
+             cextern,     { external }
              cview,       { view }
              cfixed,      { fixed }
              cprocess,    { process }
@@ -266,7 +265,7 @@ type
                ddf:  boolean; { symbol undergoing delayed definition }
                hld:  boolean; { symbol is being 'held' pending definition }
                exp:  boolean; { symbol is exportable }
-               out:  boolean; { symbol has been output to intermediate }
+               outp:  boolean; { symbol has been output to intermediate }
                ref:  integer; { reference count }
                typ:  typptr;  { pointer to symbol type }
                lab:  pstring; { symbol label }

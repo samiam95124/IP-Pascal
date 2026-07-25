@@ -14,8 +14,6 @@
 
 module xltlib;
 
-uses stddef; { standard definitions }
-
 function nrmchr(c: char): char; forward;
 overload procedure nrmchr(var s: string); forward;
 function xltchr(c: char): char; forward;

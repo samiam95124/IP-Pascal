@@ -11,7 +11,7 @@
 
 module scanner(output);
 
-uses strlib,   { string handling }
+uses strings,  { string handling }
      xltlib,   { character transliteration }
      parsedef, { global definitions }
      common,   { global variables }
@@ -584,7 +584,7 @@ begin
    end;
    { if ansi mode, serveral tolkens are invalid }
    if fansi and (nxttlk in [cxor, cforward, cmodule, cuses, cprivate, 
-                            cexternal, cview, cfixed, cprocess, cmonitor,
+                            cextern, cview, cfixed, cprocess, cmonitor,
                             cshare, cclass, cis, catom, coverload, coverride,
                             creference, cthread, cjoins, cstatic, cinherited,
                             cself, cvirtual, ctry, cexcept, cextends, 

@@ -13,12 +13,14 @@
 
 module parsesvs(command, output);
 
-uses strlib,   { string handling }
-     extlib,   { operating extentions }
+uses strings,  { string handling }
+     services, { operating extentions }
      xltlib,   { character transliteration }
      demo,     { demo enable/disable }
      parsedef, { global definitions }
      common;   { global variables }
+
+var parabort: exception; { compilation abort }
 
 procedure addext(var fn: filnam; en: ext; extend: boolean); forward;
 procedure error(e: errcod; a: boolean; view s, s2: string); forward;
@@ -99,7 +101,6 @@ fixed ascchr: array [0..127] of char = array
 
 end;
 
-procedure abort; external; { abort program vector }
 
 {*******************************************************************************
 
@@ -1755,7 +1756,7 @@ begin
      file, and spew needs to know about them. }
    if a then seterr(2) else seterr(1); { set error to OS }
    { if abort specified, or we have reached the error limit }
-   if a or (errcnt >= errlim) then abort { end compilation }
+   if a or (errcnt >= errlim) then throw(parabort) { end compilation }
 
 end;
 
@@ -2920,7 +2921,7 @@ begin
  
       write('*** Command input line overflow');
       writeln(output);
-      abort
+      throw(parabort)
 
    end;
    fllstk^.stk^.lptr := 1 { set 1st command position }

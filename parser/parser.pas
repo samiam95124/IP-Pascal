@@ -14,8 +14,8 @@
 
 module parser(output);
 
-uses strlib,   { string functions }
-     extlib,   { operating extentions }
+uses strings,  { string functions }
+     services,  { operating extentions }
      xltlib,   { transliteration }
      sepsgn,   { separated sign support }
      demo,     { demo mode enable/disable }
@@ -9091,7 +9091,7 @@ begin
       if compp(nxtlab, 'forward') then 
          fwd := true { set 'forward' found }
       else { this directive not recognized }
-         perror(ebgnexp, [cscn, cforward, cexternal]+blockset+ss, []);
+         perror(ebgnexp, [cscn, cforward, cextern]+blockset+ss, []);
 
    end;
    if nxttlk = cforward then fwd := true; { set 'forward' found }
@@ -9127,7 +9127,7 @@ begin
 
       end
 
-   end else if nxttlk = cexternal then begin { process 'external' }
+   end else if nxttlk = cextern then begin { process 'external' }
 
       gettlk; { skip 'external' }
       { Flag type entry as external assembly. 'external' used to be the main way
